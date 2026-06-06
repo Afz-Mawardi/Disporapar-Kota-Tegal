@@ -1,0 +1,6 @@
+{
+  "name": "DISPORAPAR Kota Tegal",
+  "description": "Website Resmi Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal, Jawa Tengah, Indonesia.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
