@@ -21,10 +21,10 @@ export default function AgendaPage() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  // Sort events chronologically
+  // Sort events from newest to oldest
   const sortedEvents = [...eventsList].sort((a, b) => {
     try {
-      return parseIndonesianDate(a.date).getTime() - parseIndonesianDate(b.date).getTime();
+      return parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime();
     } catch {
       return 0;
     }
@@ -82,15 +82,24 @@ export default function AgendaPage() {
   // Selected date events
   const selectedDateEvents = getEventsForDate(selectedDate);
 
-  // Next upcoming events
+  // Next upcoming events (sorted chronologically ascending, closest first)
   const today = new Date(2026, 5, 8);
-  const upcomingEvents = sortedEvents.filter(event => {
-    try {
-      return parseIndonesianDate(event.date).getTime() >= today.getTime();
-    } catch {
-      return false;
-    }
-  }).slice(0, 3);
+  const upcomingEvents = [...eventsList]
+    .filter(event => {
+      try {
+        return parseIndonesianDate(event.date).getTime() >= today.getTime();
+      } catch {
+        return false;
+      }
+    })
+    .sort((a, b) => {
+      try {
+        return parseIndonesianDate(a.date).getTime() - parseIndonesianDate(b.date).getTime();
+      } catch {
+        return 0;
+      }
+    })
+    .slice(0, 3);
 
   const formatDateHeading = (date: Date) => {
     return date.toLocaleDateString('id-ID', {

@@ -22,7 +22,7 @@ export default function KepemudaanPage() {
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
             Generasi Pelopor, Karya Inspiratif, Tegal Unggul
           </span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-tight">
             Pemberdayaan & Kepemudaan
           </h1>
         </div>
@@ -35,7 +35,7 @@ export default function KepemudaanPage() {
             <span className="text-xs font-bold text-secondary tracking-widest uppercase font-mono bg-blue-100/50 border border-blue-200/40 px-3 py-1 rounded-full inline-block w-fit">
               Program Kerja Strategis
             </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
               Inkubasi Inovasi & Agenda Kepemudaan
             </h2>
           </div>
@@ -55,7 +55,7 @@ export default function KepemudaanPage() {
                 className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md flex flex-col justify-between hover:shadow-xl transition-all duration-300 group"
               >
                 {/* Photo frame */}
-                <div className="relative aspect-16/10 w-full overflow-hidden bg-slate-50">
+                <div className="relative aspect-[21/9] md:aspect-16/10 w-full overflow-hidden bg-slate-50">
                   <Image
                     src={program.imageUrl}
                     alt={program.title}
@@ -130,7 +130,7 @@ export default function KepemudaanPage() {
               <span className="text-xs font-bold text-accent tracking-widest uppercase bg-orange-100/50 border border-orange-200/40 px-3.5 py-1.5 rounded-full inline-block font-mono">
                 Ekosistem Kemitraan Pemuda
               </span>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
                 Kemitraan Organisasi Kepemudaan (OK)
               </h2>
             </div>

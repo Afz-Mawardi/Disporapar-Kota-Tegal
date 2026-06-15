@@ -67,8 +67,8 @@ export default function PelayananPublikPage() {
   const tabs = [
     { id: 'maklumat', name: 'Maklumat Pelayanan', icon: <ShieldCheck className="h-4 w-4" />, href: '/pelayanan/maklumat' },
     { id: 'motto', name: 'Motto Pelayanan', icon: <CheckCircle className="h-4 w-4" />, href: '/pelayanan/motto' },
-    { id: 'standar', name: 'Berkas Layanan', icon: <FileText className="h-4 w-4" />, href: '/pelayanan/standar' },
     { id: 'retribusi', name: 'Retribusi', icon: <Landmark className="h-4 w-4" />, href: '/pelayanan/retribusi' },
+    { id: 'standar', name: 'Berkas Layanan', icon: <FileText className="h-4 w-4" />, href: '/pelayanan/standar' },
   ] as const;
 
   return (
@@ -86,7 +86,7 @@ export default function PelayananPublikPage() {
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
             PELAYANAN PUBLIK
           </span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-tight">
             Pelayanan Publik Terpadu
           </h1>
         </div>
@@ -100,7 +100,7 @@ export default function PelayananPublikPage() {
               <span className="text-[10px] sm:text-xs font-bold tracking-widest text-[#0E3B66] font-mono uppercase bg-blue-50 border border-blue-100/50 px-3.5 py-1.5 rounded-full inline-block w-fit">
                 AMANAH PELAYANAN
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-none">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
                 Visi & Misi Pelayanan Disporapar
               </h2>
             </div>
@@ -160,50 +160,49 @@ export default function PelayananPublikPage() {
         </div>
 
         {/* Dynamic content area following Sejarah layout */}
-        <div className="bg-white rounded-3xl border border-slate-100 p-8 sm:p-12 shadow-sm">
+        {activeTab === 'standar' ? (
+          <div className="space-y-6 w-full">
+            {/* FILTER & SEARCH INTERACTIVE BAR */}
+            <div className="sticky top-[68px] lg:top-[76px] z-30 w-full bg-white/95 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-slate-100/80 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between transition-all duration-300">
 
-          {/* TAB 1: STANDAR PELAYANAN */}
-          {activeTab === 'standar' && (
-            <div className="space-y-8 w-full text-left">
+              {/* Category Chips Tab Panel */}
+              <div className="flex flex-wrap gap-2 items-center">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase font-mono transition-all cursor-pointer ${selectedCategory === cat
+                      ? 'bg-primary text-white shadow-md shadow-primary/20 hover:bg-opacity-95'
+                      : 'bg-slate-50 text-slate-500 hover:text-[#0E3B66] hover:bg-slate-100 border border-slate-200/50'
+                      }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search box block - Expanded for ultra elegance */}
+              <div className="relative w-full lg:w-96 shrink-0">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                  <Search className="h-4 w-4" />
+                </span>
+                <input
+                  type="text"
+                  placeholder="Cari SOP, formulir, berkas..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary text-slate-800 transition-all font-medium font-inter"
+                />
+              </div>
+
+            </div>
+
+            {/* List Content inside its own card */}
+            <div className="bg-white rounded-3xl border border-slate-100 p-8 sm:p-12 shadow-sm text-left space-y-8 w-full">
               <div className="space-y-2">
                 <span className="text-[10px] font-bold tracking-widest text-[#F2994A] font-mono uppercase bg-orange-50 border border-orange-100/50 px-3 py-1.5 rounded-full inline-block">SOP & BERKAS</span>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">Berkas Layanan & Dokumen Resmi</h3>
-              </div>
-
-              {/* FILTER & SEARCH INTERACTIVE BAR */}
-              <div className="sticky top-[68px] lg:top-[76px] z-30 w-full mb-8 bg-white/95 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-slate-100/80 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between transition-all duration-300">
-
-                {/* Category Chips Tab Panel */}
-                <div className="flex flex-wrap gap-2 items-center">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase font-mono transition-all cursor-pointer ${selectedCategory === cat
-                        ? 'bg-primary text-white shadow-md shadow-primary/20 hover:bg-opacity-95'
-                        : 'bg-slate-50 text-slate-500 hover:text-[#0E3B66] hover:bg-slate-100 border border-slate-200/50'
-                        }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Search box block - Expanded for ultra elegance */}
-                <div className="relative w-full lg:w-96 shrink-0">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
-                    <Search className="h-4 w-4" />
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="Cari SOP, formulir, berkas..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary text-slate-800 transition-all font-medium font-inter"
-                  />
-                </div>
-
               </div>
 
               {/* LIST ELEMENTS STACK - NO SCROLLBAR */}
@@ -244,7 +243,7 @@ export default function PelayananPublikPage() {
                 ) : (
                   <div className="bg-slate-50/50 p-12 text-center rounded-2xl border border-slate-100 max-w-sm mx-auto my-auto flex flex-col justify-center items-center">
                     <FileText className="h-10 w-10 text-slate-300 mx-auto mb-4" />
-                    <h4 className="font-extrabold text-slate-900 tracking-tight text-sm">Berkas Tidak Ditemukan</h4>
+                    <h4 className="font-extrabold text-slate-950 tracking-tight text-sm">Berkas Tidak Ditemukan</h4>
                     <p className="text-xs text-slate-500 mt-2 font-inter max-w-[280px]">
                       Tidak ada dokumen penetapan atau formulir yang terdaftar saat ini berdasarkan filter atau pencarian Anda.
                     </p>
@@ -252,211 +251,212 @@ export default function PelayananPublikPage() {
                 )}
               </div>
             </div>
-          )}
-
-          {/* TAB 2: MAKLUMAT PELAYANAN */}
-          {activeTab === 'maklumat' && (
-            <div className="space-y-8 w-full text-left animate-fade-in">
-              <div className="space-y-2">
-                <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] font-mono uppercase bg-blue-50 border border-blue-100/50 px-3 py-1.5 rounded-full inline-block">
-                  KOMITMEN RESMI
-                </span>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">
-                  Maklumat Kesanggupan Pelayanan
-                </h3>
-              </div>
-
-              {/* NEAT MODERN WEBSITE STYLE SECTION - NO DOCUMENT STYLE */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-2">
-
-                {/* LEFT: MAKLUMAT PELAYANAN STATEMENT (PROMINENT CALLOUT CARD) */}
-                <div className="lg:col-span-5 bg-gradient-to-br from-[#0E3B66] to-[#0A2E50] text-white p-8 sm:p-10 rounded-3xl shadow-md flex flex-col justify-between relative overflow-hidden group">
-                  {/* Subtle Background Pattern Accent */}
-                  <div className="absolute -right-10 -bottom-10 w-44 h-44 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-500 pointer-events-none" />
-
-                  <div className="space-y-6 relative z-10">
-                    <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
-                      <Quote className="h-6 w-6 text-sky-300" />
-                    </div>
-
-                    <div className="space-y-3">
-                      <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-sky-300">Pernyataan Maklumat</span>
-                      <blockquote className="text-sm sm:text-base font-semibold font-inter leading-relaxed text-slate-100 italic">
-                        &ldquo;Dengan ini Kami Dinas Kepemudaan dan Olahraga dan Pariwisata Kota Tegal (Disporapar) Menyatakan Sanggup Menyelenggarakan Pelayanan Yang Telah ditetapkan dan Apabila Tidak Menepati Janji Ini, Kami Siap Menerima Sanksi Sesuai Peraturan Perundang-Undangan.&rdquo;
-                      </blockquote>
-                    </div>
-                  </div>
-
-                  <div className="pt-8 border-t border-white/10 mt-8 relative z-10 flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center font-bold text-sm text-sky-200 shrink-0 select-none">
-                      <Landmark className="w-5 h-5" />
-                    </div>
-                    <div className="space-y-0.5 min-w-0">
-                      <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Kepala DISPORAPAR</h5>
-                      <span className="text-xs font-extrabold block text-white leading-tight truncate">Dr. Drs. IRKAR YUSWAN APENDI. M.M</span>
-                      <span className="text-[9px] text-sky-305 font-mono block">NIP. 19660213.199003.1.001</span>
-                    </div>
-                  </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-3xl border border-slate-100 p-8 sm:p-12 shadow-sm">
+            {/* TAB 2: MAKLUMAT PELAYANAN */}
+            {activeTab === 'maklumat' && (
+              <div className="space-y-8 w-full text-left animate-fade-in">
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] font-mono uppercase bg-blue-50 border border-blue-100/50 px-3 py-1.5 rounded-full inline-block">
+                    KOMITMEN RESMI
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">
+                    Maklumat Kesanggupan Pelayanan
+                  </h3>
                 </div>
 
-                {/* RIGHT: TIGA JANJI PELAYANAN (PLEDGE CARDS GRID) */}
-                <div className="lg:col-span-7 flex flex-col gap-6 justify-between">
-                  <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl">
-                    <span className="text-[9px] font-black uppercase text-[#F3702A] bg-[#FFF7ED] border border-[#FEE8DD] px-2.5 py-1 rounded-md tracking-wider font-mono">Janji Pelayanan</span>
-                    <h4 className="text-base font-extrabold text-[#0E3B66] mt-2 tracking-tight">Janji Pelayanan Publik</h4>
-                    <p className="text-xs sm:text-sm text-slate-700 font-semibold font-inter mt-3 leading-relaxed border-l-2 border-[#F3702A] pl-3">
-                      Kami DISPORAPAR Kota Tegal berjanji :
-                    </p>
+                {/* NEAT MODERN WEBSITE STYLE SECTION - NO DOCUMENT STYLE */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-2">
+
+                  {/* LEFT: MAKLUMAT PELAYANAN STATEMENT (PROMINENT CALLOUT CARD) */}
+                  <div className="lg:col-span-5 bg-gradient-to-br from-[#0E3B66] to-[#0A2E50] text-white p-8 sm:p-10 rounded-3xl shadow-md flex flex-col justify-between relative overflow-hidden group">
+                    {/* Subtle Background Pattern Accent */}
+                    <div className="absolute -right-10 -bottom-10 w-44 h-44 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-500 pointer-events-none" />
+
+                    <div className="space-y-6 relative z-10">
+                      <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
+                        <Quote className="h-6 w-6 text-sky-300" />
+                      </div>
+
+                      <div className="space-y-3">
+                        <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-sky-300">Pernyataan Maklumat</span>
+                        <blockquote className="text-sm sm:text-base font-semibold font-inter leading-relaxed text-slate-100 italic">
+                          &ldquo;Dengan ini Kami Dinas Kepemudaan dan Olahraga dan Pariwisata Kota Tegal (Disporapar) Menyatakan Sanggup Menyelenggarakan Pelayanan Yang Telah ditetapkan dan Apabila Tidak Menepati Janji Ini, Kami Siap Menerima Sanksi Sesuai Peraturan Perundang-Undangan.&rdquo;
+                        </blockquote>
+                      </div>
+                    </div>
+
+                    <div className="pt-8 border-t border-white/10 mt-8 relative z-10 flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center font-bold text-sm text-sky-200 shrink-0 select-none">
+                        <Landmark className="w-5 h-5" />
+                      </div>
+                      <div className="space-y-0.5 min-w-0">
+                        <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Kepala DISPORAPAR</h5>
+                        <span className="text-xs font-extrabold block text-white leading-tight truncate">Dr. Drs. IRKAR YUSWAN APENDI. M.M</span>
+                        <span className="text-[9px] text-sky-305 font-mono block">NIP. 19660213.199003.1.001</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-4 flex-1">
-                    {[
-                      {
-                        num: "1",
-                        title: "Pelayanan Prima & Sepenuh Hati",
-                        text: "Akan melaksanakan pelayanan prima dengan sepenuh hati kepada masyarakat sesuai ketentuan perundang-undangan yang berlaku.",
-                        icon: ShieldCheck,
-                        bg: "border-l-4 border-l-[#0E3B66] bg-white hover:bg-slate-50/45",
-                        iconColor: "text-[#0E3B66]",
-                        iconBg: "bg-blue-50 border-blue-100/50"
-                      },
-                      {
-                        num: "2",
-                        title: "Orientasi Kepuasan Masyarakat",
-                        text: "Akan melaksanakan pelayanan dengan mengutamakan kepuasan masyarakat.",
-                        icon: HeartHandshake,
-                        bg: "border-l-4 border-l-sky-500 bg-white hover:bg-slate-50/45",
-                        iconColor: "text-sky-600",
-                        iconBg: "bg-sky-50 border-sky-100/50"
-                      },
-                      {
-                        num: "3",
-                        title: "Profesional Tanpa Gratifikasi & Pungli",
-                        text: "Akan Melaksanakan pelayanan secara profesional tanpa gratifikasi dan pungli dalam bentuk apapun.",
-                        icon: CheckCircle,
-                        bg: "border-l-4 border-l-emerald-500 bg-white hover:bg-slate-50/45",
-                        iconColor: "text-emerald-600",
-                        iconBg: "bg-emerald-50 border-emerald-100/50"
-                      }
-                    ].map((promise, idx) => {
-                      const IconComp = promise.icon;
-                      return (
-                        <div
-                          key={idx}
-                          className={`p-5 rounded-2xl border border-slate-100 shadow-xs hover:shadow-md transition-all duration-300 flex gap-4 items-center ${promise.bg}`}
-                        >
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 ${promise.iconBg}`}>
-                            <IconComp className={`h-5 w-5 ${promise.iconColor}`} />
+                  {/* RIGHT: TIGA JANJI PELAYANAN (PLEDGE CARDS GRID) */}
+                  <div className="lg:col-span-7 flex flex-col gap-6 justify-between">
+                    <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl">
+                      <span className="text-[9px] font-black uppercase text-[#F3702A] bg-[#FFF7ED] border border-[#FEE8DD] px-2.5 py-1 rounded-md tracking-wider font-mono">Janji Pelayanan</span>
+                      <h4 className="text-base font-extrabold text-[#0E3B66] mt-2 tracking-tight">Janji Pelayanan Publik</h4>
+                      <p className="text-xs sm:text-sm text-slate-700 font-semibold font-inter mt-3 leading-relaxed border-l-2 border-[#F3702A] pl-3">
+                        Kami DISPORAPAR Kota Tegal berjanji :
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 flex-1">
+                      {[
+                        {
+                          num: "1",
+                          title: "Pelayanan Prima & Sepenuh Hati",
+                          text: "Akan melaksanakan pelayanan prima dengan sepenuh hati kepada masyarakat sesuai ketentuan perundang-undangan yang berlaku.",
+                          icon: ShieldCheck,
+                          bg: "border-l-4 border-l-[#0E3B66] bg-white hover:bg-slate-50/45",
+                          iconColor: "text-[#0E3B66]",
+                          iconBg: "bg-blue-50 border-blue-100/50"
+                        },
+                        {
+                          num: "2",
+                          title: "Orientasi Kepuasan Masyarakat",
+                          text: "Akan melaksanakan pelayanan dengan mengutamakan kepuasan masyarakat.",
+                          icon: HeartHandshake,
+                          bg: "border-l-4 border-l-sky-500 bg-white hover:bg-slate-50/45",
+                          iconColor: "text-sky-600",
+                          iconBg: "bg-sky-50 border-sky-100/50"
+                        },
+                        {
+                          num: "3",
+                          title: "Profesional Tanpa Gratifikasi & Pungli",
+                          text: "Akan Melaksanakan pelayanan secara profesional tanpa gratifikasi dan pungli dalam bentuk apapun.",
+                          icon: CheckCircle,
+                          bg: "border-l-4 border-l-emerald-500 bg-white hover:bg-slate-50/45",
+                          iconColor: "text-emerald-600",
+                          iconBg: "bg-emerald-50 border-emerald-100/50"
+                        }
+                      ].map((promise, idx) => {
+                        const IconComp = promise.icon;
+                        return (
+                          <div
+                            key={idx}
+                            className={`p-5 rounded-2xl border border-slate-100 shadow-xs hover:shadow-md transition-all duration-300 flex gap-4 items-center ${promise.bg}`}
+                          >
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 ${promise.iconBg}`}>
+                              <IconComp className={`h-5 w-5 ${promise.iconColor}`} />
+                            </div>
+                            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-inter font-medium">
+                              {promise.text}
+                            </p>
                           </div>
-                          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-inter font-medium">
-                            {promise.text}
-                          </p>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
+
                   </div>
 
                 </div>
 
               </div>
+            )}
 
-            </div>
-          )}
-
-          {/* TAB 3: MOTTO PELAYANAN */}
-          {activeTab === 'motto' && (
-            <div className="space-y-8 w-full text-left animate-fade-in">
-              <div className="space-y-2">
-                <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] font-mono uppercase bg-blue-50 border border-blue-100/50 px-3 py-1.5 rounded-full inline-block">
-                  MOTTO LAYANAN
-                </span>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">
-                  Motto Layanan PORAPAR
-                </h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  {
-                    acronym: 'POR',
-                    title: 'PROFESIONAL',
-                    desc: 'Memberikan pelayanan dengan standar kualitas tinggi, mengutamakan kompetensi dan integritas dalam setiap proses penanganan.',
-                    textColor: 'text-[#0E3B66]'
-                  },
-                  {
-                    acronym: 'RA',
-                    title: 'RAMAH',
-                    desc: 'Menyambut setiap pemohon dengan sikap ramah, sapaan hangat, dan respon positif terhadap setiap pertanyaan dan kebutuhan.',
-                    textColor: 'text-[#2D9CDB]'
-                  },
-                  {
-                    acronym: 'PAR',
-                    title: 'PELAYANAN RESPONSIF',
-                    desc: 'Merespons dengan cepat, tepat, and sesuai dengan kebutuhan masyarakat serta memberikan solusi terbaik dalam setiap permasalahan.',
-                    textColor: 'text-[#219653]'
-                  }
-                ].map((mottoItem, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white border border-slate-100/80 rounded-3xl p-8 sm:p-10 hover:shadow-md hover:border-slate-200 transition-all duration-300 flex flex-col items-center text-center shadow-xs"
-                  >
-                    <span className={`text-2xl font-black mb-4 tracking-tight shrink-0 ${mottoItem.textColor}`}>
-                      {mottoItem.acronym}
-                    </span>
-                    <h4 className="font-extrabold text-slate-900 text-xs sm:text-sm tracking-wider mb-4 uppercase">
-                      {mottoItem.title}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-slate-500 font-inter font-light leading-relaxed max-w-xs md:max-w-none">
-                      {mottoItem.desc}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: RETRIBUSI */}
-          {activeTab === 'retribusi' && (
-            <div className="space-y-8 w-full text-left">
-              <div className="space-y-2">
-                <span className="text-[10px] font-bold tracking-widest text-[#0F5A9E] font-mono uppercase bg-indigo-50 border border-indigo-100/50 px-3 py-1.5 rounded-full inline-block">TARIF RETRIBUSI RESMI</span>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">Legalitas Tarif & Biaya Administrasi</h3>
-              </div>
-
-              <div className="space-y-6">
-                <div className="bg-white rounded-2xl border border-slate-100 p-6 sm:p-8 flex items-start gap-5 border-l-4 border-emerald-500 shadow-xs">
-                  <div className="bg-emerald-50 p-2.5 rounded-xl text-emerald-600 shrink-0">
-                    <Shield className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-slate-950 text-base leading-none mb-2">Peraturan Daerah Tentang Retribusi</h4>
-                    <p className="text-slate-500 text-sm leading-relaxed font-inter font-light">
-                      Penetapan tarif penggunaan retribusi pemanfaatan sewa fasilitas gedung olahraga daerah serta retribusi tanda masuk tempat rekreasi pariwisata bahari didasarkan pada draf regulasi <span className="font-bold text-slate-900">Peraturan Daerah Kota Tegal No. 5 Tahun 2021</span>. Biaya retribusi disetor langsung menuju kas daerah secara sah.
-                    </p>
-                  </div>
+            {/* TAB 3: MOTTO PELAYANAN */}
+            {activeTab === 'motto' && (
+              <div className="space-y-8 w-full text-left animate-fade-in">
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] font-mono uppercase bg-blue-50 border border-blue-100/50 px-3 py-1.5 rounded-full inline-block">
+                    MOTTO LAYANAN
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">
+                    Motto Layanan PORAPAR
+                  </h3>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-slate-50/50 p-5 rounded-xl border border-slate-100 flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      acronym: 'POR',
+                      title: 'PROFESIONAL',
+                      desc: 'Memberikan pelayanan dengan standar kualitas tinggi, mengutamakan kompetensi and integritas dalam setiap proses penanganan.',
+                      textColor: 'text-[#0E3B66]'
+                    },
+                    {
+                      acronym: 'RA',
+                      title: 'RAMAH',
+                      desc: 'Menyambut setiap pemohon dengan sikap ramah, sapaan hangat, and respon positif terhadap setiap pertanyaan and kebutuhan.',
+                      textColor: 'text-[#2D9CDB]'
+                    },
+                    {
+                      acronym: 'PAR',
+                      title: 'PELAYANAN RESPONSIF',
+                      desc: 'Merespons dengan cepat, tepat, and sesuai dengan kebutuhan masyarakat serta memberikan solusi terbaik dalam setiap permasalahan.',
+                      textColor: 'text-[#219653]'
+                    }
+                  ].map((mottoItem, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-white border border-slate-100/80 rounded-3xl p-8 sm:p-10 hover:shadow-md hover:border-slate-200 transition-all duration-300 flex flex-col items-center text-center shadow-xs"
+                    >
+                      <span className={`text-2xl font-black mb-4 tracking-tight shrink-0 ${mottoItem.textColor}`}>
+                        {mottoItem.acronym}
+                      </span>
+                      <h4 className="font-extrabold text-slate-900 text-xs sm:text-sm tracking-wider mb-4 uppercase">
+                        {mottoItem.title}
+                      </h4>
+                      <p className="text-xs sm:text-sm text-slate-500 font-inter font-light leading-relaxed max-w-xs md:max-w-none">
+                        {mottoItem.desc}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: RETRIBUSI */}
+            {activeTab === 'retribusi' && (
+              <div className="space-y-8 w-full text-left">
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold tracking-widest text-[#0F5A9E] font-mono uppercase bg-indigo-50 border border-indigo-100/50 px-3 py-1.5 rounded-full inline-block">TARIF RETRIBUSI RESMI</span>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">Legalitas Tarif & Biaya Administrasi</h3>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="bg-white rounded-2xl border border-slate-100 p-6 sm:p-8 flex items-start gap-5 border-l-4 border-emerald-500 shadow-xs">
+                    <div className="bg-emerald-50 p-2.5 rounded-xl text-emerald-600 shrink-0">
+                      <Shield className="h-6 w-6" />
+                    </div>
                     <div>
-                      <h5 className="font-extrabold text-slate-900 text-sm leading-tight">Biaya SOP Administrasi/Rekomendasi</h5>
-                      <p className="text-xs text-slate-500 mt-1 font-inter">Seluruh pendaftaran komunitas pemuda atau rekomendasi dinas berbiaya Rp 0 (GRATIS).</p>
+                      <h4 className="font-extrabold text-slate-950 text-base leading-none mb-2">Peraturan Daerah Tentang Retribusi</h4>
+                      <p className="text-slate-500 text-sm leading-relaxed font-inter font-light">
+                        Penetapan tarif penggunaan retribusi pemanfaatan sewa fasilitas gedung olahraga daerah serta retribusi tanda masuk tempat rekreasi pariwisata bahari didasarkan pada draf regulasi <span className="font-bold text-slate-900">Peraturan Daerah Kota Tegal No. 5 Tahun 2021</span>. Biaya retribusi disetor langsung menuju kas daerah secara sah.
+                      </p>
                     </div>
                   </div>
-                  <div className="bg-slate-50/50 p-5 rounded-xl border border-slate-100 flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-                    <div>
-                      <h5 className="font-extrabold text-slate-900 text-sm leading-tight">Penyetoran Kas Daerah Langsung</h5>
-                      <p className="text-xs text-slate-500 mt-1 font-inter">Segala sewa prasarana lapangan wajib terlampir kuintansi billing resmi perbankan daerah (Bank Jateng).</p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-slate-50/50 p-5 rounded-xl border border-slate-100 flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                      <div>
+                        <h5 className="font-extrabold text-slate-900 text-sm leading-tight">Biaya SOP Administrasi/Rekomendasi</h5>
+                        <p className="text-xs text-slate-500 mt-1 font-inter">Seluruh pendaftaran komunitas pemuda atau rekomendasi dinas berbiaya Rp 0 (GRATIS).</p>
+                      </div>
+                    </div>
+                    <div className="bg-slate-50/50 p-5 rounded-xl border border-slate-100 flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                      <div>
+                        <h5 className="font-extrabold text-slate-900 text-sm leading-tight">Penyetoran Kas Daerah Langsung</h5>
+                        <p className="text-xs text-slate-500 mt-1 font-inter">Segala sewa prasarana lapangan wajib terlampir kuintansi billing resmi perbankan daerah (Bank Jateng).</p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-
-        </div>
+            )}
+          </div>
+        )}
       </section>
 
     </div>

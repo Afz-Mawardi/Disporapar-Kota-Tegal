@@ -12,7 +12,6 @@ interface DropdownItem {
   name: string;
   href: string;
   isExternal?: boolean;
-  desc?: string;
 }
 
 interface MenuGroup {
@@ -70,42 +69,42 @@ export default function Header() {
     {
       name: 'PROFIL',
       items: [
-        { name: 'Sambutan', href: '/profil', desc: 'Mengenal dinas secara umum' },
-        { name: 'Struktur Organisasi', href: '/profil/struktur-organisasi', desc: 'Bagan pembagian unit kerja Disporapar' },
-        { name: 'Tupoksi', href: '/profil/tupoksi', desc: 'Uraian tugas pokok & wewenang' },
+        { name: 'Sambutan', href: '/profil' },
+        { name: 'Struktur Organisasi', href: '/profil/struktur-organisasi' },
+        { name: 'Tupoksi', href: '/profil/tupoksi' },
       ],
     },
     {
       name: 'BIDANG',
       items: [
-        { name: 'Kepemudaan', href: '/kepemudaan', desc: 'Pembinaan karakter dan inovasi pemuda' },
-        { name: 'Olahraga', href: '/olahraga', desc: 'Sewa prasarana olahraga & pembinaan atlet' },
-        { name: 'Pariwisata', href: '/pariwisata', desc: 'Potensi wisata dan atraksi Kota Bahari' },
+        { name: 'Kepemudaan', href: '/kepemudaan' },
+        { name: 'Olahraga', href: '/olahraga' },
+        { name: 'Pariwisata', href: '/pariwisata' },
       ],
     },
     {
       name: 'LAYANAN',
       items: [
-        { name: 'Visi & Misi Pelayanan', href: '/pelayanan', desc: 'Komitmen mutu & visi pelayanan' },
-        { name: 'Maklumat Pelayanan', href: '/pelayanan/maklumat', desc: 'Pernyataan kesanggupan pelayanan' },
-        { name: 'Motto Pelayanan', href: '/pelayanan/motto', desc: 'Motto kerja pelayanan TEKAD' },
-        { name: 'Berkas Layanan', href: '/pelayanan/standar', desc: 'SOP, maklumat & formulir resmi' },
-        { name: 'Retribusi', href: '/pelayanan/retribusi', desc: 'Rujukan regulasi biaya pemanfaatan kekayaan daerah' },
+        { name: 'Visi & Misi', href: '/pelayanan' },
+        { name: 'Maklumat Pelayanan', href: '/pelayanan/maklumat' },
+        { name: 'Motto Pelayanan', href: '/pelayanan/motto' },
+        { name: 'Retribusi', href: '/pelayanan/retribusi' },
+        { name: 'Berkas Layanan', href: '/pelayanan/standar' },
       ],
     },
     {
-      name: 'MEDIA',
+      name: 'PUBLIKASI',
       items: [
-        { name: 'Berita', href: '/berita', desc: 'Kanal pers rilis & kabar dinas' },
-        { name: 'Galeri', href: '/galeri', desc: 'Potret riil dinamika kegiatan' },
-        { name: 'Agenda', href: '/agenda', desc: 'Kalender agenda & festival kota' },
+        { name: 'Agenda', href: '/agenda' },
+        { name: 'Berita', href: '/berita' },
+        { name: 'Galeri', href: '/galeri' },
       ],
     },
     {
       name: 'PENGADUAN',
       items: [
-        { name: 'LaporGub!', href: 'https://laporgub.jatengprov.go.id/', isExternal: true, desc: 'Aduan warga ke Gubernur Jawa Tengah' },
-        { name: 'SP4N LAPOR!', href: 'https://lapor.go.id/', isExternal: true, desc: 'Lembaga Aspirasi & Pengaduan Online Rakyat' },
+        { name: 'LaporGub!', href: 'https://laporgub.jatengprov.go.id/', isExternal: true },
+        { name: 'SP4N-LAPOR!', href: 'https://lapor.go.id/', isExternal: true },
       ],
     },
     {
@@ -137,8 +136,8 @@ export default function Header() {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isWhiteNav
-        ? 'bg-white/95 backdrop-blur-md shadow-md py-2 lg:py-1.5 text-slate-850'
-        : 'bg-gradient-to-b from-black/75 via-black/20 to-transparent py-2 lg:py-2.5 text-white'
+      ? 'bg-white/95 backdrop-blur-md shadow-md py-2 lg:py-1.5 text-slate-850'
+      : 'bg-gradient-to-b from-black/75 via-black/20 to-transparent py-2 lg:py-2.5 text-white'
       }`}>
       <div className="max-w-7xl mx-auto px-4 lg:px-4 xl:px-8">
         <div className="flex items-center justify-between h-12">
@@ -167,12 +166,12 @@ export default function Header() {
                     <button
                       type="button"
                       className={`flex items-center justify-center gap-1 lg:gap-1.5 h-9 px-2 lg:px-2.5 xl:px-3.5 rounded-xl text-[11px] lg:text-[11.5px] xl:text-[13px] font-bold tracking-wide transition-all duration-200 uppercase font-mono cursor-pointer focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isHighlighted
-                          ? isWhiteNav
-                            ? 'text-accent bg-[#0E3B66]/5 font-black border border-accent/15'
-                            : 'text-accent bg-[#0E3B66]/60 font-black border border-accent/20'
-                          : isWhiteNav
-                            ? 'text-[#0E3B66] hover:text-accent hover:bg-[#0E3B66]/5 border border-transparent'
-                            : 'text-white hover:text-accent hover:bg-white/10 border border-transparent'
+                        ? isWhiteNav
+                          ? 'text-accent bg-[#0E3B66]/5 font-black border border-accent/15'
+                          : 'text-accent bg-[#0E3B66]/60 font-black border border-accent/20'
+                        : isWhiteNav
+                          ? 'text-[#0E3B66] hover:text-accent hover:bg-[#0E3B66]/5 border border-transparent'
+                          : 'text-white hover:text-accent hover:bg-white/10 border border-transparent'
                         }`}
                     >
                       <span>{group.name}</span>
@@ -221,8 +220,8 @@ export default function Header() {
                                       }
                                     }}
                                     className={`flex flex-col gap-0.5 px-4 py-2 rounded-xl transition-all border-l-2 border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isSubActive
-                                        ? 'bg-accent/20 text-accent border-accent'
-                                        : 'hover:bg-[#2D9CDB]/15 text-slate-200 hover:text-white'
+                                      ? 'bg-accent/20 text-accent border-accent'
+                                      : 'hover:bg-[#2D9CDB]/15 text-slate-200 hover:text-white'
                                       }`}
                                   >
                                     <div className="flex items-center justify-between text-xs sm:text-[13px] font-bold">
@@ -262,12 +261,12 @@ export default function Header() {
                   id={`nav-link-${group.name.toLowerCase().replace(/\s+/g, '-')}`}
                   {...linkProps}
                   className={`px-2 lg:px-2.5 xl:px-3.5 rounded-xl text-[11px] lg:text-[11.5px] xl:text-[13px] font-bold tracking-wide transition-all duration-200 uppercase font-mono flex items-center justify-center gap-1 lg:gap-1.5 h-9 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${active
-                      ? isWhiteNav
-                        ? 'text-accent bg-[#0E3B66]/5 font-black border border-accent/15'
-                        : 'text-accent bg-[#0E3B66]/60 font-black border border-accent/20'
-                      : isWhiteNav
-                        ? 'text-[#0E3B66] hover:text-accent hover:bg-[#0E3B66]/5 border border-transparent'
-                        : 'text-white hover:text-accent hover:bg-white/10 border border-transparent'
+                    ? isWhiteNav
+                      ? 'text-accent bg-[#0E3B66]/5 font-black border border-accent/15'
+                      : 'text-accent bg-[#0E3B66]/60 font-black border border-accent/20'
+                    : isWhiteNav
+                      ? 'text-[#0E3B66] hover:text-accent hover:bg-[#0E3B66]/5 border border-transparent'
+                      : 'text-white hover:text-accent hover:bg-white/10 border border-transparent'
                     }`}
                 >
                   <span>{group.name}</span>
@@ -287,10 +286,10 @@ export default function Header() {
                 }
               }}
               className={`px-3 lg:px-3.5 xl:px-4 py-2 rounded-xl text-[11px] lg:text-[11.5px] xl:text-[13px] font-bold tracking-wide uppercase border font-mono transition-all duration-300 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isHubungiActive
-                  ? 'bg-accent text-white border-accent shadow-md shadow-accent/20'
-                  : isWhiteNav
-                    ? 'border-accent text-accent hover:bg-accent hover:text-white shadow-xs'
-                    : 'border-accent text-accent hover:bg-accent hover:text-white drop-shadow-xs'
+                ? 'bg-accent text-white border-accent shadow-md shadow-accent/20'
+                : isWhiteNav
+                  ? 'border-accent text-accent hover:bg-accent hover:text-white shadow-xs'
+                  : 'border-accent text-accent hover:bg-accent hover:text-white drop-shadow-xs'
                 }`}
             >
               HUBUNGI KAMI
@@ -338,8 +337,8 @@ export default function Header() {
                           type="button"
                           onClick={() => toggleMobileMenuExpansion(group.name)}
                           className={`flex items-center justify-between px-4 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider text-left transition-all focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${active
-                              ? 'bg-accent/15 text-accent font-bold'
-                              : 'text-slate-200 hover:bg-white/5'
+                            ? 'bg-accent/15 text-accent font-bold'
+                            : 'text-slate-200 hover:bg-white/5'
                             }`}
                         >
                           <span>{group.name}</span>
@@ -386,8 +385,8 @@ export default function Header() {
                                       }
                                     }}
                                     className={`flex flex-col px-4 py-2.5 rounded-xl transition-all focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isSubActive
-                                        ? 'text-accent font-bold'
-                                        : 'text-slate-300 hover:text-white hover:bg-white/5'
+                                      ? 'text-accent font-bold'
+                                      : 'text-slate-300 hover:text-white hover:bg-white/5'
                                       }`}
                                   >
                                     <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase font-mono">
@@ -423,8 +422,8 @@ export default function Header() {
                       key={group.name}
                       {...mobLinkProps}
                       className={`px-4 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-between focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${active
-                          ? 'bg-accent/20 text-accent border-l-4 border-accent'
-                          : 'text-slate-200 hover:bg-white/5'
+                        ? 'bg-accent/20 text-accent border-l-4 border-accent'
+                        : 'text-slate-200 hover:bg-white/5'
                         }`}
                     >
                       <span>{group.name}</span>
@@ -443,8 +442,8 @@ export default function Header() {
                     }
                   }}
                   className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold font-mono text-xs uppercase tracking-wider transition-all mt-1 border focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isHubungiActive
-                      ? 'bg-accent text-white border-accent shadow-md shadow-accent/15'
-                      : 'text-slate-200 hover:text-white hover:bg-white/5 border-white/10'
+                    ? 'bg-accent text-white border-accent shadow-md shadow-accent/15'
+                    : 'text-slate-200 hover:text-white hover:bg-white/5 border-white/10'
                     }`}
                 >
                   <span>HUBUNGI KAMI</span>

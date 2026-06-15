@@ -22,7 +22,7 @@ export default function OlahragaPage() {
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
             Membina Juara & Semangat Hidup Sehat
           </span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-tight">
             Olahraga Prestasi & Rekreasi
           </h1>
         </div>
@@ -35,7 +35,7 @@ export default function OlahragaPage() {
             <span className="text-xs font-bold text-secondary tracking-widest uppercase font-mono bg-blue-100/50 border border-blue-200/40 px-3 py-1 rounded-full inline-block">
               Sarana Prasarana Daerah
             </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
               Sewa Lapangan & Gelanggang Olahraga
             </h2>
           </div>
@@ -55,7 +55,7 @@ export default function OlahragaPage() {
                 className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between group"
               >
                 {/* Image Layout */}
-                <div className="relative aspect-16/10 w-full overflow-hidden bg-slate-50">
+                <div className="relative aspect-[21/9] md:aspect-16/10 w-full overflow-hidden bg-slate-50">
                   <Image
                     src={venue.imageUrl}
                     alt={venue.name}
@@ -133,7 +133,7 @@ export default function OlahragaPage() {
                 <span className="text-xs font-bold text-accent tracking-widest uppercase bg-orange-100/50 border border-orange-200/40 px-3.5 py-1.5 rounded-full inline-block font-mono">
                   Pemberdayaan Atlet Daerah
                 </span>
-                <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
                   Pemusatan Latihan & Pembinaan Olahraga Berkelanjutan
                 </h2>
               </div>
@@ -156,9 +156,8 @@ export default function OlahragaPage() {
               </div>
             </div>
 
-            {/* Visual Photo Section Column */}
             <div className="lg:col-span-5 relative">
-              <div className="relative aspect-square w-full rounded-2.5xl overflow-hidden shadow-md border border-slate-100 bg-slate-50">
+              <div className="relative aspect-video lg:aspect-square w-full rounded-2.5xl overflow-hidden shadow-md border border-slate-100 bg-slate-50">
                 <Image
                   src="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=800"
                   alt="Latihan Kejuaraan Atlet Tegal"

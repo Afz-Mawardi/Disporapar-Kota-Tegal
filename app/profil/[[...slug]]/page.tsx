@@ -14,6 +14,8 @@ export default function ProfilPage() {
     ? welcomeMessage.content.split(/\\n|\n/)
     : [];
 
+  const [activeAccordion, setActiveAccordion] = useState<'tugas' | 'fungsi' | null>('tugas');
+
   useEffect(() => {
     if (pathname === '/profil/struktur-organisasi') {
       setTimeout(() => {
@@ -51,7 +53,7 @@ export default function ProfilPage() {
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
             Mengenal Instansi
           </span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
             Profil Resmi DISPORAPAR
           </h1>
         </div>
@@ -64,7 +66,7 @@ export default function ProfilPage() {
 
             {/* Foto Kepala Dinas */}
             <div className="lg:col-span-4 flex flex-col items-center">
-              <div className="relative w-60 h-76 rounded-2xl overflow-hidden shadow-md border-4 border-slate-100 bg-slate-50 shrink-0">
+              <div className="relative w-48 h-60 sm:w-60 sm:h-76 rounded-2xl overflow-hidden shadow-md border-4 border-slate-100 bg-slate-50 shrink-0">
                 <Image
                   src={welcomeMessage.imageUrl || '/images/kabid Image 5 Jun 2026, 14.29.31.webp'}
                   alt={welcomeMessage.name}
@@ -75,7 +77,7 @@ export default function ProfilPage() {
                 />
               </div>
               <div className="text-center mt-6">
-                <h3 className="font-extrabold text-slate-900 text-lg sm:text-xl leading-tight">{welcomeMessage.name}</h3>
+                <h3 className="font-extrabold text-slate-900 text-base sm:text-lg lg:text-xl leading-tight">{welcomeMessage.name}</h3>
                 <p className="text-[10px] text-slate-400 mt-1.5 uppercase tracking-widest font-bold font-mono">Kepala DISPORAPAR Kota Tegal</p>
                 {welcomeMessage.nip && <p className="text-[10px] text-slate-400 mt-0.5 font-mono">NIP. {welcomeMessage.nip}</p>}
               </div>
@@ -94,7 +96,7 @@ export default function ProfilPage() {
                   return (
                     <p
                       key={index}
-                      className={isWassalam ? "font-bold text-slate-900 pt-3 italic font-sans" : ""}
+                      className={isWassalam ? "font-bold text-[#0E3B66] pt-3 italic font-sans" : ""}
                     >
                       {trimmed}
                     </p>
@@ -113,127 +115,63 @@ export default function ProfilPage() {
           {(() => {
             const rolesDetails: Record<string, {
               title: string;
-              responsibility: string[];
-              programs: string[];
               bgClass: string;
               icon: React.ReactNode;
             }> = {
               kepala: {
                 title: "KEPALA DISPORAPAR",
                 bgClass: "bg-[#0E3B66]",
-                icon: <User className="h-5 w-5" />,
-                responsibility: [
-                  "Memimpin, membina, mengarahkan, dan menetapkan seluruh kebijakan umum sektoral bidang Kepemudaan, Keolahragaan, dan Pariwisata di wilayah Kota Tegal.",
-                  "Mengawasi kinerja seluruh Aparatur Sipil Negara (ASN) di lingkungan kerja dinas.",
-                  "Menandatangani kesepakatan kemitraan strategis, pemberian hibah, serta kerjasama pengembangan destinasi wisata daerah."
-                ],
-                programs: ["Agenda Reformasi Birokrasi Terpadu", "Penyelarasan RPJMD Sektor Wisata & Olahraga", "Supervisi Zona Integritas Bebas Pungli"]
+                icon: <User className="h-5 w-5" />
               },
               sekretaris: {
                 title: "SEKRETARIS",
                 bgClass: "bg-sky-600",
-                icon: <User className="h-5 w-5" />,
-                responsibility: [
-                  "Mengkoordinasikan perumusan rencana operasional kerja, pembinaan administrasi organisasi, kepegawaian, keuangan, serta aset dinas.",
-                  "Menyelenggarakan ketatausahaan dinas demi kelancaran administrasi terpadu.",
-                  "Mengevaluasi dan melaporkan capaian target program kedinasan secara berkala kepada Kepala Dinas."
-                ],
-                programs: ["Sistem Informasi Kearsipan Dinamis (Srikandi)", "Pelayanan Adminitrasi Satu Pintu Sektoral", "Penyusunan Standard Operating Procedure (SOP) Terpadu"]
+                icon: <User className="h-5 w-5" />
               },
               subbag_umum: {
                 title: "KEPALA SUB BAGIAN UMUM DAN KEPEGAWAIAN",
                 bgClass: "bg-slate-650",
-                icon: <User className="h-4 w-4" />,
-                responsibility: [
-                  "Melaksanakan tata laksana surat-menyurat masuk/keluar, penggandaan, kearsipan dinas, serta ketatausahaan umum.",
-                  "Mengasuh pembinaan disiplin, daftar urut kepangkatan, penilaian kinerja, jaminan kesejahteraan, mutasi, dan kesejahteraan ASN.",
-                  "Mengelola urusan rumah tangga dinas, kebersihan, pemeliharaan sarana kantor, serta inventarisasi barang milik daerah."
-                ],
-                programs: ["Sistem Informasi Penilaian Kinerja ASN", "Digitalisasi Profil Kepegawaian DISPORAPAR", "Pengadaan Alat Tulis Kantor & Fasilitas Berwawasan Lingkungan"]
+                icon: <User className="h-4 w-4" />
               },
               subbag_perencanaan: {
                 title: "KEPALA SUB BAGIAN PERENCANAAN EVALUASI DAN KEUANGAN",
                 bgClass: "bg-slate-650",
-                icon: <User className="h-4 w-4" />,
-                responsibility: [
-                  "Menghimpun draf rencana kerja anggaran (RKA) dan dokumen pelaksanaan anggaran (DPA) seluruh bidang.",
-                  "Melakukan verifikasi dokumen pertanggungjawaban penatausahaan keuangan serta membina pencatatan pembukuan.",
-                  "Menyusun Laporan Realisasi Keuangan (LRA), dokumen evaluasi kinerja pembangunan dinas (LPPD, LKjIP, LAKIP)."
-                ],
-                programs: ["Integrasi Aplikasi e-Planning & SIPD RI", "Rekonsiliasi Pengeluaran Kas Sektoral", "Asistensi Audit Eksternal BPK-RI"]
+                icon: <User className="h-4 w-4" />
               },
               kabid_kepemudaan: {
                 title: "KEPALA BIDANG KEPEMUDAAN",
                 bgClass: "bg-violet-600",
-                icon: <User className="h-5 w-5" />,
-                responsibility: [
-                  "Merancang program inkubasi kewirausahaan pemuda, pelatihan kepemimpinan kader pelopor daerah secara berkala.",
-                  "Melakukan pembinaan kemitraan organisasi kepemudaan (OKP) serta pembinaan karang taruna tingkat wilayah Tegal.",
-                  "Memfasilitasi prasarana dan kegiatan pemuda pelopor rintisan digital."
-                ],
-                programs: ["Wadah Wirausaha Muda Tegal (AWMT)", "Seleksi Pemuda Pelopor Berprestasi Tingkat Provinsi", "Forum Kemitraan Pemuda Pelopor Kreatif"]
+                icon: <User className="h-5 w-5" />
               },
               kabid_keolahragaan: {
                 title: "KEPALA BIDANG KEOLAHRAGAAN",
                 bgClass: "bg-emerald-600",
-                icon: <User className="h-5 w-5" />,
-                responsibility: [
-                  "Menyelenggarakan pembinaan atlet and pelatih berprestasi jangka panjang bersinergi bersama KONI Kota Tegal.",
-                  "Mengelola pengelolaan fasilitas prasarana olahraga daerah seperti GOR Serbaguna dan Stadion.",
-                  "Merancang pembibitan atlet usia dini berpotensi melalui festival olahraga pelajar & daerah."
-                ],
-                programs: ["Pemusatan Latihan Terpadu Kualifikasi PON/KONI", "Revitalisasi Kompleks Sarana Olahraga Publik", "Festival Olahraga Tradisional & Rekreasi"]
+                icon: <User className="h-5 w-5" />
               },
               kabid_pariwisata: {
                 title: "KEPALA BIDANG PARIWISATA",
                 bgClass: "bg-amber-600",
-                icon: <User className="h-5 w-5" />,
-                responsibility: [
-                  "Mengembangkan destinasi wisata unggulan bahari daerah, penataan objek pesisir terintegrasi.",
-                  "Memfasilitasi kepatuhan tata kelola, pendaftaran izin tanda daftar pariwisata daerah berkelanjutan.",
-                  "Mendorong promosi wisata bahari pesisir Tegal ke jejaring promosi nasional & mancanegara."
-                ],
-                programs: ["Masterplan Dermaga Apung & Pesisir Pantai Alam Indah (PAI)", "Sertifikasi Kelayakan Destinasi Wisata Bersih (CHSE)", "Promosi Event Pariwisata Bahari & UMKM Karangtaruna"]
+                icon: <User className="h-5 w-5" />
               },
               fungsional_kepala: {
                 title: "KELOMPOK JABATAN FUNGSIONAL",
                 bgClass: "bg-slate-600",
-                icon: <User className="h-5 w-5" />,
-                responsibility: [
-                  "Melakukan kajian akademis teknis, rekomendasi standar kebijakan kedinasan tertentu di bawah bimbingan Kepala Dinas langsung.",
-                  "Merumuskan usulan rekomendasi strategis terhadap tantangan penyerapan sektor pemuda, olahraga, dan pariwisata."
-                ],
-                programs: ["Analisis Statistik Produktivitas Pemuda Tegal", "Kajian Pemulihan Pasca Pandemi Sektor Industri Pariwisata"]
+                icon: <User className="h-5 w-5" />
               },
               fungsional_pemuda: {
                 title: "KELOMPOK JABATAN FUNGSIONAL",
                 bgClass: "bg-slate-600",
-                icon: <User className="h-4 w-4" />,
-                responsibility: [
-                  "Melaksanakan tugas-tugas bimbingan, pendataan statistik komunitas kepemudaan secara fungsional keahlian.",
-                  "Melakukan sertifikasi dan pemetaan kebutuhan inkubasi wirausaha muda daerah."
-                ],
-                programs: ["Penyuluhan Manajemen Anggaran OKP", "Sertifikasi Kelayakan Inkubasi Wirausaha"]
+                icon: <User className="h-4 w-4" />
               },
               fungsional_olahraga: {
                 title: "KELOMPOK JABATAN FUNGSIONAL",
                 bgClass: "bg-slate-600",
-                icon: <User className="h-4 w-4" />,
-                responsibility: [
-                  "Mendukung verifikasi kualifikasi wasit dan uji kelayakan tanding bagi atlet daerah.",
-                  "Penyusunan basis statistik hasil skor tanding dan penyiapan sistem informasi keatletan."
-                ],
-                programs: ["Studi Komparasi Pembinaan Fisik Akademis Pelatih", "Database Sistem Informasi Keatletan Tegal"]
+                icon: <User className="h-4 w-4" />
               },
               fungsional_parwis: {
                 title: "KELOMPOK JABATAN FUNGSIONAL",
                 bgClass: "bg-slate-600",
-                icon: <User className="h-4 w-4" />,
-                responsibility: [
-                  "Melakukan penyuluhan kesadaran sapta pesona pariwisata, pembinaan Kelompok Sadar Wisata (Pokdarwis).",
-                  "Melakukan pemantauan angka kunjungan wisata mingguan dan kepuasan pengunjung Pantai Alam Indah Tegal."
-                ],
-                programs: ["Penyuluhan Sapta Pesona Masyarakat Pantai", "Pemberdayaan Pokdarwis Area Maritim Wisata"]
+                icon: <User className="h-4 w-4" />
               }
             };
 
@@ -306,7 +244,7 @@ export default function ProfilPage() {
                 borderColor: "border-slate-200",
                 hoverBorder: "hover:border-slate-400 hover:shadow-slate-400/5",
                 badgeBg: "bg-slate-100 text-slate-600",
-                badgeText: "text-slate-600",
+                badgeText: "text-slate-660",
                 avatarBg: "bg-slate-400"
               },
               fungsional_pemuda: {
@@ -314,7 +252,7 @@ export default function ProfilPage() {
                 borderColor: "border-slate-200",
                 hoverBorder: "hover:border-slate-400 hover:shadow-slate-400/5",
                 badgeBg: "bg-slate-100 text-slate-600",
-                badgeText: "text-slate-600",
+                badgeText: "text-slate-660",
                 avatarBg: "bg-slate-400"
               },
               fungsional_olahraga: {
@@ -322,7 +260,7 @@ export default function ProfilPage() {
                 borderColor: "border-slate-200",
                 hoverBorder: "hover:border-slate-400 hover:shadow-slate-400/5",
                 badgeBg: "bg-slate-100 text-slate-600",
-                badgeText: "text-slate-600",
+                badgeText: "text-slate-660",
                 avatarBg: "bg-slate-400"
               },
               fungsional_parwis: {
@@ -330,7 +268,7 @@ export default function ProfilPage() {
                 borderColor: "border-slate-200",
                 hoverBorder: "hover:border-slate-400 hover:shadow-slate-400/5",
                 badgeBg: "bg-slate-100 text-slate-600",
-                badgeText: "text-slate-600",
+                badgeText: "text-slate-660",
                 avatarBg: "bg-slate-400"
               }
             };
@@ -344,7 +282,7 @@ export default function ProfilPage() {
                 <div
                   key={roleKey}
                   id={`card-${roleKey}`}
-                  className={`w-full text-left p-3 sm:p-3.5 xl:p-4 rounded-xl border bg-white ${style.borderColor} shadow-xs relative overflow-hidden`}
+                  className={`w-full text-left p-3 sm:p-3.5 xl:p-4 rounded-xl border bg-white ${style.borderColor} relative overflow-hidden select-none`}
                 >
                   {/* Absolute left subtle accent color strip */}
                   <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${style.avatarBg}`} />
@@ -455,8 +393,6 @@ export default function ProfilPage() {
                     </div>
                   </div>
                 </div>
-
-
               </div>
             );
           })()}
@@ -464,73 +400,92 @@ export default function ProfilPage() {
       </section>
 
       {/* Section 2: Tugas Pokok & Fungsi */}
-      <section id="tupoksi-dan-fungsi" className="scroll-mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+      <section id="tupoksi-dan-fungsi" className="scroll-mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-10 lg:p-12 shadow-sm">
-          <div className="space-y-8 w-full animate-fadeIn">
-            <div className="mb-2">
+          <div className="space-y-8 w-full animate-fadeIn text-left">
+            <div>
               <span className="text-[10px] font-bold tracking-widest text-[#0F5A9E] font-mono uppercase bg-blue-50 border border-blue-100/60 px-3 py-1 rounded-full inline-block">
                 Regulasi & Mandat
               </span>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0E3B66] tracking-tight mt-3">
                 Tugas Pokok & Fungsi (Tupoksi)
               </h3>
-              <p className="text-slate-500 text-sm mt-1 leading-relaxed text-left">
-                Berdasarkan Peraturan Wali Kota Tegal mengenai kedudukan, susunan organisasi, tugas dan fungsi serta tata kerja Dinas Kepemudaan dan Olahraga dan Pariwisata.
-              </p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-              <div className="border-l-4 border-[#0F5A9E] p-6 sm:p-8">
-                <div className="flex items-start gap-4">
-                  <div className="bg-blue-50 p-3 rounded-xl shrink-0">
-                    <Target className="h-6 w-6 text-[#0F5A9E]" />
+            <div className="space-y-4 pt-2">
+              {/* Accordion 1: Tugas Pokok */}
+              <div className="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setActiveAccordion(activeAccordion === 'tugas' ? null : 'tugas')}
+                  className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors text-left focus:outline-none"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="bg-blue-50 p-3 rounded-xl shrink-0 text-[#0F5A9E]">
+                      <Target className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Mandat Utama</span>
+                      <h4 className="text-base sm:text-lg font-bold text-[#0E3B66]">Tugas Pokok Dinas</h4>
+                    </div>
                   </div>
-                  <div className="w-full">
-                    <span className="text-xs font-bold text-[#0F5A9E] font-mono uppercase tracking-wider block mb-1">Mandat Utama</span>
-                    <h4 className="text-lg sm:text-xl font-bold text-[#0E3B66] tracking-tight">
-                      Tugas Pokok
-                    </h4>
-                    <p className="text-slate-650 text-sm sm:text-base font-inter leading-relaxed mt-2.5 text-left">
-                      Membantu Wali Kota Tegal melaksanakan urusan pemerintahan yang menjadi kewenangan daerah bidang kepemudaan dan olahraga, dan bidang pariwisata.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  <span className="text-xl font-bold text-[#0E3B66] font-mono pr-2">{activeAccordion === 'tugas' ? '−' : '+'}</span>
+                </button>
 
-            <div className="pt-2">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="bg-emerald-50 p-2 rounded-xl shrink-0">
-                  <Award className="h-5 w-5 text-emerald-600" />
-                </div>
-                <h4 className="text-lg sm:text-xl font-bold text-[#0E3B66] tracking-tight">
-                  Fungsi Dinas
-                </h4>
+                {activeAccordion === 'tugas' && (
+                  <div className="px-6 pb-6 pt-4 border-t border-slate-50/80 animate-fadeIn text-slate-650 text-sm sm:text-base font-inter leading-relaxed pl-6 sm:pl-20">
+                    Membantu Wali Kota Tegal melaksanakan urusan pemerintahan yang menjadi kewenangan daerah bidang kepemudaan dan olahraga, dan bidang pariwisata.
+                  </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  "Perumusan kebijakan teknis di bidang kepemudaan dan olahraga, dan bidang pariwisata.",
-                  "Pengoordinasian pelaksanaan kebijakan teknis di bidang kepemudaan dan olahraga, dan bidang pariwisata.",
-                  "Pengoordinasian pelaksanaan tugas dan fungsi di bidang kepemudaan, bidang keolahragaan, dan bidang pariwisata.",
-                  "Pembinaan dan fasilitasi di bidang kepemudaan dan olahraga, dan bidang pariwisata.",
-                  "Pemantauan, evaluasi dan pelaporan pelaksanaan tugas di bidang kepemudaan dan olahraga, dan bidang pariwisata.",
-                  "Pengendalian administrasi kesekretariatan Dinas.",
-                  "Pengendalian penyelenggaraan tugas UPTD.",
-                  "Pelaksanaan tugas lain yang diberikan oleh Wali Kota sesuai dengan tugas dan fungsinya."
-                ].map((fungsiItem, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white rounded-2xl border border-slate-100 p-5 flex items-start gap-4 hover:shadow-md hover:border-blue-100/80 transition-all duration-300 h-full group"
-                  >
-                    <span className="flex items-center justify-center h-8 w-8 rounded-full bg-blue-50 text-[#0F5A9E] font-mono text-sm font-bold shrink-0 shadow-sm group-hover:bg-[#0F5A9E] group-hover:text-white transition-all duration-300">
-                      {idx + 1}
-                    </span>
-                    <p className="text-slate-600 text-sm sm:text-base font-inter leading-relaxed pt-0.5 text-left">
-                      {fungsiItem}
-                    </p>
+              {/* Accordion 2: Fungsi Dinas */}
+              <div className="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setActiveAccordion(activeAccordion === 'fungsi' ? null : 'fungsi')}
+                  className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors text-left focus:outline-none"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="bg-emerald-50 p-3 rounded-xl shrink-0 text-emerald-600">
+                      <Award className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Uraian Kewenangan</span>
+                      <h4 className="text-base sm:text-lg font-bold text-[#0E3B66]">8 Fungsi Utama Dinas</h4>
+                    </div>
                   </div>
-                ))}
+                  <span className="text-xl font-bold text-[#0E3B66] font-mono pr-2">{activeAccordion === 'fungsi' ? '−' : '+'}</span>
+                </button>
+
+                {activeAccordion === 'fungsi' && (
+                  <div className="px-6 pb-6 pt-6 border-t border-slate-50/80 animate-fadeIn pl-6 sm:pl-20">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {[
+                        "Perumusan kebijakan teknis di bidang kepemudaan dan olahraga, dan bidang pariwisata.",
+                        "Pengoordinasian pelaksanaan kebijakan teknis di bidang kepemudaan dan olahraga, dan bidang pariwisata.",
+                        "Pengoordinasian pelaksanaan tugas dan fungsi di bidang kepemudaan, bidang keolahragaan, dan bidang pariwisata.",
+                        "Pembinaan dan fasilitasi di bidang kepemudaan dan olahraga, dan bidang pariwisata.",
+                        "Pemantauan, evaluasi dan pelaporan pelaksanaan tugas di bidang kepemudaan dan olahraga, dan bidang pariwisata.",
+                        "Pengendalian administrasi kesekretariatan Dinas.",
+                        "Pengendalian penyelenggaraan tugas UPTD.",
+                        "Pelaksanaan tugas lain yang diberikan oleh Wali Kota sesuai dengan tugas dan fungsinya."
+                      ].map((fungsiItem, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-slate-50/50 rounded-xl border border-slate-100 p-4.5 flex items-start gap-4 hover:bg-white hover:shadow-md hover:border-blue-100 transition-all duration-300 h-full"
+                        >
+                          <span className="flex items-center justify-center h-8 w-8 rounded-full bg-blue-50 text-[#0F5A9E] font-mono text-sm font-bold shrink-0 shadow-sm">
+                            {idx + 1}
+                          </span>
+                          <p className="text-slate-650 text-xs sm:text-sm font-inter leading-relaxed pt-0.5">
+                            {fungsiItem}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

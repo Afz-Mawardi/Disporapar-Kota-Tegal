@@ -10,7 +10,8 @@ import {
   useOfficeInfo,
   useCategories,
   useWelcomeMessage,
-  useHeroSlides
+  useHeroSlides,
+  useHomepageSettings
 } from '@/lib/data-store';
 import {
   ShieldAlert,
@@ -32,18 +33,22 @@ import {
   Upload,
   ExternalLink,
   ChevronRight,
+  ChevronDown,
   TrendingUp,
   MapPin,
   Clock,
   Mail,
   Menu,
   User,
-  Sliders
+  Sliders,
+  Monitor,
+  Smartphone
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { HeroSlide } from '@/lib/data';
+import { parseIndonesianDate } from '@/lib/utils';
 
 // Helper to parse Indonesian date format (e.g. "24 Mei 2026") to YYYY-MM-DD
 const parseIndonesianDateToYYYYMMDD = (dateStr: string): string => {
@@ -78,11 +83,58 @@ const parseTimeRange = (timeStr?: string) => {
   return { start, end };
 };
 
+const convertImageToWebP = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const validTypes = ['image/webp', 'image/png', 'image/jpeg', 'image/jpg'];
+    if (!validTypes.includes(file.type) && !/\.(webp|png|jpe?g)$/i.test(file.name)) {
+      reject(new Error('Format gambar harus berupa WEBP, PNG, JPG, atau JPEG.'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Gagal memproses gambar.'));
+          return;
+        }
+        ctx.drawImage(img, 0, 0);
+        const webpBase64 = canvas.toDataURL('image/webp', 0.85);
+        resolve(webpBase64);
+      };
+      img.onerror = () => {
+        reject(new Error('Gagal memuat gambar untuk konversi.'));
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = () => {
+      reject(new Error('Gagal membaca berkas gambar.'));
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+const isValidUrlOrPath = (url?: string): boolean => {
+  if (!url || url === '#' || url === '') return true;
+  // Online URLs (http:// or https://)
+  if (/^(https?:\/\/)/i.test(url)) return true;
+  // Local paths starting with /, ./, or ../
+  if (/^(\/|\.\/|\.\.\/)/.test(url)) return true;
+  // Standard relative paths with query parameters and hash anchors
+  if (/^[a-zA-Z0-9_\-\.\/?=#%&]+$/.test(url)) return true;
+  return false;
+};
+
 export default function AdminPage() {
   const router = useRouter();
 
   // Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -100,6 +152,20 @@ export default function AdminPage() {
   const [categoriesStore, setCategoriesStore] = useCategories();
   const [welcomeMessage, setWelcomeMessage] = useWelcomeMessage();
   const [heroSlides, setHeroSlides] = useHeroSlides();
+  const [homepageSettings, setHomepageSettings] = useHomepageSettings();
+
+  // Beranda settings states
+  const [isEditingBeranda, setIsEditingBeranda] = useState<boolean>(false);
+  const [berandaSubTab, setBerandaSubTab] = useState<'hero' | 'about' | 'agenda' | 'programs' | 'news_gallery' | 'documents'>('hero');
+  const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop');
+  const [previewSettings, setPreviewSettings] = useState<any>(null);
+
+  // Sync preview settings with homepageSettings
+  useEffect(() => {
+    if (homepageSettings) {
+      setPreviewSettings(homepageSettings);
+    }
+  }, [homepageSettings]);
 
   // Welcome message states
   const [isEditingWelcome, setIsEditingWelcome] = useState<boolean>(false);
@@ -108,10 +174,12 @@ export default function AdminPage() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isEditingContact, setIsEditingContact] = useState<boolean>(false);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('Semua');
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState<boolean>(false);
+  const [dashboardTab, setDashboardTab] = useState<'berita' | 'galeri' | 'agenda' | 'berkas'>('agenda');
 
   // Category Manager Modal States
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState<boolean>(false);
-  const [categoryManagerTab, setCategoryManagerTab] = useState<'news' | 'gallery' | 'events' | 'services'>('news');
+  const [categoryManagerTab, setCategoryManagerTab] = useState<'news' | 'gallery' | 'services'>('news');
   const [newCategoryName, setNewCategoryName] = useState<string>('');
   const [editingCategoryIndex, setEditingCategoryIndex] = useState<number | null>(null);
   const [editingCategoryName, setEditingCategoryName] = useState<string>('');
@@ -129,6 +197,9 @@ export default function AdminPage() {
 
   // File Upload Helper State
   const [uploadedImageBase64, setUploadedImageBase64] = useState<string>('');
+  const [welcomeImage, setWelcomeImage] = useState<string>('');
+  const [isDragOverWelcome, setIsDragOverWelcome] = useState<boolean>(false);
+  const [isDragOverModal, setIsDragOverModal] = useState<boolean>(false);
 
   // Document Upload Helper States
   const [uploadedFileBase64, setUploadedFileBase64] = useState<string>('');
@@ -137,11 +208,103 @@ export default function AdminPage() {
 
   // Check login on mount
   useEffect(() => {
-    const session = localStorage.getItem('disporapar_admin_session');
+    const session = sessionStorage.getItem('disporapar_admin_session');
     if (session === 'true') {
       setIsLoggedIn(true);
     }
+    setIsCheckingAuth(false);
   }, []);
+
+  // Reset category filter on tab change
+  useEffect(() => {
+    setSelectedCategoryFilter('Semua');
+    setIsFilterDropdownOpen(false);
+  }, [activeTab]);
+
+  // Sync homepage limits on mount if active items exceed limit
+  const hasCheckedLimits = React.useRef(false);
+  useEffect(() => {
+    if (hasCheckedLimits.current) return;
+    hasCheckedLimits.current = true;
+
+    let newsChanged = false;
+    let eventsChanged = false;
+    let galleryChanged = false;
+    let servicesChanged = false;
+
+    // News: max 3
+    const activeNews = news.filter(item => item.showOnHomepage !== false);
+    let updatedNews = [...news];
+    if (activeNews.length > 3) {
+      let activeCount = 0;
+      updatedNews = news.map(item => {
+        if (item.showOnHomepage !== false) {
+          activeCount++;
+          if (activeCount > 3) {
+            newsChanged = true;
+            return { ...item, showOnHomepage: false };
+          }
+        }
+        return item;
+      });
+    }
+
+    // Events: max 4
+    const activeEvents = events.filter(item => item.showOnHomepage !== false);
+    let updatedEvents = [...events];
+    if (activeEvents.length > 4) {
+      let activeCount = 0;
+      updatedEvents = events.map(item => {
+        if (item.showOnHomepage !== false) {
+          activeCount++;
+          if (activeCount > 4) {
+            eventsChanged = true;
+            return { ...item, showOnHomepage: false };
+          }
+        }
+        return item;
+      });
+    }
+
+    // Gallery: max 5
+    const activeGallery = gallery.filter(item => item.showOnHomepage !== false);
+    let updatedGallery = [...gallery];
+    if (activeGallery.length > 5) {
+      let activeCount = 0;
+      updatedGallery = gallery.map(item => {
+        if (item.showOnHomepage !== false) {
+          activeCount++;
+          if (activeCount > 5) {
+            galleryChanged = true;
+            return { ...item, showOnHomepage: false };
+          }
+        }
+        return item;
+      });
+    }
+
+    // Services: max 3
+    const activeServices = services.filter(item => item.showOnHomepage !== false);
+    let updatedServices = [...services];
+    if (activeServices.length > 3) {
+      let activeCount = 0;
+      updatedServices = services.map(item => {
+        if (item.showOnHomepage !== false) {
+          activeCount++;
+          if (activeCount > 3) {
+            servicesChanged = true;
+            return { ...item, showOnHomepage: false };
+          }
+        }
+        return item;
+      });
+    }
+
+    if (newsChanged) setNews(updatedNews);
+    if (eventsChanged) setEvents(updatedEvents);
+    if (galleryChanged) setGallery(updatedGallery);
+    if (servicesChanged) setServices(updatedServices);
+  }, [news, events, gallery, services, setNews, setEvents, setGallery, setServices]);
 
   // Handle Login
   const handleLogin = (e: React.FormEvent) => {
@@ -149,7 +312,7 @@ export default function AdminPage() {
     if (username === 'admin123' && password === 'admin123') {
       setIsLoggedIn(true);
       setLoginError('');
-      localStorage.setItem('disporapar_admin_session', 'true');
+      sessionStorage.setItem('disporapar_admin_session', 'true');
       showNotification('Berhasil masuk ke panel admin!', 'success');
     } else {
       setLoginError('Username atau password salah.');
@@ -159,7 +322,7 @@ export default function AdminPage() {
   // Handle Logout
   const handleLogout = () => {
     setIsLoggedIn(false);
-    localStorage.removeItem('disporapar_admin_session');
+    sessionStorage.removeItem('disporapar_admin_session');
     showNotification('Berhasil keluar.', 'success');
   };
 
@@ -171,28 +334,63 @@ export default function AdminPage() {
     }, 4000);
   };
 
-  // Convert File to Base64
+  // Convert File and automatically convert to WebP
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        showNotification('Ukuran gambar maksimal 2MB untuk penyimpanan lokal.', 'error');
+        showNotification('Ukuran gambar maksimal 2MB.', 'error');
+        e.target.value = '';
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUploadedImageBase64(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      showNotification('Sedang mengompresi dan mengunggah gambar...', 'success');
+      convertImageToWebP(file)
+        .then(async (webpBase64) => {
+          try {
+            const res = await fetch('/api/upload', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                fileBase64: webpBase64,
+                fileName: file.name.substring(0, file.name.lastIndexOf('.')) + '.webp',
+                menu: activeTab
+              })
+            });
+            const result = await res.json();
+            if (result.success) {
+              setUploadedImageBase64(result.url);
+              if (activeTab === 'sambutan') {
+                setWelcomeImage(result.url);
+              }
+              showNotification('Gambar berhasil diunggah dan disimpan ke server.', 'success');
+            } else {
+              throw new Error(result.error || 'Gagal menyimpan gambar di server.');
+            }
+          } catch (err: any) {
+            showNotification(err.message || 'Gagal mengunggah gambar ke server.', 'error');
+            e.target.value = '';
+          }
+        })
+        .catch((err) => {
+          showNotification(err.message || 'Gagal memproses gambar.', 'error');
+          e.target.value = '';
+        });
     }
   };
 
-  // Convert Document File and calculate its size
   const handleDocFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const validDocExtensions = ['.pdf', '.zip', '.doc', '.docx'];
+      const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!validDocExtensions.includes(fileExtension)) {
+        showNotification('Format berkas harus berupa PDF, ZIP, DOC, atau DOCX.', 'error');
+        e.target.value = '';
+        return;
+      }
       if (file.size > 5 * 1024 * 1024) {
         showNotification('Ukuran berkas maksimal 5MB.', 'error');
+        e.target.value = '';
         return;
       }
 
@@ -205,10 +403,32 @@ export default function AdminPage() {
 
       setUploadedFileSize(sizeStr);
       setUploadedFileName(file.name);
+      showNotification('Sedang mengunggah berkas...', 'success');
 
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setUploadedFileBase64(reader.result as string);
+      reader.onloadend = async () => {
+        const docBase64 = reader.result as string;
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fileBase64: docBase64,
+              fileName: file.name,
+              menu: activeTab
+            })
+          });
+          const result = await res.json();
+          if (result.success) {
+            setUploadedFileBase64(result.url);
+            showNotification('Berkas berhasil diunggah ke server.', 'success');
+          } else {
+            throw new Error(result.error || 'Gagal menyimpan berkas di server.');
+          }
+        } catch (err: any) {
+          showNotification(err.message || 'Gagal mengunggah berkas ke server.', 'error');
+          e.target.value = '';
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -267,6 +487,19 @@ export default function AdminPage() {
       showNotification('Data berhasil dihapus.', 'success');
       setIsModalOpen(false);
       setEditingItem(null);
+      return;
+    }
+
+    // Validate online URLs if provided
+    const imageUrlVal = formData.get('imageUrl') as string;
+    const downloadUrlVal = formData.get('downloadUrl') as string;
+
+    if (imageUrlVal && !isValidUrlOrPath(imageUrlVal)) {
+      showNotification('Tautan URL gambar tidak valid.', 'error');
+      return;
+    }
+    if (downloadUrlVal && !isValidUrlOrPath(downloadUrlVal)) {
+      showNotification('Tautan URL berkas tidak valid.', 'error');
       return;
     }
 
@@ -352,7 +585,6 @@ export default function AdminPage() {
       const endTime = formData.get('endTime') as string || '12:00';
       const time = `${startTime} - ${endTime} WIB`;
       const location = formData.get('location') as string;
-      const category = '';
       const description = '';
 
       // Format YYYY-MM-DD to Indonesian "DD Bulan YYYY"
@@ -372,7 +604,6 @@ export default function AdminPage() {
           date: dateString,
           time,
           location,
-          category,
           description,
           imageUrl: ''
         };
@@ -385,14 +616,13 @@ export default function AdminPage() {
           date: dateString,
           time,
           location,
-          category,
           description
         } : item));
         showNotification('Agenda berhasil diubah.', 'success');
       }
     } else if (activeTab === 'berkas') {
       const title = formData.get('title') as string;
-      const description = formData.get('description') as string;
+      const description = '';
       const category = formData.get('category') as any;
       const urlInput = formData.get('downloadUrl') as string;
       const downloadUrl = uploadedFileBase64 || urlInput || '#';
@@ -502,13 +732,17 @@ export default function AdminPage() {
     const name = formData.get('name') as string;
     const nip = formData.get('nip') as string || '';
     const content = formData.get('content') as string;
-    const imageUrl = uploadedImageBase64 || formData.get('imageUrl') as string || welcomeMessage.imageUrl;
+
+    if (welcomeImage && !welcomeImage.startsWith('data:') && !isValidUrlOrPath(welcomeImage)) {
+      showNotification('Tautan URL foto tidak valid.', 'error');
+      return;
+    }
 
     setWelcomeMessage({
       name,
       nip,
       content,
-      imageUrl
+      imageUrl: welcomeImage
     });
 
     setIsEditingWelcome(false);
@@ -516,25 +750,21 @@ export default function AdminPage() {
   };
 
   // Cascade Category Changes
-  const cascadeRenameCategory = (moduleType: 'news' | 'gallery' | 'events' | 'services', oldName: string, newName: string) => {
+  const cascadeRenameCategory = (moduleType: 'news' | 'gallery' | 'services', oldName: string, newName: string) => {
     if (moduleType === 'news') {
       setNews(news.map(item => item.category === oldName ? { ...item, category: newName } : item));
     } else if (moduleType === 'gallery') {
       setGallery(gallery.map(item => item.category === oldName ? { ...item, category: newName } : item));
-    } else if (moduleType === 'events') {
-      setEvents(events.map(item => item.category === oldName ? { ...item, category: newName } : item));
     } else if (moduleType === 'services') {
       setServices(services.map(item => item.category === oldName ? { ...item, category: newName } : item));
     }
   };
 
-  const cascadeDeleteCategory = (moduleType: 'news' | 'gallery' | 'events' | 'services', catName: string, fallback: string) => {
+  const cascadeDeleteCategory = (moduleType: 'news' | 'gallery' | 'services', catName: string, fallback: string) => {
     if (moduleType === 'news') {
       setNews(news.map(item => item.category === catName ? { ...item, category: fallback } : item));
     } else if (moduleType === 'gallery') {
       setGallery(gallery.map(item => item.category === catName ? { ...item, category: fallback } : item));
-    } else if (moduleType === 'events') {
-      setEvents(events.map(item => item.category === catName ? { ...item, category: fallback } : item));
     } else if (moduleType === 'services') {
       setServices(services.map(item => item.category === catName ? { ...item, category: fallback } : item));
     }
@@ -592,6 +822,26 @@ export default function AdminPage() {
     showNotification('Kategori berhasil dihapus.', 'success');
   };
 
+  const toggleNewsHomepage = (id: string) => {
+    setNews(news.map(item => item.id === id ? { ...item, showOnHomepage: !(item.showOnHomepage !== false) } : item));
+    showNotification('Status tampilan berita di beranda berhasil diubah.', 'success');
+  };
+
+  const toggleGalleryHomepage = (id: string) => {
+    setGallery(gallery.map(item => item.id === id ? { ...item, showOnHomepage: !(item.showOnHomepage !== false) } : item));
+    showNotification('Status tampilan galeri di beranda berhasil diubah.', 'success');
+  };
+
+  const toggleEventsHomepage = (id: string) => {
+    setEvents(events.map(item => item.id === id ? { ...item, showOnHomepage: !(item.showOnHomepage !== false) } : item));
+    showNotification('Status tampilan agenda di beranda berhasil diubah.', 'success');
+  };
+
+  const toggleServicesHomepage = (id: string) => {
+    setServices(services.map(item => item.id === id ? { ...item, showOnHomepage: !(item.showOnHomepage !== false) } : item));
+    showNotification('Status tampilan berkas di beranda berhasil diubah.', 'success');
+  };
+
   // Filter lists based on search query
   const getFilteredData = () => {
     if (activeTab === 'berita') {
@@ -601,6 +851,12 @@ export default function AdminPage() {
           item.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
           item.category.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
+      }).sort((a, b) => {
+        try {
+          return parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime();
+        } catch {
+          return 0;
+        }
       });
     } else if (activeTab === 'galeri') {
       return gallery.filter((item) => {
@@ -611,11 +867,15 @@ export default function AdminPage() {
       });
     } else if (activeTab === 'agenda') {
       return events.filter((item) => {
-        const matchesCategory = selectedCategoryFilter === 'Semua' || item.category === selectedCategoryFilter;
         const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.category.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesCategory && matchesSearch;
+          item.location.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesSearch;
+      }).sort((a, b) => {
+        try {
+          return parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime();
+        } catch {
+          return 0;
+        }
       });
     } else if (activeTab === 'berkas') {
       return services.filter((item) => {
@@ -627,6 +887,150 @@ export default function AdminPage() {
     }
     return [];
   };
+
+  // ==========================================
+  // Dashboard Chart Calculations
+  // ==========================================
+  const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+  const getMonthIndex = (dateStr?: string): number => {
+    if (!dateStr) return -1;
+    const lower = dateStr.toLowerCase();
+    if (lower.includes('januari') || lower.includes('jan')) return 0;
+    if (lower.includes('februari') || lower.includes('feb')) return 1;
+    if (lower.includes('maret') || lower.includes('mar')) return 2;
+    if (lower.includes('april') || lower.includes('apr')) return 3;
+    if (lower.includes('mei')) return 4;
+    if (lower.includes('juni') || lower.includes('jun')) return 5;
+    if (lower.includes('juli') || lower.includes('jul')) return 6;
+    if (lower.includes('agustus') || lower.includes('agu')) return 7;
+    if (lower.includes('september') || lower.includes('sep')) return 8;
+    if (lower.includes('oktober') || lower.includes('okt')) return 9;
+    if (lower.includes('november') || lower.includes('nov')) return 10;
+    if (lower.includes('desember') || lower.includes('des')) return 11;
+    return -1;
+  };
+
+  const currentMonthIdx = new Date().getMonth();
+  const lineChartMonths = Array.from({ length: 6 }).map((_, i) => {
+    const idx = (currentMonthIdx - (5 - i) + 12) % 12;
+    return {
+      short: shortMonths[idx],
+      full: fullMonths[idx],
+      index: idx
+    };
+  });
+
+  const getMonthlyActivityCount = (monthIdx: number): number => {
+    // 1. News Count
+    const newsCount = news.filter((item) => {
+      const part = item.id.split('-')[1];
+      const timestamp = part ? Number(part) : NaN;
+      if (!isNaN(timestamp) && timestamp > 1000000000000) {
+        return new Date(timestamp).getMonth() === monthIdx;
+      }
+      return getMonthIndex(item.date) === monthIdx;
+    }).length;
+
+    // 2. Events Count
+    const eventsCount = events.filter((item) => {
+      const part = item.id.split('-')[1];
+      const timestamp = part ? Number(part) : NaN;
+      if (!isNaN(timestamp) && timestamp > 1000000000000) {
+        return new Date(timestamp).getMonth() === monthIdx;
+      }
+      return getMonthIndex(item.date) === monthIdx;
+    }).length;
+
+    // 3. Gallery Count
+    const galleryCount = gallery.filter((item) => {
+      const part = item.id.split('-')[1];
+      const timestamp = part ? Number(part) : NaN;
+      if (!isNaN(timestamp) && timestamp > 1000000000000) {
+        return new Date(timestamp).getMonth() === monthIdx;
+      }
+      // Distribute initial gallery photos (g-1 to g-8) logically:
+      // g-1, g-2 -> Feb (1), g-3, g-4 -> Mar (2), g-5, g-6 -> Apr (3), g-7, g-8 -> Mei (4)
+      const num = Number(item.id.replace('g-', ''));
+      if (!isNaN(num)) {
+        if (num <= 2) return monthIdx === 1; // Feb
+        if (num <= 4) return monthIdx === 2; // Mar
+        if (num <= 6) return monthIdx === 3; // Apr
+        return monthIdx === 4; // Mei
+      }
+      return false;
+    }).length;
+
+    // 4. Services (Berkas) Count
+    const servicesCount = services.filter((item) => {
+      const part = item.id.split('-')[1];
+      const timestamp = part ? Number(part) : NaN;
+      if (!isNaN(timestamp) && timestamp > 1000000000000) {
+        return new Date(timestamp).getMonth() === monthIdx;
+      }
+      // Distribute initial services (s-1 to s-10):
+      // s-1, s-2 -> Jan (0), s-3, s-4 -> Feb (1), s-5, s-6 -> Mar (2), s-7, s-8 -> Apr (3), s-9, s-10 -> Mei (4)
+      const num = Number(item.id.replace('s-', ''));
+      if (!isNaN(num)) {
+        if (num <= 2) return monthIdx === 0;
+        if (num <= 4) return monthIdx === 1;
+        if (num <= 6) return monthIdx === 2;
+        if (num <= 8) return monthIdx === 3;
+        return monthIdx === 4;
+      }
+      return false;
+    }).length;
+
+    // 5. Slides Count
+    const slidesCount = heroSlides.filter((item) => {
+      const part = item.id.split('-')[1];
+      const timestamp = part ? Number(part) : NaN;
+      if (!isNaN(timestamp) && timestamp > 1000000000000) {
+        return new Date(timestamp).getMonth() === monthIdx;
+      }
+      // Initial slides in Jan (0)
+      return monthIdx === 0;
+    }).length;
+
+    return newsCount + eventsCount + galleryCount + servicesCount + slidesCount;
+  };
+
+  const activityCounts = lineChartMonths.map(m => getMonthlyActivityCount(m.index));
+  const maxActivityVal = Math.max(10, ...activityCounts);
+
+  const lineChartPoints = lineChartMonths.map((m, idx) => {
+    const x = 45 + idx * 87;
+    const count = activityCounts[idx];
+    const y = 180 - (count / maxActivityVal) * 150;
+    return { x, y, count, label: m.short };
+  });
+
+  const linePathD = "M " + lineChartPoints.map(p => `${p.x},${p.y}`).join(" L ");
+  const areaPathD = `M ${lineChartPoints[0].x},180 L ` + lineChartPoints.map(p => `${p.x},${p.y}`).join(" L ") + ` L ${lineChartPoints[lineChartPoints.length - 1].x},180 Z`;
+
+  const barChartData = [
+    { name: 'Berita', x: 55, val: news.length, color: '#2D9CDB' },
+    { name: 'Galeri', x: 135, val: gallery.length, color: '#9B51E0' },
+    { name: 'Agenda', x: 215, val: events.length, color: '#F2994A' },
+    { name: 'Berkas', x: 295, val: services.length, color: '#27AE60' }
+  ];
+
+  const maxBarVal = Math.max(10, ...barChartData.map(b => b.val));
+
+  // ==========================================
+  // Render Auth Checking Spinner
+  // ==========================================
+  if (isCheckingAuth) {
+    return (
+      <div className="w-full min-h-screen bg-gradient-to-tr from-[#051424] via-[#0E3B66] to-[#124b82] flex items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-white font-mono text-xs uppercase tracking-wider">Memuat Sesi...</span>
+        </div>
+      </div>
+    );
+  }
 
   // ==========================================
   // Render Login Panel
@@ -751,9 +1155,6 @@ export default function AdminPage() {
           <div className="p-6 border-b border-white/5 flex items-center justify-between">
             <div className="flex flex-col gap-2 w-full select-none">
               <Logo variant="dark" className="scale-90 origin-left pointer-events-none" />
-              <span className="font-mono font-bold text-[9.5px] tracking-widest uppercase text-slate-400 border border-slate-700/60 rounded px-2 py-0.5 self-start ml-[50px] leading-none bg-slate-900/50 select-none">
-                ADMIN PANEL
-              </span>
             </div>
             {/* Close button for mobile */}
             <button
@@ -771,9 +1172,9 @@ export default function AdminPage() {
               { id: 'dashboard', name: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
               { id: 'beranda', name: 'Slide Beranda', icon: <Sliders className="w-4 h-4" /> },
               { id: 'sambutan', name: 'Sambutan', icon: <User className="w-4 h-4" /> },
+              { id: 'agenda', name: 'Agenda Event', icon: <Calendar className="w-4 h-4" /> },
               { id: 'berita', name: 'Berita', icon: <Newspaper className="w-4 h-4" /> },
               { id: 'galeri', name: 'Galeri Foto', icon: <ImageIcon className="w-4 h-4" /> },
-              { id: 'agenda', name: 'Agenda Event', icon: <Calendar className="w-4 h-4" /> },
               { id: 'berkas', name: 'Berkas Layanan', icon: <FileText className="w-4 h-4" /> },
               { id: 'kontak', name: 'Info Kontak', icon: <Phone className="w-4 h-4" /> }
             ].map((tab) => {
@@ -850,7 +1251,7 @@ export default function AdminPage() {
 
           <div className="flex items-center gap-3 shrink-0">
             <span className="hidden sm:inline bg-blue-50 text-[#0E3B66] border border-blue-100 text-[10px] font-extrabold px-3 py-1.5 rounded-lg font-mono uppercase">
-              admin disporapar
+              panel admin
             </span>
           </div>
         </header>
@@ -866,18 +1267,17 @@ export default function AdminPage() {
                 {/* Stat summary cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                   {[
-                    { title: 'Total Berita', count: news.length, desc: 'Rilis pers & berita', icon: <Newspaper className="w-5 h-5 text-blue-600" />, bg: 'bg-blue-50/50 border-blue-100' },
-                    { title: 'Dokumentasi Galeri', count: gallery.length, desc: 'Foto publikasi', icon: <ImageIcon className="w-5 h-5 text-purple-600" />, bg: 'bg-purple-50/50 border-purple-100' },
-                    { title: 'Agenda Terdaftar', count: events.length, desc: 'Event dinas mendatanng', icon: <Calendar className="w-5 h-5 text-amber-600" />, bg: 'bg-amber-50/50 border-amber-100' },
-                    { title: 'Berkas Unduhan', count: services.length, desc: 'Formulir & SOP layanan', icon: <FileText className="w-5 h-5 text-emerald-600" />, bg: 'bg-emerald-50/50 border-emerald-100' }
+                    { title: 'Total Berita', count: news.length, icon: <Newspaper className="w-5 h-5 text-blue-600" />, bg: 'bg-blue-50/50 border-blue-100' },
+                    { title: 'Dokumentasi Galeri', count: gallery.length, icon: <ImageIcon className="w-5 h-5 text-purple-600" />, bg: 'bg-purple-50/50 border-purple-100' },
+                    { title: 'Agenda Terdaftar', count: events.length, icon: <Calendar className="w-5 h-5 text-amber-600" />, bg: 'bg-amber-50/50 border-amber-100' },
+                    { title: 'Berkas Unduhan', count: services.length, icon: <FileText className="w-5 h-5 text-emerald-600" />, bg: 'bg-emerald-50/50 border-emerald-100' }
                   ].map((stat, i) => (
-                    <div key={i} className={`p-5 rounded-2xl bg-white border shadow-xs flex items-start justify-between ${stat.bg}`}>
-                      <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block leading-none">{stat.title}</span>
-                        <span className="text-3xl font-black text-[#0E3B66] font-mono block mt-2.5">{stat.count}</span>
-                        <p className="text-[9px] text-slate-400 font-inter mt-1.5 font-light">{stat.desc}</p>
+                    <div key={i} className={`p-4 rounded-2xl bg-white border shadow-xs flex items-center justify-between ${stat.bg}`}>
+                      <div className="min-w-0 text-left">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block leading-none truncate">{stat.title}</span>
+                        <span className="text-2xl sm:text-3xl font-black text-[#0E3B66] font-mono block mt-1.5 leading-none">{stat.count}</span>
                       </div>
-                      <div className="p-2.5 bg-white border border-slate-100 rounded-xl shadow-xs shrink-0">
+                      <div className="p-2 bg-white border border-slate-100 rounded-xl shadow-xs shrink-0 ml-3">
                         {stat.icon}
                       </div>
                     </div>
@@ -889,43 +1289,40 @@ export default function AdminPage() {
                 {/* ========================================================================= */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                  {/* 1. Monthly Activity Line Chart (7 columns) */}
+                  {/* 1. Monthly Activity Line Chart (7 columns - 60% split) */}
                   <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-6">
                       <div>
                         <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
                           <TrendingUp className="w-5 h-5 text-accent" />
-                          <span>Tren Aktivitas Bulanan (2026)</span>
+                          <span>Tren Aktivitas Bulanan</span>
                         </h3>
-                        <p className="text-[10px] text-slate-400 font-inter mt-1">Akumulasi posting berita & agenda per bulan</p>
+                        <p className="text-[10px] text-slate-400 font-inter mt-1">Total unggahan berita & agenda bulanan</p>
                       </div>
                       <span className="bg-slate-50 border border-slate-100 text-slate-500 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">LINE CHART</span>
                     </div>
 
                     {/* Line Chart Draw Area */}
                     <div className="relative w-full h-64 border border-slate-100/50 bg-slate-50/50 rounded-2xl p-4 flex items-center justify-center select-none font-inter text-[9px] font-medium text-slate-400">
-                      <svg viewBox="0 0 500 220" className="w-full h-full overflow-visible">
+                      <svg viewBox="0 0 500 230" className="w-full h-full overflow-visible">
                         {/* Grid Lines */}
-                        <line x1="40" y1="20" x2="480" y2="20" stroke="#f1f5f9" strokeWidth="1" />
-                        <line x1="40" y1="65" x2="480" y2="65" stroke="#f1f5f9" strokeWidth="1" />
-                        <line x1="40" y1="110" x2="480" y2="110" stroke="#f1f5f9" strokeWidth="1" />
-                        <line x1="40" y1="155" x2="480" y2="155" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3 3" />
-                        <line x1="40" y1="180" x2="480" y2="180" stroke="#cbd5e1" strokeWidth="1.5" />
+                        <line x1="45" y1="20" x2="480" y2="20" stroke="#f1f5f9" strokeWidth="1" />
+                        <line x1="45" y1="65" x2="480" y2="65" stroke="#f1f5f9" strokeWidth="1" />
+                        <line x1="45" y1="110" x2="480" y2="110" stroke="#f1f5f9" strokeWidth="1" />
+                        <line x1="45" y1="155" x2="480" y2="155" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3 3" />
+                        <line x1="45" y1="180" x2="480" y2="180" stroke="#cbd5e1" strokeWidth="1.5" />
 
                         {/* Y-Axis Labels */}
-                        <text x="30" y="24" textAnchor="end">12</text>
-                        <text x="30" y="69" textAnchor="end">9</text>
-                        <text x="30" y="114" textAnchor="end">6</text>
-                        <text x="30" y="159" textAnchor="end">3</text>
-                        <text x="30" y="184" textAnchor="end">0</text>
+                        <text x="35" y="24" textAnchor="end" className="font-semibold fill-slate-400 text-[10px]">{maxActivityVal}</text>
+                        <text x="35" y="69" textAnchor="end" className="font-semibold fill-slate-400 text-[10px]">{Math.round(maxActivityVal * 0.75)}</text>
+                        <text x="35" y="114" textAnchor="end" className="font-semibold fill-slate-400 text-[10px]">{Math.round(maxActivityVal * 0.5)}</text>
+                        <text x="35" y="159" textAnchor="end" className="font-semibold fill-slate-400 text-[10px]">{Math.round(maxActivityVal * 0.25)}</text>
+                        <text x="35" y="184" textAnchor="end" className="font-semibold fill-slate-400 text-[10px]">0</text>
 
-                        {/* X-Axis Labels (Months Jan-Jun) */}
-                        {['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'].map((month, idx) => {
-                          const x = 40 + idx * 80;
-                          return (
-                            <text key={idx} x={x} y="202" textAnchor="middle" className="font-bold text-slate-500 fill-current">{month}</text>
-                          );
-                        })}
+                        {/* X-Axis Labels (Months) */}
+                        {lineChartPoints.map((pt, idx) => (
+                          <text key={idx} x={pt.x} y="208" textAnchor="middle" className="font-bold fill-slate-500 text-[10px]">{pt.label}</text>
+                        ))}
 
                         {/* SVG Gradient definition */}
                         <defs>
@@ -937,31 +1334,24 @@ export default function AdminPage() {
 
                         {/* Area under line */}
                         <path
-                          d="M 40,165 C 80,150 80,120 120,120 C 160,120 160,150 200,135 C 240,120 280,45 320,50 C 360,55 360,95 400,80 C 440,65 440,30 480,30 L 480,180 L 40,180 Z"
+                          d={areaPathD}
                           fill="url(#line-gradient)"
-                          className="transition-all duration-1000 ease-out"
+                          className="transition-all duration-500 ease-out"
                         />
 
                         {/* Glowing Line */}
                         <path
-                          d="M 40,165 C 80,150 80,120 120,120 C 160,120 160,150 200,135 C 240,120 280,45 320,50 C 360,55 360,95 400,80 C 440,65 440,30 480,30"
+                          d={linePathD}
                           fill="none"
                           stroke="#F2994A"
                           strokeWidth="3.5"
                           strokeLinecap="round"
-                          className="transition-all duration-1000 ease-out"
+                          className="transition-all duration-500 ease-out"
                           style={{ filter: 'drop-shadow(0px 3px 6px rgba(242,153,74,0.3))' }}
                         />
 
                         {/* Interactive Data Dots */}
-                        {[
-                          { x: 40, y: 165, val: 2 },
-                          { x: 120, y: 120, val: 5 },
-                          { x: 200, y: 135, val: 4 },
-                          { x: 320, y: 50, val: 10 },
-                          { x: 400, y: 80, val: 8 },
-                          { x: 480, y: 30, val: 12 }
-                        ].map((pt, idx) => (
+                        {lineChartPoints.map((pt, idx) => (
                           <g key={idx} className="group cursor-pointer">
                             <circle
                               cx={pt.x}
@@ -982,7 +1372,7 @@ export default function AdminPage() {
                               textAnchor="middle"
                               className="opacity-0 group-hover:opacity-100 fill-[#0E3B66] font-bold text-[10px] transition-opacity"
                             >
-                              {pt.val} Kegiatan
+                              {pt.count} Aktivitas
                             </text>
                           </g>
                         ))}
@@ -990,22 +1380,22 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  {/* 2. Category Distribution Bar Chart (5 columns) */}
+                  {/* 2. Category Distribution Bar Chart (5 columns - 40% split) */}
                   <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-6">
                       <div>
                         <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
-                          <ImageIcon className="w-5 h-5 text-primary" />
-                          <span>Kategori Distribusi</span>
+                          <Sliders className="w-5 h-5 text-purple-650" />
+                          <span>Distribusi Data Modul</span>
                         </h3>
-                        <p className="text-[10px] text-slate-400 font-inter mt-1">Komparasi data berdasarkan rumpun bidang</p>
+                        <p className="text-[10px] text-slate-400 font-inter mt-1">Jumlah data aktif per kategori konten</p>
                       </div>
                       <span className="bg-slate-50 border border-slate-100 text-slate-500 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">BAR CHART</span>
                     </div>
 
                     {/* Bar Chart Draw Area */}
                     <div className="relative w-full h-64 border border-slate-100/50 bg-slate-50/50 rounded-2xl p-5 flex items-center justify-center select-none font-inter text-[9px] font-medium text-slate-400">
-                      <svg viewBox="0 0 350 200" className="w-full h-full overflow-visible">
+                      <svg viewBox="0 0 350 210" className="w-full h-full overflow-visible">
                         {/* Grid Lines */}
                         <line x1="30" y1="20" x2="330" y2="20" stroke="#f1f5f9" strokeWidth="1" />
                         <line x1="30" y1="70" x2="330" y2="70" stroke="#f1f5f9" strokeWidth="1" />
@@ -1013,20 +1403,8 @@ export default function AdminPage() {
                         <line x1="30" y1="160" x2="330" y2="160" stroke="#cbd5e1" strokeWidth="1" />
 
                         {/* X-Axis Labels */}
-                        {[
-                          { name: 'Wisata', x: 75, val: news.filter(n => n.category === 'Pariwisata').length + gallery.filter(g => g.category === 'Pariwisata').length, color: '#F2994A' },
-                          { name: 'Olahraga', x: 155, val: news.filter(n => n.category === 'Olahraga').length + gallery.filter(g => g.category === 'Olahraga').length, color: '#2D9CDB' },
-                          { name: 'Pemuda', x: 235, val: news.filter(n => n.category === 'Kepemudaan').length + gallery.filter(g => g.category === 'Kepemudaan').length, color: '#27AE60' },
-                          { name: 'Dinas', x: 300, val: events.filter(e => e.category === 'Dinas').length, color: '#9B51E0' }
-                        ].map((bar, idx) => {
-                          // Calculate bar height dynamically
-                          const maxVal = Math.max(10, ...[
-                            news.filter(n => n.category === 'Pariwisata').length + gallery.filter(g => g.category === 'Pariwisata').length,
-                            news.filter(n => n.category === 'Olahraga').length + gallery.filter(g => g.category === 'Olahraga').length,
-                            news.filter(n => n.category === 'Kepemudaan').length + gallery.filter(g => g.category === 'Kepemudaan').length,
-                            events.filter(e => e.category === 'Dinas').length
-                          ]);
-                          const barHeight = Math.max(15, (bar.val / maxVal) * 125);
+                        {barChartData.map((bar, idx) => {
+                          const barHeight = Math.max(15, (bar.val / maxBarVal) * 125);
                           const y = 160 - barHeight;
 
                           return (
@@ -1047,7 +1425,7 @@ export default function AdminPage() {
                                 height={barHeight}
                                 rx="6"
                                 fill={`url(#bar-gradient-${idx})`}
-                                className="transition-all duration-1000 group-hover:fill-opacity-90"
+                                className="transition-all duration-550 group-hover:fill-opacity-90"
                               />
 
                               {/* Count on top of bar */}
@@ -1063,9 +1441,9 @@ export default function AdminPage() {
                               {/* Label */}
                               <text
                                 x={bar.x}
-                                y="180"
+                                y="185"
                                 textAnchor="middle"
-                                className="font-bold text-slate-500 fill-current"
+                                className="font-bold fill-slate-550 text-[10px]"
                               >
                                 {bar.name}
                               </text>
@@ -1078,37 +1456,377 @@ export default function AdminPage() {
 
                 </div>
 
-                {/* Recent Activity List */}
-                <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm">
-                  <div className="flex items-center justify-between mb-6">
+                {/* Homepage Publication Manager */}
+                <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm text-left">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
                     <div>
-                      <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight">Kabar Rilis Berita Terbaru</h3>
-                      <p className="text-[10px] text-slate-400 font-inter mt-1">Data sinkronisasi portal publik</p>
+                      <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight">Manajer Publikasi Beranda</h3>
                     </div>
-                    <button
-                      onClick={() => setActiveTab('berita')}
-                      className="text-xs font-bold text-primary hover:text-accent font-mono uppercase tracking-wider transition-colors flex items-center gap-1"
-                    >
-                      <span>Kelola Berita</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
+
+                    {/* Sub-tabs inside Dashboard */}
+                    <div className="flex gap-1.5 p-1 bg-slate-100 rounded-xl">
+                      {[
+                        { id: 'agenda', name: 'Agenda' },
+                        { id: 'berita', name: 'Berita' },
+                        { id: 'galeri', name: 'Galeri' },
+                        { id: 'berkas', name: 'Berkas' }
+                      ].map((tab) => (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => setDashboardTab(tab.id as any)}
+                          className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider font-mono transition-colors text-center cursor-pointer select-none ${dashboardTab === tab.id
+                            ? 'bg-[#0E3B66] text-white shadow-xs'
+                            : 'text-slate-500 hover:bg-slate-200/50 hover:text-slate-800'
+                            }`}
+                        >
+                          {tab.name}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="space-y-4">
-                    {news.slice(0, 3).map((item) => (
-                      <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl hover:border-blue-100 transition-colors">
-                        <div className="flex items-center gap-4 min-w-0">
-                          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
-                            <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
+                  {/* Tab Contents */}
+                  <div className="space-y-6 max-h-[450px] overflow-y-auto pr-1">
+                    {/* 1. Berita Tab */}
+                    {dashboardTab === 'berita' && (() => {
+                      const sortedNews = [...news].sort((a, b) => {
+                        try {
+                          return parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime();
+                        } catch {
+                          return 0;
+                        }
+                      });
+                      const activeItems = sortedNews.filter(item => item.showOnHomepage !== false);
+                      const inactiveItems = sortedNews.filter(item => item.showOnHomepage === false);
+                      return (
+                        <div className="space-y-5">
+                          {/* Active Group */}
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider font-mono">Aktif di Beranda ({activeItems.length}/3)</span>
+                            </div>
+                            {activeItems.length > 0 ? (
+                              activeItems.map(item => (
+                                <div key={item.id} className="flex items-center justify-between p-4 bg-emerald-50/15 border border-emerald-100 rounded-2xl transition-colors">
+                                  <div className="flex items-center gap-4 min-w-0">
+                                    <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                                      <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="text-left min-w-0">
+                                      <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                                      <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • {item.date}</span>
+                                    </div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleNewsHomepage(item.id)}
+                                    className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+                                  >
+                                    <Eye className="w-3.5 h-3.5" />
+                                    <span>TAMPIL</span>
+                                  </button>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Belum ada berita yang ditampilkan di beranda.</p>
+                            )}
                           </div>
-                          <div className="text-left min-w-0">
-                            <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
-                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • {item.date}</span>
+
+                          {/* Inactive Group */}
+                          <div className="space-y-2 pt-3 border-t border-slate-100">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono block">Tersedia untuk Ditampilkan</span>
+                            {inactiveItems.length > 0 ? (
+                              inactiveItems.map(item => (
+                                <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/30 border border-slate-100 rounded-2xl transition-colors">
+                                  <div className="flex items-center gap-4 min-w-0">
+                                    <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                                      <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="text-left min-w-0">
+                                      <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                                      <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • {item.date}</span>
+                                    </div>
+                                  </div>
+                                  {activeItems.length < 3 ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleNewsHomepage(item.id)}
+                                      className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100"
+                                    >
+                                      <EyeOff className="w-3.5 h-3.5" />
+                                      <span>SEMBUNYI</span>
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      disabled
+                                      className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider bg-slate-100 border border-slate-200 text-slate-350 flex items-center gap-1.5 cursor-not-allowed shrink-0 select-none"
+                                      title="Limit 3 berita tercapai. Sembunyikan berita lain terlebih dahulu."
+                                    >
+                                      <X className="w-3.5 h-3.5 text-slate-350" />
+                                      <span>LIMIT</span>
+                                    </button>
+                                  )}
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Semua berita sudah ditampilkan di beranda.</p>
+                            )}
                           </div>
                         </div>
-                        <span className="hidden sm:inline-block bg-emerald-50 text-emerald-700 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">Terbit</span>
-                      </div>
-                    ))}
+                      );
+                    })()}
+
+                    {/* 2. Galeri Tab */}
+                    {dashboardTab === 'galeri' && (() => {
+                      const activeItems = gallery.filter(item => item.showOnHomepage !== false);
+                      const inactiveItems = gallery.filter(item => item.showOnHomepage === false);
+                      return (
+                        <div className="space-y-5">
+                          {/* Active Group */}
+                          <div className="space-y-2">
+                            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider font-mono block">Aktif di Beranda ({activeItems.length}/5)</span>
+                            {activeItems.length > 0 ? (
+                              activeItems.map(item => (
+                                <div key={item.id} className="flex items-center justify-between p-4 bg-emerald-50/15 border border-emerald-100 rounded-2xl transition-colors">
+                                  <div className="flex items-center gap-4 min-w-0">
+                                    <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                                      <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="text-left min-w-0">
+                                      <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                                      <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category}</span>
+                                    </div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleGalleryHomepage(item.id)}
+                                    className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+                                  >
+                                    <Eye className="w-3.5 h-3.5" />
+                                    <span>TAMPIL</span>
+                                  </button>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Belum ada foto yang ditampilkan di beranda.</p>
+                            )}
+                          </div>
+
+                          {/* Inactive Group */}
+                          <div className="space-y-2 pt-3 border-t border-slate-100">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono block">Tersedia untuk Ditampilkan</span>
+                            {inactiveItems.length > 0 ? (
+                              inactiveItems.map(item => (
+                                <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/30 border border-slate-100 rounded-2xl transition-colors">
+                                  <div className="flex items-center gap-4 min-w-0">
+                                    <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                                      <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="text-left min-w-0">
+                                      <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                                      <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category}</span>
+                                    </div>
+                                  </div>
+                                  {activeItems.length < 5 ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleGalleryHomepage(item.id)}
+                                      className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100"
+                                    >
+                                      <EyeOff className="w-3.5 h-3.5" />
+                                      <span>SEMBUNYI</span>
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      disabled
+                                      className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider bg-slate-100 border border-slate-200 text-slate-350 flex items-center gap-1.5 cursor-not-allowed shrink-0 select-none"
+                                      title="Limit 5 foto galeri tercapai. Sembunyikan foto lain terlebih dahulu."
+                                    >
+                                      <X className="w-3.5 h-3.5 text-slate-350" />
+                                      <span>LIMIT</span>
+                                    </button>
+                                  )}
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Semua foto sudah ditampilkan di beranda.</p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* 3. Agenda Tab */}
+                    {dashboardTab === 'agenda' && (() => {
+                      const sortedEvents = [...events].sort((a, b) => {
+                        try {
+                          return parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime();
+                        } catch {
+                          return 0;
+                        }
+                      });
+                      const activeItems = sortedEvents.filter(item => item.showOnHomepage !== false);
+                      const inactiveItems = sortedEvents.filter(item => item.showOnHomepage === false);
+                      return (
+                        <div className="space-y-5">
+                          {/* Active Group */}
+                          <div className="space-y-2">
+                            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider font-mono block">Aktif di Beranda ({activeItems.length}/4)</span>
+                            {activeItems.length > 0 ? (
+                              activeItems.map(item => (
+                                <div key={item.id} className="flex items-center justify-between p-4 bg-emerald-50/15 border border-emerald-100 rounded-2xl transition-colors">
+                                  <div className="flex items-center gap-4 min-w-0">
+                                    <div className="w-12 h-12 rounded-xl bg-amber-50/50 border border-amber-100 flex items-center justify-center shrink-0 text-amber-600">
+                                      <Calendar className="w-6 h-6" />
+                                    </div>
+                                    <div className="text-left min-w-0">
+                                      <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                                      <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">LOKASI: {item.location} • {item.date} ({item.time})</span>
+                                    </div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleEventsHomepage(item.id)}
+                                    className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+                                  >
+                                    <Eye className="w-3.5 h-3.5" />
+                                    <span>TAMPIL</span>
+                                  </button>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Belum ada agenda yang ditampilkan di beranda.</p>
+                            )}
+                          </div>
+
+                          {/* Inactive Group */}
+                          <div className="space-y-2 pt-3 border-t border-slate-100">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono block">Tersedia untuk Ditampilkan</span>
+                            {inactiveItems.length > 0 ? (
+                              inactiveItems.map(item => (
+                                <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/30 border border-slate-100 rounded-2xl transition-colors">
+                                  <div className="flex items-center gap-4 min-w-0">
+                                    <div className="w-12 h-12 rounded-xl bg-amber-50/50 border border-amber-100 flex items-center justify-center shrink-0 text-amber-600">
+                                      <Calendar className="w-6 h-6" />
+                                    </div>
+                                    <div className="text-left min-w-0">
+                                      <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                                      <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">LOKASI: {item.location} • {item.date} ({item.time})</span>
+                                    </div>
+                                  </div>
+                                  {activeItems.length < 4 ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleEventsHomepage(item.id)}
+                                      className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100"
+                                    >
+                                      <EyeOff className="w-3.5 h-3.5" />
+                                      <span>SEMBUNYI</span>
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      disabled
+                                      className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider bg-slate-100 border border-slate-200 text-slate-350 flex items-center gap-1.5 cursor-not-allowed shrink-0 select-none"
+                                      title="Limit 4 agenda tercapai. Sembunyikan agenda lain terlebih dahulu."
+                                    >
+                                      <X className="w-3.5 h-3.5 text-slate-350" />
+                                      <span>LIMIT</span>
+                                    </button>
+                                  )}
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Semua agenda sudah ditampilkan di beranda.</p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* 4. Berkas Tab */}
+                    {dashboardTab === 'berkas' && (() => {
+                      const activeItems = services.filter(item => item.showOnHomepage !== false);
+                      const inactiveItems = services.filter(item => item.showOnHomepage === false);
+                      return (
+                        <div className="space-y-5">
+                          {/* Active Group */}
+                          <div className="space-y-2">
+                            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider font-mono block">Aktif di Beranda ({activeItems.length}/3)</span>
+                            {activeItems.length > 0 ? (
+                              activeItems.map(item => (
+                                <div key={item.id} className="flex items-center justify-between p-4 bg-emerald-50/15 border border-emerald-100 rounded-2xl transition-colors">
+                                  <div className="flex items-center gap-4 min-w-0">
+                                    <div className="w-12 h-12 rounded-xl bg-emerald-50/50 border border-emerald-100 flex items-center justify-center shrink-0 text-emerald-600">
+                                      <FileText className="w-6 h-6" />
+                                    </div>
+                                    <div className="text-left min-w-0">
+                                      <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                                      <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • UKURAN: {item.fileSize}</span>
+                                    </div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleServicesHomepage(item.id)}
+                                    className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+                                  >
+                                    <Eye className="w-3.5 h-3.5" />
+                                    <span>TAMPIL</span>
+                                  </button>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Belum ada berkas yang ditampilkan di beranda.</p>
+                            )}
+                          </div>
+
+                          {/* Inactive Group */}
+                          <div className="space-y-2 pt-3 border-t border-slate-100">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono block">Tersedia untuk Ditampilkan</span>
+                            {inactiveItems.length > 0 ? (
+                              inactiveItems.map(item => (
+                                <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/30 border border-slate-100 rounded-2xl transition-colors">
+                                  <div className="flex items-center gap-4 min-w-0">
+                                    <div className="w-12 h-12 rounded-xl bg-emerald-50/50 border border-emerald-100 flex items-center justify-center shrink-0 text-emerald-600">
+                                      <FileText className="w-6 h-6" />
+                                    </div>
+                                    <div className="text-left min-w-0">
+                                      <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                                      <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • UKURAN: {item.fileSize}</span>
+                                    </div>
+                                  </div>
+                                  {activeItems.length < 3 ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleServicesHomepage(item.id)}
+                                      className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100"
+                                    >
+                                      <EyeOff className="w-3.5 h-3.5" />
+                                      <span>SEMBUNYI</span>
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      disabled
+                                      className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider bg-slate-100 border border-slate-200 text-slate-350 flex items-center gap-1.5 cursor-not-allowed shrink-0 select-none"
+                                      title="Limit 3 berkas tercapai. Sembunyikan berkas lain terlebih dahulu."
+                                    >
+                                      <X className="w-3.5 h-3.5 text-slate-350" />
+                                      <span>LIMIT</span>
+                                    </button>
+                                  )}
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Semua berkas sudah ditampilkan di beranda.</p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
@@ -1137,40 +1855,79 @@ export default function AdminPage() {
                     </div>
 
                     {/* Category Filter Dropdown */}
-                    <div className="w-full sm:w-44">
-                      <select
-                        value={selectedCategoryFilter}
-                        onChange={(e) => setSelectedCategoryFilter(e.target.value)}
-                        className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium font-inter cursor-pointer"
-                      >
-                        <option value="Semua">Semua Kategori</option>
-                        {activeTab === 'berita' && categoriesStore.news.map(c => <option key={c} value={c}>{c}</option>)}
-                        {activeTab === 'galeri' && categoriesStore.gallery.map(c => <option key={c} value={c}>{c}</option>)}
-                        {activeTab === 'agenda' && categoriesStore.events.map(c => <option key={c} value={c}>{c}</option>)}
-                        {activeTab === 'berkas' && categoriesStore.services.map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
-                    </div>
+                    {activeTab !== 'agenda' && (
+                      <div className="w-full sm:w-44 relative font-inter">
+                        <button
+                          type="button"
+                          onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+                          className={`w-full px-4 py-2.5 bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium flex items-center justify-between cursor-pointer select-none text-xs sm:text-sm ${isFilterDropdownOpen ? 'border-accent ring-2 ring-accent/20' : 'border-slate-200'
+                            }`}
+                        >
+                          <span>{selectedCategoryFilter === 'Semua' ? 'Semua Kategori' : selectedCategoryFilter}</span>
+                          <ChevronDown className={`w-4 h-4 text-slate-450 transition-transform duration-200 shrink-0 ${isFilterDropdownOpen ? 'rotate-180 text-accent' : ''}`} />
+                        </button>
+
+                        {isFilterDropdownOpen && (
+                          <>
+                            {/* Backdrop overlay to close dropdown */}
+                            <div
+                              className="fixed inset-0 z-30"
+                              onClick={() => setIsFilterDropdownOpen(false)}
+                            />
+                            {/* Options dropdown menu */}
+                            <div className="absolute left-0 right-0 mt-2 z-40 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden py-1 animate-fade-in text-left">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedCategoryFilter('Semua');
+                                  setIsFilterDropdownOpen(false);
+                                }}
+                                className={`w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors text-xs sm:text-sm font-semibold flex items-center justify-between ${selectedCategoryFilter === 'Semua' ? 'text-accent bg-accent/5 font-extrabold' : 'text-slate-700'
+                                  }`}
+                              >
+                                <span>Semua Kategori</span>
+                              </button>
+                              {(activeTab === 'berita' ? categoriesStore.news : activeTab === 'galeri' ? categoriesStore.gallery : categoriesStore.services).map((c) => (
+                                <button
+                                  key={c}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedCategoryFilter(c);
+                                    setIsFilterDropdownOpen(false);
+                                  }}
+                                  className={`w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors text-xs sm:text-sm font-semibold flex items-center justify-between ${selectedCategoryFilter === c ? 'text-accent bg-accent/5 font-extrabold' : 'text-slate-700'
+                                    }`}
+                                >
+                                  <span>{c}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Actions Group */}
                   <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const moduleMap: Record<string, 'news' | 'gallery' | 'events' | 'services'> = {
-                          'berita': 'news',
-                          'galeri': 'gallery',
-                          'agenda': 'events',
-                          'berkas': 'services'
-                        };
-                        setCategoryManagerTab(moduleMap[activeTab] || 'news');
-                        setIsCategoryModalOpen(true);
-                      }}
-                      className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[#0E3B66] font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5 font-mono text-xs uppercase tracking-wider cursor-pointer"
-                    >
-                      <Edit2 className="w-3.5 h-3.5 text-[#0E3B66]" />
-                      <span>Kategori</span>
-                    </button>
+                    {activeTab !== 'agenda' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const moduleMap: Record<string, 'news' | 'gallery' | 'services'> = {
+                            'berita': 'news',
+                            'galeri': 'gallery',
+                            'berkas': 'services'
+                          };
+                          setCategoryManagerTab(moduleMap[activeTab] || 'news');
+                          setIsCategoryModalOpen(true);
+                        }}
+                        className="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[#0E3B66] font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5 font-mono text-xs uppercase tracking-wider cursor-pointer"
+                      >
+                        <Edit2 className="w-3.5 h-3.5 text-[#0E3B66]" />
+                        <span>Kategori</span>
+                      </button>
+                    )}
                     <button
                       onClick={() => openForm('add')}
                       className="w-full sm:w-auto px-5 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider cursor-pointer"
@@ -1189,35 +1946,35 @@ export default function AdminPage() {
                         <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
                           {activeTab === 'berita' && (
                             <>
-                              <th className="py-4.5 px-6">Berita</th>
-                              <th className="py-4.5 px-6">Kategori</th>
-                              <th className="py-4.5 px-6">Tanggal</th>
-                              <th className="py-4.5 px-6">Penulis</th>
-                              <th className="py-4.5 px-6 text-center">Aksi</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Berita</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Kategori</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Tanggal</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Penulis</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6 text-center">Aksi</th>
                             </>
                           )}
                           {activeTab === 'galeri' && (
                             <>
-                              <th className="py-4.5 px-6">Media</th>
-                              <th className="py-4.5 px-6">Judul Foto</th>
-                              <th className="py-4.5 px-6">Kategori</th>
-                              <th className="py-4.5 px-6 text-center">Aksi</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Media</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Judul Foto</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Kategori</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6 text-center">Aksi</th>
                             </>
                           )}
                           {activeTab === 'agenda' && (
                             <>
-                              <th className="py-4.5 px-6">Agenda</th>
-                              <th className="py-4.5 px-6">Waktu &amp; Tanggal</th>
-                              <th className="py-4.5 px-6">Lokasi</th>
-                              <th className="py-4.5 px-6 text-center">Aksi</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Agenda</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Waktu &amp; Tanggal</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Lokasi</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6 text-center">Aksi</th>
                             </>
                           )}
                           {activeTab === 'berkas' && (
                             <>
-                              <th className="py-4.5 px-6">Nama Berkas</th>
-                              <th className="py-4.5 px-6">Kategori</th>
-                              <th className="py-4.5 px-6">Ukuran</th>
-                              <th className="py-4.5 px-6 text-center">Aksi</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Nama Berkas</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Kategori</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6">Ukuran</th>
+                              <th className="py-3 px-3 sm:py-4.5 sm:px-6 text-center">Aksi</th>
                             </>
                           )}
                         </tr>
@@ -1229,7 +1986,7 @@ export default function AdminPage() {
                               {/* Berita Row rendering */}
                               {activeTab === 'berita' && (
                                 <>
-                                  <td className="py-4.5 px-6 max-w-xs">
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 max-w-xs">
                                     <div className="flex items-center gap-3 min-w-0">
                                       <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0">
                                         <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
@@ -1240,52 +1997,51 @@ export default function AdminPage() {
                                       </div>
                                     </div>
                                   </td>
-                                  <td className="py-4.5 px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
-                                  <td className="py-4.5 px-6 text-slate-550 font-mono text-[11px] whitespace-nowrap">{item.date}</td>
-                                  <td className="py-4.5 px-6 text-[#0E3B66] font-bold">{item.author}</td>
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-slate-550 font-mono text-[11px] whitespace-nowrap">{item.date}</td>
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-[#0E3B66] font-bold">{item.author}</td>
                                 </>
                               )}
 
                               {/* Galeri Row rendering */}
                               {activeTab === 'galeri' && (
                                 <>
-                                  <td className="py-4.5 px-6 whitespace-nowrap">
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 whitespace-nowrap">
                                     <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-slate-100 shadow-xs border border-slate-100">
                                       <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
                                     </div>
                                   </td>
-                                  <td className="py-4.5 px-6 max-w-xs font-bold text-[#0E3B66]">{item.title}</td>
-                                  <td className="py-4.5 px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 max-w-xs font-bold text-[#0E3B66]">{item.title}</td>
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
                                 </>
                               )}
 
                               {activeTab === 'agenda' && (
                                 <>
-                                  <td className="py-4.5 px-6 max-w-xs">
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 max-w-xs">
                                     <h4 className="font-bold text-[#0E3B66] leading-tight">{item.title}</h4>
                                   </td>
-                                  <td className="py-4.5 px-6 text-slate-550 whitespace-nowrap">
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-slate-550 whitespace-nowrap">
                                     <div className="font-bold text-[11px]">{item.date}</div>
                                     <div className="text-[10px] mt-0.5 font-mono text-slate-400">{item.time}</div>
                                   </td>
-                                  <td className="py-4.5 px-6 text-slate-600 font-inter">{item.location}</td>
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-slate-600 font-inter">{item.location}</td>
                                 </>
                               )}
 
                               {/* Berkas Row rendering */}
                               {activeTab === 'berkas' && (
                                 <>
-                                  <td className="py-4.5 px-6 max-w-xs">
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 max-w-xs">
                                     <h4 className="font-bold text-[#0E3B66] leading-tight">{item.title}</h4>
-                                    <p className="text-[10px] text-slate-400 truncate mt-1">{item.description}</p>
                                   </td>
-                                  <td className="py-4.5 px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
-                                  <td className="py-4.5 px-6 font-mono text-[11px] text-slate-500 whitespace-nowrap">{item.fileSize}</td>
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 uppercase font-mono text-[10px] tracking-wider text-slate-550">{item.category}</td>
+                                  <td className="py-3 px-3 sm:py-4.5 sm:px-6 font-mono text-[11px] text-slate-500 whitespace-nowrap">{item.fileSize}</td>
                                 </>
                               )}
 
                               {/* Actions Column */}
-                              <td className="py-4.5 px-6 text-center whitespace-nowrap">
+                              <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-center whitespace-nowrap">
                                 <div className="flex items-center justify-center gap-2">
                                   <button
                                     onClick={() => openForm('edit', item)}
@@ -1329,21 +2085,31 @@ export default function AdminPage() {
                     <div>
                       <h3 className="text-base sm:text-lg font-extrabold text-[#0E3B66]">Informasi Kontak Dinas</h3>
                     </div>
-                    <button
-                      type={isEditingContact ? "submit" : "button"}
-                      onClick={(e) => {
-                        if (!isEditingContact) {
-                          e.preventDefault();
-                          setIsEditingContact(true);
-                        }
-                      }}
-                      className={`w-56 h-11 px-4 flex items-center justify-center font-extrabold rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0 ${isEditingContact
-                        ? 'bg-accent hover:bg-orange-500 text-white'
-                        : 'bg-[#0E3B66] hover:bg-[#0c3359] text-white'
-                        }`}
-                    >
-                      {isEditingContact ? 'Simpan Kontak' : 'Edit Kontak'}
-                    </button>
+                    {isEditingContact ? (
+                      <div className="flex items-center gap-3 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingContact(false)}
+                          className="h-11 px-5 flex items-center justify-center font-extrabold border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none"
+                        >
+                          Batal
+                        </button>
+                        <button
+                          type="submit"
+                          className="h-11 px-5 flex items-center justify-center font-extrabold bg-accent hover:bg-orange-500 text-white rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent"
+                        >
+                          Simpan
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingContact(true)}
+                        className="h-11 px-6 flex items-center justify-center font-extrabold bg-[#0E3B66] hover:bg-[#0c3359] text-white rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0"
+                      >
+                        Edit Kontak
+                      </button>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -1464,7 +2230,6 @@ export default function AdminPage() {
                 <div className="sticky top-0 z-20 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-md">
                   <div>
                     <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight">Kelola Slide Hero Beranda</h3>
-                    <p className="text-[10px] text-slate-400 font-inter mt-1">Ubah background hero, tagline, judul, tombol CTA dan tautannya</p>
                   </div>
                   <button
                     onClick={() => openForm('add')}
@@ -1481,31 +2246,31 @@ export default function AdminPage() {
                     <table className="w-full text-left border-collapse text-xs sm:text-sm font-inter">
                       <thead>
                         <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
-                          <th className="py-4.5 px-6 w-24">Gambar</th>
-                          <th className="py-4.5 px-6">Tagline & Judul</th>
-                          <th className="py-4.5 px-6">Tombol CTA</th>
-                          <th className="py-4.5 px-6">Tautan (Link)</th>
-                          <th className="py-4.5 px-6 text-center">Aksi</th>
+                          <th className="py-3 px-3 sm:py-4.5 sm:px-6 w-24">Gambar</th>
+                          <th className="py-3 px-3 sm:py-4.5 sm:px-6">Tagline & Judul</th>
+                          <th className="py-3 px-3 sm:py-4.5 sm:px-6">Tombol CTA</th>
+                          <th className="py-3 px-3 sm:py-4.5 sm:px-6">Tautan (Link)</th>
+                          <th className="py-3 px-3 sm:py-4.5 sm:px-6 text-center">Aksi</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                         {heroSlides.length > 0 ? (
                           heroSlides.map((slide) => (
                             <tr key={slide.id} className="hover:bg-slate-50/50 transition-colors">
-                              <td className="py-4.5 px-6 whitespace-nowrap">
+                              <td className="py-3 px-3 sm:py-4.5 sm:px-6 whitespace-nowrap">
                                 <div className="relative w-20 h-12 rounded-lg overflow-hidden bg-slate-100 shadow-xs border border-slate-100">
                                   <Image src={slide.image} alt={slide.title} fill className="object-cover" />
                                 </div>
                               </td>
-                              <td className="py-4.5 px-6 max-w-xs">
+                              <td className="py-3 px-3 sm:py-4.5 sm:px-6 max-w-xs">
                                 <span className="text-[10px] font-bold text-accent uppercase tracking-wider block font-mono">{slide.tagline}</span>
                                 <h4 className="font-bold text-[#0E3B66] leading-tight mt-1">{slide.title}</h4>
                               </td>
-                              <td className="py-4.5 px-6 text-slate-650 font-bold">{slide.cta}</td>
-                              <td className="py-4.5 px-6 font-mono text-[11px] text-slate-500 truncate max-w-[150px]" title={slide.href}>
+                              <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-slate-650 font-bold">{slide.cta}</td>
+                              <td className="py-3 px-3 sm:py-4.5 sm:px-6 font-mono text-[11px] text-slate-500 truncate max-w-[150px]" title={slide.href}>
                                 {slide.href}
                               </td>
-                              <td className="py-4.5 px-6 text-center whitespace-nowrap">
+                              <td className="py-3 px-3 sm:py-4.5 sm:px-6 text-center whitespace-nowrap">
                                 <div className="flex items-center justify-center gap-2">
                                   <button
                                     onClick={() => openForm('edit', slide)}
@@ -1549,56 +2314,86 @@ export default function AdminPage() {
                     <div>
                       <h3 className="text-base sm:text-lg font-extrabold text-[#0E3B66]">Kelola Sambutan Kepala Dinas</h3>
                     </div>
-                    <button
-                      type={isEditingWelcome ? "submit" : "button"}
-                      onClick={(e) => {
-                        if (!isEditingWelcome) {
-                          e.preventDefault();
+                    {isEditingWelcome ? (
+                      <div className="flex items-center gap-3 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsEditingWelcome(false);
+                            setWelcomeImage('');
+                          }}
+                          className="h-11 px-5 flex items-center justify-center font-extrabold border border-slate-200 text-slate-700 hover:bg-slate-55 rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none"
+                        >
+                          Batal
+                        </button>
+                        <button
+                          type="submit"
+                          className="h-11 px-5 flex items-center justify-center font-extrabold bg-accent hover:bg-orange-500 text-white rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent"
+                        >
+                          Simpan
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
                           setIsEditingWelcome(true);
-                          setUploadedImageBase64(welcomeMessage.imageUrl || '');
-                        }
-                      }}
-                      className={`w-56 h-11 px-4 flex items-center justify-center font-extrabold rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0 ${isEditingWelcome
-                        ? 'bg-accent hover:bg-orange-500 text-white'
-                        : 'bg-[#0E3B66] hover:bg-[#0c3359] text-white'
-                        }`}
-                    >
-                      {isEditingWelcome ? 'Simpan Perubahan' : 'Edit Sambutan'}
-                    </button>
+                          setWelcomeImage(welcomeMessage.imageUrl || '');
+                        }}
+                        className="h-11 px-6 flex items-center justify-center font-extrabold bg-[#0E3B66] hover:bg-[#0c3359] text-white rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0"
+                      >
+                        Edit Sambutan
+                      </button>
+                    )}
                   </div>
-
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Left side: Photo upload & preview */}
-                    <div className="lg:col-span-4 space-y-4">
-                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono block">Foto Kepala Dinas</label>
+                    <div className="lg:col-span-4 space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono block">Foto Kepala Dinas</label>
 
-                      <div className="relative aspect-[4/5] w-full max-w-[240px] mx-auto rounded-2xl overflow-hidden border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center p-4 group">
-                        {uploadedImageBase64 ? (
-                          <>
-                            <Image src={uploadedImageBase64} alt="Pratinjau Foto" fill className="object-cover" />
-                            {isEditingWelcome && (
+                      <div className={`relative aspect-[4/5] w-full max-w-[240px] mx-auto rounded-2xl overflow-hidden border-2 border-dashed transition-all duration-200 flex flex-col items-center justify-center p-4 group ${isDragOverWelcome
+                        ? 'border-accent bg-accent/5 scale-[1.02] shadow-md'
+                        : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                        }`}>
+                        {isEditingWelcome ? (
+                          welcomeImage && (welcomeImage.startsWith('data:') || welcomeImage.startsWith('http://') || welcomeImage.startsWith('https://') || welcomeImage.startsWith('/')) ? (
+                            <>
+                              <img src={welcomeImage} alt="Pratinjau Foto" className="w-full h-full object-cover" />
                               <button
                                 type="button"
-                                onClick={() => setUploadedImageBase64('')}
-                                className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition-colors cursor-pointer"
+                                onClick={() => setWelcomeImage('')}
+                                className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-600/90 text-white hover:bg-red-700 hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer"
                                 title="Hapus Gambar"
                               >
                                 <X className="w-4 h-4" />
                               </button>
-                            )}
-                          </>
+                            </>
+                          ) : (
+                            <div className="text-center space-y-2">
+                              <Upload className="w-8 h-8 text-slate-400 mx-auto" />
+                              <span className="text-[11px] text-slate-500 font-bold block">Pilih File Foto</span>
+                              <span className="text-[9px] text-slate-400 block font-light">Maksimal 2MB (WEBP/PNG/JPG/JPEG)</span>
+                            </div>
+                          )
                         ) : (
-                          <div className="text-center space-y-2">
-                            <Upload className="w-8 h-8 text-slate-400 mx-auto" />
-                            <span className="text-[11px] text-slate-500 font-bold block">Pilih File Foto</span>
-                            <span className="text-[9px] text-slate-400 block font-light">Maksimal 2MB (JPG/PNG)</span>
-                          </div>
+                          welcomeMessage.imageUrl ? (
+                            <Image src={welcomeMessage.imageUrl} alt="Foto Kepala Dinas" fill className="object-cover" />
+                          ) : (
+                            <div className="text-center space-y-2">
+                              <Upload className="w-8 h-8 text-slate-400 mx-auto" />
+                              <span className="text-[11px] text-slate-500 font-bold block">Tidak Ada Foto</span>
+                              <span className="text-[9px] text-slate-400 block font-light leading-none">Foto belum diatur</span>
+                            </div>
+                          )
                         )}
-                        {isEditingWelcome && !uploadedImageBase64 && (
+                        {isEditingWelcome && !welcomeImage && (
                           <input
                             type="file"
-                            accept="image/*"
+                            accept="image/webp, image/png, image/jpeg, image/jpg"
                             onChange={handleFileChange}
+                            onDragEnter={() => setIsDragOverWelcome(true)}
+                            onDragLeave={() => setIsDragOverWelcome(false)}
+                            onDrop={() => setIsDragOverWelcome(false)}
                             className="absolute inset-0 opacity-0 cursor-pointer"
                           />
                         )}
@@ -1606,12 +2401,13 @@ export default function AdminPage() {
 
                       {isEditingWelcome && (
                         <div className="space-y-1 text-left">
-                          <label className="text-[9px] font-bold text-slate-455 uppercase tracking-wider font-mono">Atau Tautan URL Gambar</label>
+                          <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider font-mono">Atau Tautan URL Gambar</label>
                           <input
                             type="text"
                             name="imageUrl"
                             placeholder="https://..."
-                            defaultValue={welcomeMessage.imageUrl}
+                            value={welcomeImage.startsWith('data:') ? '' : welcomeImage}
+                            onChange={(e) => setWelcomeImage(e.target.value)}
                             disabled={!isEditingWelcome}
                             className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                           />
@@ -1689,7 +2485,8 @@ export default function AdminPage() {
                   setEditingItem(null);
                   setUploadedImageBase64('');
                 }}
-                className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-red-650 text-white/80 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 hover:rotate-90"
+                title="Tutup"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1790,14 +2587,20 @@ export default function AdminPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Local Upload */}
-                      <div className="p-4 border border-dashed border-slate-350 bg-slate-50/50 hover:bg-slate-50 rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors relative">
+                      <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${isDragOverModal
+                        ? 'border-accent bg-accent/5 scale-[1.02] shadow-md'
+                        : 'border-slate-350 bg-slate-50/50 hover:bg-slate-50'
+                        }`}>
                         <Upload className="w-5 h-5 text-slate-400" />
                         <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Gambar</span>
-                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (jpg/png)</span>
+                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (WEBP/PNG/JPG/JPEG)</span>
                         <input
                           type="file"
-                          accept="image/*"
+                          accept="image/webp, image/png, image/jpeg, image/jpg"
                           onChange={handleFileChange}
+                          onDragEnter={() => setIsDragOverModal(true)}
+                          onDragLeave={() => setIsDragOverModal(false)}
+                          onDrop={() => setIsDragOverModal(false)}
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         />
                       </div>
@@ -1821,7 +2624,7 @@ export default function AdminPage() {
                         <button
                           type="button"
                           onClick={() => setUploadedImageBase64('')}
-                          className="absolute top-2 right-2 w-7 h-7 bg-black/60 rounded-full flex items-center justify-center text-white text-xs hover:bg-black transition-colors"
+                          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-600/90 text-white hover:bg-red-700 hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer hover:rotate-90"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -1919,14 +2722,20 @@ export default function AdminPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Local Upload */}
-                      <div className="p-4 border border-dashed border-slate-350 bg-slate-50/50 hover:bg-slate-50 rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors relative">
+                      <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${isDragOverModal
+                        ? 'border-accent bg-accent/5 scale-[1.02] shadow-md'
+                        : 'border-slate-350 bg-slate-50/50 hover:bg-slate-50'
+                        }`}>
                         <Upload className="w-5 h-5 text-slate-400" />
                         <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Berkas</span>
-                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (jpg/png)</span>
+                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (WEBP/PNG/JPG/JPEG)</span>
                         <input
                           type="file"
-                          accept="image/*"
+                          accept="image/webp, image/png, image/jpeg, image/jpg"
                           onChange={handleFileChange}
+                          onDragEnter={() => setIsDragOverModal(true)}
+                          onDragLeave={() => setIsDragOverModal(false)}
+                          onDrop={() => setIsDragOverModal(false)}
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         />
                       </div>
@@ -1950,7 +2759,7 @@ export default function AdminPage() {
                         <button
                           type="button"
                           onClick={() => setUploadedImageBase64('')}
-                          className="absolute top-2 right-2 w-7 h-7 bg-black/60 rounded-full flex items-center justify-center text-white text-xs hover:bg-black transition-colors"
+                          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-600/90 text-white hover:bg-red-700 hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer hover:rotate-90"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -1994,14 +2803,20 @@ export default function AdminPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Local Upload */}
-                      <div className="p-4 border border-dashed border-slate-350 bg-slate-50/50 hover:bg-slate-50 rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors relative">
+                      <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${isDragOverModal
+                        ? 'border-accent bg-accent/5 scale-[1.02] shadow-md'
+                        : 'border-slate-350 bg-slate-50/50 hover:bg-slate-50'
+                        }`}>
                         <Upload className="w-5 h-5 text-slate-400" />
                         <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Berkas</span>
-                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (jpg/png)</span>
+                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (WEBP/PNG/JPG/JPEG)</span>
                         <input
                           type="file"
-                          accept="image/*"
+                          accept="image/webp, image/png, image/jpeg, image/jpg"
                           onChange={handleFileChange}
+                          onDragEnter={() => setIsDragOverModal(true)}
+                          onDragLeave={() => setIsDragOverModal(false)}
+                          onDrop={() => setIsDragOverModal(false)}
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         />
                       </div>
@@ -2025,7 +2840,7 @@ export default function AdminPage() {
                         <button
                           type="button"
                           onClick={() => setUploadedImageBase64('')}
-                          className="absolute top-2 right-2 w-7 h-7 bg-black/60 rounded-full flex items-center justify-center text-white text-xs hover:bg-black transition-colors"
+                          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-600/90 text-white hover:bg-red-700 hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer hover:rotate-90"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -2118,17 +2933,6 @@ export default function AdminPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Deskripsi</label>
-                    <input
-                      type="text"
-                      required
-                      name="description"
-                      defaultValue={editingItem?.description || ''}
-                      placeholder="Deskripsi singkat isi dokumen"
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
                     <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Kategori Layanan</label>
                     <select
                       name="category"
@@ -2146,14 +2950,20 @@ export default function AdminPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Local Upload */}
-                      <div className="p-4 border border-dashed border-slate-350 bg-slate-50/50 hover:bg-slate-50 rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer relative">
+                      <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${isDragOverModal
+                        ? 'border-accent bg-accent/5 scale-[1.02] shadow-md'
+                        : 'border-slate-350 bg-slate-50/50 hover:bg-slate-50'
+                        }`}>
                         <Upload className="w-5 h-5 text-slate-400" />
                         <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Berkas</span>
-                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 5MB (PDF/Docx/Zip)</span>
+                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 5MB (PDF/ZIP/DOC/DOCX)</span>
                         <input
                           type="file"
-                          accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.rar"
+                          accept=".pdf,.zip,.doc,.docx"
                           onChange={handleDocFileChange}
+                          onDragEnter={() => setIsDragOverModal(true)}
+                          onDragLeave={() => setIsDragOverModal(false)}
+                          onDrop={() => setIsDragOverModal(false)}
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         />
                       </div>
@@ -2218,7 +3028,7 @@ export default function AdminPage() {
                       setUploadedFileName('');
                       setUploadedFileSize('');
                     }}
-                    className="px-5 py-2.5 border border-slate-200 text-slate-700 hover:bg-slate-55 rounded-xl transition-all cursor-pointer font-bold text-xs uppercase tracking-wider font-mono"
+                    className="px-5 py-2.5 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all cursor-pointer font-bold text-xs uppercase tracking-wider font-mono"
                   >
                     Batal
                   </button>
@@ -2255,7 +3065,8 @@ export default function AdminPage() {
                   setEditingCategoryIndex(null);
                   setEditingCategoryName('');
                 }}
-                className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-red-650 text-white/80 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 hover:rotate-90"
+                title="Tutup"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2269,7 +3080,6 @@ export default function AdminPage() {
                 {[
                   { id: 'news', name: 'Berita' },
                   { id: 'gallery', name: 'Galeri' },
-                  { id: 'events', name: 'Agenda' },
                   { id: 'services', name: 'Berkas' }
                 ].map((tab) => (
                   <button

@@ -8,7 +8,8 @@ import {
   PUBLIC_SERVICES,
   OFFICE_INFO,
   WELCOME_MESSAGE,
-  HERO_SLIDES
+  HERO_SLIDES,
+  INITIAL_HOMEPAGE_SETTINGS
 } from '@/lib/data';
 export const dynamic = 'force-dynamic';
 
@@ -31,7 +32,8 @@ function getDbData() {
           gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
           events: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Dinas'],
           services: ['SOP', 'Formulir', 'Berkas Layanan', 'Izin Usaha']
-        }
+        },
+        homepageSettings: INITIAL_HOMEPAGE_SETTINGS
       };
       // Ensure the directory exists
       const dir = path.dirname(dbPath);
@@ -62,6 +64,32 @@ function getDbData() {
     if (!parsed.heroSlides) {
       parsed.heroSlides = HERO_SLIDES;
       saveDbData(parsed);
+    }
+    // Ensure homepageSettings key exists on read
+    if (!parsed.homepageSettings) {
+      parsed.homepageSettings = INITIAL_HOMEPAGE_SETTINGS;
+      saveDbData(parsed);
+    } else {
+      let needsSave = false;
+      if (!parsed.homepageSettings.about) {
+        parsed.homepageSettings.about = { ...INITIAL_HOMEPAGE_SETTINGS.about };
+        needsSave = true;
+      } else if (!parsed.homepageSettings.about.stats) {
+        parsed.homepageSettings.about.stats = INITIAL_HOMEPAGE_SETTINGS.about.stats;
+        needsSave = true;
+      }
+      
+      if (!parsed.homepageSettings.programs) {
+        parsed.homepageSettings.programs = { ...INITIAL_HOMEPAGE_SETTINGS.programs };
+        needsSave = true;
+      } else if (!parsed.homepageSettings.programs.cards) {
+        parsed.homepageSettings.programs.cards = INITIAL_HOMEPAGE_SETTINGS.programs.cards;
+        needsSave = true;
+      }
+
+      if (needsSave) {
+        saveDbData(parsed);
+      }
     }
     return parsed;
   } catch (error) {
@@ -130,6 +158,8 @@ export async function POST(request: Request) {
       currentData.welcomeMessage = data;
     } else if (type === 'heroSlides') {
       currentData.heroSlides = data;
+    } else if (type === 'homepageSettings') {
+      currentData.homepageSettings = data;
     } else {
       return NextResponse.json({ error: 'Invalid data type' }, { status: 400 });
     }

@@ -20,7 +20,6 @@ import {
   MapPin,
   Clock,
   Phone,
-  Mail,
   X,
   Download,
   Star,
@@ -31,7 +30,6 @@ import {
   Sparkles
 } from 'lucide-react';
 import {
-  DESTINATIONS,
   YOUTH_PROGRAMS,
   SPORTS_VENUES
 } from '@/lib/data';
@@ -41,7 +39,8 @@ import {
   useGallery,
   usePublicServices,
   useOfficeInfo,
-  useHeroSlides
+  useHeroSlides,
+  useHomepageSettings
 } from '@/lib/data-store';
 import { parseIndonesianDate } from '@/lib/utils';
 
@@ -52,6 +51,7 @@ export default function HomePage() {
   const [publicServices] = usePublicServices();
   const [officeInfo] = useOfficeInfo();
   const [heroSlides] = useHeroSlides();
+  const [homepageSettings] = useHomepageSettings();
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
@@ -90,27 +90,17 @@ export default function HomePage() {
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
   };
 
-  // Get 4 closest upcoming events for Homepage (June 8, 2026 is today in mock context)
-  const hpToday = new Date(2026, 5, 8);
-  const hpSortedEvents = [...eventsList].sort((a, b) => {
-    try {
-      return parseIndonesianDate(a.date).getTime() - parseIndonesianDate(b.date).getTime();
-    } catch {
-      return 0;
-    }
-  });
-
-  const hpUpcomingEvents = hpSortedEvents.filter(event => {
-    try {
-      return parseIndonesianDate(event.date).getTime() >= hpToday.getTime();
-    } catch {
-      return false;
-    }
-  });
-
-  const homepageEvents = hpUpcomingEvents.length >= 4
-    ? hpUpcomingEvents.slice(0, 4)
-    : hpSortedEvents.slice(0, 4);
+  // Sort homepage events from newest to oldest and limit to max 4
+  const homepageEvents = [...eventsList]
+    .filter(event => event.showOnHomepage !== false)
+    .sort((a, b) => {
+      try {
+        return parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime();
+      } catch {
+        return 0;
+      }
+    })
+    .slice(0, 4);
 
   return (
     <div className="w-full min-h-screen bg-[#F8FAFC] selection:bg-primary selection:text-white font-sans overflow-x-hidden">
@@ -142,8 +132,7 @@ export default function HomePage() {
         )}
 
         {/* Ambient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/30 to-slate-950/10 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/65 via-transparent to-transparent z-10" />
+        <div className="absolute inset-0 bg-slate-950/45 z-10" />
 
         {/* Main Hero Container */}
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col items-center justify-center text-center pt-20 sm:pt-24 pb-16">
@@ -158,19 +147,30 @@ export default function HomePage() {
               </div>
 
               {/* Headline */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-6xl font-extrabold tracking-tight text-white leading-tight mb-6">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-6xl font-extrabold tracking-tight text-white leading-tight mb-4">
                 {heroSlides[currentSlide].title}
               </h1>
 
-              {/* Dynamic CTA Button */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-0">
+              {/* Value Proposition Description */}
+              <p className="text-slate-200 text-xs sm:text-sm md:text-base font-inter max-w-2xl mb-8 leading-relaxed font-light">
+                {/*Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal berkomitmen membangun kepemudaan kreatif, membina keolahragaan prestasi, serta memajukan destinasi wisata maritim yang unggul dan berdaya saing.*/}
+              </p>
+
+              {/* Redesigned CTAs */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4.5 w-full sm:w-auto">
                 <Link
-                  href={heroSlides[currentSlide].href}
-                  className="inline-flex items-center gap-2.5 px-6.5 py-3.5 bg-accent hover:bg-orange-500 text-white rounded-xl font-bold font-mono text-xs uppercase tracking-wider transition-all border border-transparent shadow-lg shadow-orange-500/20 active:scale-95 cursor-pointer"
+                  href="/pelayanan"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6.5 py-3.5 bg-accent hover:bg-orange-500 text-white rounded-xl font-extrabold font-mono text-xs uppercase tracking-wider transition-all shadow-lg shadow-orange-500/20 active:scale-95 cursor-pointer"
                 >
-                  <span>{heroSlides[currentSlide].cta}</span>
+                  <span>Lihat Layanan Publik</span>
                   <ArrowRight className="w-4 h-4 text-white" />
                 </Link>
+                <a
+                  href="#agenda-section"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6.5 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/25 backdrop-blur-md rounded-xl font-extrabold font-mono text-xs uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
+                >
+                  <span>Jadwal Agenda Event</span>
+                </a>
               </div>
             </div>
           ) : (
@@ -223,26 +223,26 @@ export default function HomePage() {
 
       {/* 2. QUICK ACCESS SERVICES */}
       <section className="relative z-30 -mt-12 sm:-mt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-xl border border-slate-100/80">
-          <div className="text-center md:text-left mb-6">
+        <div className="bg-white rounded-[2rem] p-8 sm:p-10 shadow-xl border border-slate-100">
+          <div className="text-center md:text-left mb-8">
             <span className="text-[10px] font-bold tracking-widest text-[#F2994A] uppercase bg-orange-50 border border-orange-100/50 px-3 py-1 rounded-full inline-block font-mono mb-2">
               AKSES UTAMA LAYANAN
             </span>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">
+            <h2 className="text-lg sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">
               Layanan & Informasi Cepat
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
-            {/* PPID Card */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
+            {/* Profil */}
             <Link
               href="/profil"
-              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center justify-center text-center p-5 rounded-2xl bg-[#F8FAFC] hover:bg-white border border-transparent hover:border-slate-100 hover:shadow-md hover:-translate-y-1 active:scale-[0.98] transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl bg-blue-50 group-hover:bg-white/10 flex items-center justify-center text-primary group-hover:text-blue-300 mb-3 transition-colors duration-300">
-                <Shield className="w-6 h-6" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#EBF3FF] flex items-center justify-center text-[#2F80ED] mb-3.5 transition-all duration-300 group-hover:scale-105">
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
+              <h3 className="text-xs sm:text-sm font-bold text-[#0E3B66] tracking-tight leading-snug font-sans">
                 Profil
               </h3>
             </Link>
@@ -250,12 +250,12 @@ export default function HomePage() {
             {/* Layanan Publik */}
             <Link
               href="/pelayanan"
-              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center justify-center text-center p-5 rounded-2xl bg-[#F8FAFC] hover:bg-white border border-transparent hover:border-slate-100 hover:shadow-md hover:-translate-y-1 active:scale-[0.98] transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 group-hover:bg-white/10 flex items-center justify-center text-emerald-600 group-hover:text-emerald-300 mb-3 transition-colors duration-300">
-                <Activity className="w-6 h-6" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#EEFBF3] flex items-center justify-center text-[#27AE60] mb-3.5 transition-all duration-300 group-hover:scale-105">
+                <Activity className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
+              <h3 className="text-xs sm:text-sm font-bold text-[#0E3B66] tracking-tight leading-snug font-sans">
                 Layanan Publik
               </h3>
             </Link>
@@ -263,12 +263,12 @@ export default function HomePage() {
             {/* Formulir & Unduhan */}
             <Link
               href="/pelayanan/standar"
-              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center justify-center text-center p-5 rounded-2xl bg-[#F8FAFC] hover:bg-white border border-transparent hover:border-slate-100 hover:shadow-md hover:-translate-y-1 active:scale-[0.98] transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl bg-orange-50 group-hover:bg-white/10 flex items-center justify-center text-[#F2994A] group-hover:text-orange-350 mb-3 transition-colors duration-300">
-                <FileText className="w-6 h-6" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#FFF4E5] flex items-center justify-center text-[#F2994A] mb-3.5 transition-all duration-300 group-hover:scale-105">
+                <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
+              <h3 className="text-xs sm:text-sm font-bold text-[#0E3B66] tracking-tight leading-snug font-sans">
                 Formulir & Unduhan
               </h3>
             </Link>
@@ -276,12 +276,12 @@ export default function HomePage() {
             {/* Agenda Kegiatan */}
             <a
               href="#agenda-section"
-              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center justify-center text-center p-5 rounded-2xl bg-[#F8FAFC] hover:bg-white border border-transparent hover:border-slate-100 hover:shadow-md hover:-translate-y-1 active:scale-[0.98] transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl bg-indigo-50 group-hover:bg-white/10 flex items-center justify-center text-indigo-600 group-hover:text-indigo-300 mb-3 transition-colors duration-300">
-                <Calendar className="w-6 h-6" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#ECEBFF] flex items-center justify-center text-[#6F57E3] mb-3.5 transition-all duration-300 group-hover:scale-105">
+                <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
+              <h3 className="text-xs sm:text-sm font-bold text-[#0E3B66] tracking-tight leading-snug font-sans">
                 Agenda Kegiatan
               </h3>
             </a>
@@ -289,12 +289,12 @@ export default function HomePage() {
             {/* Destinasi Wisata */}
             <Link
               href="/pariwisata"
-              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center justify-center text-center p-5 rounded-2xl bg-[#F8FAFC] hover:bg-white border border-transparent hover:border-slate-100 hover:shadow-md hover:-translate-y-1 active:scale-[0.98] transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl bg-teal-50 group-hover:bg-white/10 flex items-center justify-center text-teal-600 group-hover:text-teal-300 mb-3 transition-colors duration-300">
-                <Compass className="w-6 h-6" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#E6F9F5] flex items-center justify-center text-[#00A389] mb-3.5 transition-all duration-300 group-hover:scale-105">
+                <Compass className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
+              <h3 className="text-xs sm:text-sm font-bold text-[#0E3B66] tracking-tight leading-snug font-sans">
                 Destinasi Wisata
               </h3>
             </Link>
@@ -302,12 +302,12 @@ export default function HomePage() {
             {/* Kontak Dinas */}
             <Link
               href="/hubungi-kami"
-              className="group flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 hover:bg-[#0E3B66] border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center justify-center text-center p-5 rounded-2xl bg-[#F8FAFC] hover:bg-white border border-transparent hover:border-slate-100 hover:shadow-md hover:-translate-y-1 active:scale-[0.98] transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl bg-rose-50 group-hover:bg-white/10 flex items-center justify-center text-rose-500 group-hover:text-rose-350 mb-3 transition-colors duration-300">
-                <Phone className="w-6 h-6" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#FFEBF0] flex items-center justify-center text-[#EB5757] mb-3.5 transition-all duration-300 group-hover:scale-105">
+                <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-white tracking-tight leading-snug">
+              <h3 className="text-xs sm:text-sm font-bold text-[#0E3B66] tracking-tight leading-snug font-sans">
                 Kontak Dinas
               </h3>
             </Link>
@@ -316,801 +316,530 @@ export default function HomePage() {
       </section>
 
       {/* 3. ABOUT DISPORAPAR & STATISTICS */}
-      <section className="py-24 bg-white bg-grid-dots relative z-20 overflow-hidden">
-        {/* Ambient Decorative Glows */}
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-80 h-80 bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute top-1/2 right-0 -translate-y-1/2 w-80 h-80 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Intro on Left */}
-            <div className="lg:col-span-5 space-y-6 text-left">
-              <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] uppercase bg-blue-50 border border-blue-105 px-3 py-1 rounded-full inline-block font-mono">
-                TENTANG KAMI
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
-                Membangun Tegal Bersama DISPORAPAR
-              </h2>
-              <p className="text-slate-500 text-sm sm:text-base font-light leading-relaxed font-inter">
-                DISPORAPAR Kota Tegal berkomitmen mengembangkan pemuda, meningkatkan prestasi olahraga, dan memajukan pariwisata untuk mendukung kesejahteraan masyarakat.
-              </p>
-              <div className="pt-2">
-                <Link
-                  href="/profil"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary uppercase tracking-widest font-mono transition-all group"
-                >
-                  <span>Selengkapnya Tentang Profil Kami</span>
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Stats Dashboard on Right */}
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              {/* Stat 1 */}
-              <div className="flex gap-4 p-5 bg-slate-50/70 hover:bg-white rounded-2xl border border-slate-100/80 hover:shadow-md transition-all duration-300 text-left items-start">
-                <div className="w-10 h-10 rounded-xl bg-orange-50/80 border border-orange-100 flex items-center justify-center text-accent shrink-0 mt-0.5">
-                  <Compass className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-xl sm:text-2xl font-black text-[#0E3B66] tracking-tight font-mono">
-                    15+
-                  </div>
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-800 mt-0.5 leading-tight">
-                    Destinasi Wisata
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-inter mt-1 leading-snug">
-                    Potensi alam, budaya & sejarah
-                  </p>
+      {homepageSettings.about.show && (
+        <section className="py-16 bg-white bg-grid-dots relative z-20 overflow-hidden">
+          {/* Ambient Decorative Glows */}
+          <div className="absolute top-1/2 left-0 -translate-y-1/2 w-80 h-80 bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute top-1/2 right-0 -translate-y-1/2 w-80 h-80 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              {/* Intro on Left */}
+              <div className="lg:col-span-5 space-y-6 text-left">
+                <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] uppercase bg-blue-50 border border-blue-105 px-3 py-1 rounded-full inline-block font-mono">
+                  {homepageSettings.about.subtitle}
+                </span>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
+                  {homepageSettings.about.title}
+                </h2>
+                <p className="text-slate-500 text-sm sm:text-base font-light leading-relaxed font-inter">
+                  {homepageSettings.about.desc}
+                </p>
+                <div className="pt-2">
+                  <Link
+                    href="/profil"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary uppercase tracking-widest font-mono transition-all group"
+                  >
+                    <span>Selengkapnya Profil Kami</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
+                  </Link>
                 </div>
               </div>
 
-              {/* Stat 2 */}
-              <div className="flex gap-4 p-5 bg-slate-50/70 hover:bg-white rounded-2xl border border-slate-100/80 hover:shadow-md transition-all duration-300 text-left items-start">
-                <div className="w-10 h-10 rounded-xl bg-blue-50/80 border border-blue-100 flex items-center justify-center text-[#2D9CDB] shrink-0 mt-0.5">
-                  <Calendar className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-xl sm:text-2xl font-black text-[#0E3B66] tracking-tight font-mono">
-                    40+
-                  </div>
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-800 mt-0.5 leading-tight">
-                    Event Tahunan
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-inter mt-1 leading-snug">
-                    Rangkaian festival & agenda daerah
-                  </p>
-                </div>
-              </div>
+              {/* Stats Dashboard on Right */}
+              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                {homepageSettings.about.stats?.map((stat, idx) => {
+                  const icons = [
+                    <Compass className="w-5 h-5" key="stat-0" />,
+                    <Calendar className="w-5 h-5" key="stat-1" />,
+                    <Users className="w-5 h-5" key="stat-2" />,
+                    <Trophy className="w-5 h-5" key="stat-3" />
+                  ];
+                  const styles = [
+                    { bg: 'bg-orange-50/80 border border-orange-100', text: 'text-accent' },
+                    { bg: 'bg-blue-50/80 border border-blue-100', text: 'text-[#2D9CDB]' },
+                    { bg: 'bg-emerald-50/80 border border-emerald-100', text: 'text-emerald-600' },
+                    { bg: 'bg-rose-50/80 border border-rose-100', text: 'text-rose-500' }
+                  ];
+                  const icon = icons[idx % icons.length];
+                  const style = styles[idx % styles.length];
 
-              {/* Stat 3 */}
-              <div className="flex gap-4 p-5 bg-slate-50/70 hover:bg-white rounded-2xl border border-slate-100/80 hover:shadow-md transition-all duration-300 text-left items-start">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50/80 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0 mt-0.5">
-                  <Users className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-xl sm:text-2xl font-black text-[#0E3B66] tracking-tight font-mono">
-                    25+
-                  </div>
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-800 mt-0.5 leading-tight">
-                    Komunitas Pemuda
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-inter mt-1 leading-snug">
-                    Klub kreatif & mitra kepemudaan
-                  </p>
-                </div>
-              </div>
-
-              {/* Stat 4 */}
-              <div className="flex gap-4 p-5 bg-slate-50/70 hover:bg-white rounded-2xl border border-slate-100/80 hover:shadow-md transition-all duration-300 text-left items-start">
-                <div className="w-10 h-10 rounded-xl bg-rose-50/80 border border-rose-100 flex items-center justify-center text-rose-500 shrink-0 mt-0.5">
-                  <Trophy className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-xl sm:text-2xl font-black text-[#0E3B66] tracking-tight font-mono">
-                    10+
-                  </div>
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-800 mt-0.5 leading-tight">
-                    Cabang Olahraga Binaan
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-inter mt-1 leading-snug">
-                    Sentra atlet & prasarana olahraga
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. FEATURED TOURISM DESTINATIONS */}
-      <section className="py-24 bg-slate-50/60 bg-grid-lines relative overflow-hidden border-t border-slate-100">
-        {/* Ambient Decorative Glows */}
-        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-primary/3 rounded-full blur-[120px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
-            <div className="max-w-xl text-left">
-              <span className="text-[10px] font-bold tracking-widest text-[#F2994A] uppercase bg-orange-50 border border-orange-100 px-3 py-1 rounded-full inline-block mb-3 font-mono">
-                EKSPLORASI TEGAL
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
-                Destinasi Wisata Pilihan
-              </h2>
-              <p className="mt-3 text-slate-500 font-light text-sm sm:text-base leading-relaxed font-inter">
-                Pesona keindahan pesisir pantai maritim, budaya kearifan lokal, serta sajian wisata kuliner autentik Kota Tegal.
-              </p>
-            </div>
-            <Link
-              href="/pariwisata"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary uppercase tracking-widest font-mono transition-colors group"
-            >
-              <span>Lihat Semua Destinasi</span>
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {DESTINATIONS.slice(0, 3).map((dest) => (
-              <div
-                key={dest.id}
-                id={`dest-${dest.id}`}
-                className="group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full"
-              >
-                {/* Image Container with zoom */}
-                <div className="relative aspect-video w-full overflow-hidden bg-slate-100">
-                  <Image
-                    src={dest.imageUrl}
-                    alt={dest.name}
-                    fill
-                    className="object-cover group-hover:scale-102 transition-transform duration-500"
-                    sizes="(max-w-768px) 100vw, 33vw"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="px-2.5 py-1 text-[9px] font-bold text-white bg-primary/95 tracking-widest uppercase rounded-lg shadow-sm backdrop-blur-md font-mono">
-                      {dest.category}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Body Details */}
-                <div className="p-6 flex-grow flex flex-col justify-between">
-                  <div className="text-left">
-                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-primary transition-colors duration-200">
-                      {dest.name}
-                    </h3>
-                    <p className="mt-2 text-xs sm:text-sm text-slate-550 leading-relaxed font-inter line-clamp-2">
-                      {dest.description}
-                    </p>
-
-                    {/* Stats Rows */}
-                    <div className="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs text-slate-600 font-inter">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-3.5 w-3.5 text-accent shrink-0" />
-                        <span className="truncate">{dest.location}</span>
+                  return (
+                    <div key={idx} className="flex gap-4 p-5 bg-slate-50/70 hover:bg-white rounded-2xl border border-slate-100/80 hover:shadow-md transition-all duration-300 text-left items-start">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${style.bg} ${style.text}`}>
+                        {icon}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-3.5 w-3.5 text-secondary shrink-0" />
-                        <span>{dest.operationalHours}</span>
+                      <div className="min-w-0">
+                        <div className="text-xl sm:text-2xl font-black text-[#0E3B66] tracking-tight font-mono">
+                          {stat.value}
+                        </div>
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-800 mt-0.5 leading-tight">
+                          {stat.label}
+                        </h4>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="mt-6">
-                    <Link
-                      href="/pariwisata"
-                      className="w-full text-center py-2.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-wider transition-all block font-mono"
-                    >
-                      Detail Wisata
-                    </Link>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 5. UPCOMING EVENTS & AGENDA */}
-      <section id="agenda-section" className="py-24 bg-white relative scroll-mt-20 border-t border-slate-100 overflow-hidden">
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-80 h-80 bg-primary/3 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-10 right-10 w-80 h-80 bg-accent/4 rounded-full blur-[100px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {homepageSettings.agenda.show && (
+        <section id="agenda-section" className="py-16 bg-[#F5F7FA] relative scroll-mt-20 border-t border-slate-100 overflow-hidden">
+          <div className="absolute top-1/2 left-0 -translate-y-1/2 w-80 h-80 bg-primary/3 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-10 right-10 w-80 h-80 bg-accent/4 rounded-full blur-[100px] pointer-events-none" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Section Header — matches Destinasi layout */}
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
-            <div className="max-w-xl text-left">
-              <span className="text-[10px] font-bold tracking-widest text-[#F2994A] uppercase bg-orange-50 border border-orange-100 px-3 py-1 rounded-full inline-block mb-3 font-mono">
-                AGENDA UTAMA DINAS
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
-                Event &amp; Agenda Mendatang
-              </h2>
-              <p className="mt-3 text-slate-500 font-light text-sm sm:text-base leading-relaxed font-inter">
-                Agenda resmi, festival tahunan pemuda kreatif, kompetisi olahraga, serta forum rapat terbuka DISPORAPAR Kota Tegal.
-              </p>
+            {/* Section Header */}
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
+              <div className="max-w-xl text-left">
+                <span className="text-[10px] font-bold tracking-widest text-[#F2994A] uppercase bg-orange-50 border border-orange-100 px-3 py-1 rounded-full inline-block mb-3 font-mono">
+                  {homepageSettings.agenda.subtitle}
+                </span>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
+                  {homepageSettings.agenda.title}
+                </h2>
+                <p className="mt-3 text-slate-500 font-light text-sm sm:text-base leading-relaxed font-inter">
+                  {homepageSettings.agenda.desc}
+                </p>
+              </div>
+              <Link
+                href="/agenda"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary uppercase tracking-widest font-mono transition-colors group shrink-0"
+              >
+                <span>Semua Agenda</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
+              </Link>
             </div>
-            <Link
-              href="/agenda"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#353086] hover:text-primary uppercase tracking-widest font-mono transition-colors group shrink-0"
-            >
-              <span>Semua Agenda</span>
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
-            </Link>
-          </div>
 
-          {/* Event Cards Grid — full width 2x2 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {homepageEvents.map((event) => {
-              let parsedDate: Date | null = null;
-              try { parsedDate = parseIndonesianDate(event.date); } catch { }
-              const dayNum = parsedDate ? parsedDate.getDate().toString().padStart(2, '0') : '--';
-              const monthShort = parsedDate ? parsedDate.toLocaleDateString('id-ID', { month: 'short' }).toUpperCase() : '';
-              const yearNum = parsedDate ? parsedDate.getFullYear() : '';
+            {/* Responsive 2-column Card Grid */}
+            <div className="flex flex-wrap justify-center gap-8 py-2">
+              {homepageEvents.map((event) => {
+                let parsedDate: Date | null = null;
+                try { parsedDate = parseIndonesianDate(event.date); } catch { }
+                const dayNum = parsedDate ? parsedDate.getDate().toString().padStart(2, '0') : '--';
 
-              // Category color map
-              const categoryColors: Record<string, { text: string; bg: string; border: string }> = {
-                'Olahraga': { text: 'text-[#F3702A]', bg: 'bg-orange-50', border: 'border-orange-200' },
-                'Pariwisata': { text: 'text-[#353086]', bg: 'bg-indigo-50', border: 'border-indigo-200' },
-                'Kepemudaan': { text: 'text-[#0E3B66]', bg: 'bg-blue-50', border: 'border-blue-200' },
-                'Dinas': { text: 'text-[#353086]', bg: 'bg-violet-50', border: 'border-violet-200' },
-              };
-              const catStyle = categoryColors[event.category] || categoryColors['Olahraga'];
+                const getIndoMonthShort = (date: Date) => {
+                  const list = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
+                  return list[date.getMonth()] || 'JUN';
+                };
+                const monthShort = parsedDate ? getIndoMonthShort(parsedDate) : '';
+                const yearNum = parsedDate ? parsedDate.getFullYear() : '2026';
 
-              return (
-                <div
-                  key={event.id}
-                  className="flex bg-white border border-slate-100 rounded-2xl transition-all duration-300 hover:shadow-lg hover:border-slate-200 group overflow-hidden"
-                >
-                  {/* Date block — fixed width column */}
-                  <div className="shrink-0 w-[100px] flex flex-col items-center justify-center select-none border-r border-slate-100 py-6">
-                    <div className="text-[42px] font-black text-[#353086] leading-none tracking-tighter">{dayNum}</div>
-                    <div className="text-[11px] font-extrabold text-[#F3702A] uppercase tracking-widest mt-1.5">{monthShort}</div>
-                    <div className="text-[13px] font-semibold text-slate-400 mt-0.5">{yearNum}</div>
-                  </div>
+                // All cards have navy dark title by default and transition to orange on hover to be consistent
+                const titleColorClass = 'text-[#0E3B66] group-hover:text-[#F3702A]';
 
-                  {/* Details — flexible right side */}
-                  <div className="flex-1 min-w-0 px-6 py-5 flex flex-col justify-center">
-                    {/* Category + Time row */}
-                    <div className="flex items-center justify-between gap-3 mb-2.5">
-                      <span className={`text-[9px] font-bold tracking-[0.12em] uppercase ${catStyle.text} ${catStyle.bg} border ${catStyle.border} px-2.5 py-1 rounded-md font-mono leading-none`}>
-                        {event.category}
-                      </span>
-                      <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1 shrink-0 whitespace-nowrap">
-                        <Clock className="w-3.5 h-3.5" />
-                        {event.time}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h4 className="font-extrabold text-base sm:text-lg text-[#0E3B66] leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                      {event.title}
-                    </h4>
-
-                    {/* Location */}
-                    {event.location && (
-                      <div className="flex items-start gap-1.5 mt-3 text-[13px] text-slate-400 font-inter">
-                        <MapPin className="w-4 h-4 text-[#F3702A] shrink-0 mt-px" />
-                        <span className="line-clamp-1">{event.location}</span>
+                return (
+                  <div
+                    key={event.id}
+                    className="group flex flex-row bg-white rounded-[24px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.1)] transition-all duration-300 ease-in-out w-full lg:w-[calc(50%-16px)] max-w-2xl font-sans min-h-[160px]"
+                  >
+                    {/* Left Date Panel */}
+                    <div className="shrink-0 w-[110px] sm:w-[115px] bg-[#0F3D6E] flex flex-col items-center justify-center select-none text-center px-3">
+                      <div className="text-3xl sm:text-[34px] font-extrabold text-white leading-none tracking-tight font-sans">
+                        {dayNum}
                       </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-        </div>
-      </section>
-
-      {/* 6. PRIORITY PROGRAMS */}
-      <section className="py-24 bg-slate-50/60 bg-grid-lines relative overflow-hidden border-t border-slate-100">
-        {/* Ambient Decorative Glows */}
-        <div className="absolute top-10 left-10 w-96 h-96 bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] uppercase bg-blue-50 border border-blue-100 px-3 py-1 rounded-full inline-block font-mono">
-              PROGRAM UNGGULAN DINAS
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0E3B66] tracking-tight mt-4">
-              Pilar Program Prioritas
-            </h2>
-            <p className="mt-4 text-slate-500 text-sm sm:text-base font-light leading-relaxed font-inter">
-              Fokus strategis pembangunan yang diimplementasikan secara akuntabel, transparan, dan berkelanjutan untuk Kota Tegal.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Pariwisata Card */}
-            <div className="group bg-white rounded-2xl p-8 border border-slate-100 hover:border-accent transition-all duration-300 flex flex-col justify-between hover:shadow-lg text-center">
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-accent mb-6 border border-orange-100/50 mx-auto">
-                  <Compass className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-bold text-[#0E3B66] tracking-tight text-center">Pariwisata Bahari & Religi</h3>
-                <p className="mt-3 text-xs sm:text-sm text-slate-500 font-light leading-relaxed font-inter mb-6 text-center max-w-sm">
-                  Revitalisasi pariwisata bahari PAI terpadu, pengembangan wisata religi cagar sejarah Alun-alun & Taman Pancasila serta sertifikasi pembinaan usaha kuliner legendaris Tegal.
-                </p>
-                <div className="w-full flex justify-center text-left">
-                  <ul className="space-y-2.5 font-inter text-xs text-slate-600">
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                      <span>Kampung Seni & Galeri Wisata PAI</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                      <span>Lembaga Pengelola Usaha Pariwisata (TDUP)</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                      <span>Festival Pesisir & Kuliner Tahunan</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-8 pt-5 border-t border-slate-100 flex justify-center">
-                <Link
-                  href="/pariwisata"
-                  className="inline-flex items-center gap-1.5 font-bold text-xs text-[#0E3B66] uppercase tracking-widest font-mono hover:text-accent transition-colors"
-                >
-                  <span>Selengkapnya</span>
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Kepemudaan Card */}
-            <div className="group bg-white rounded-2xl p-8 border border-slate-100 hover:border-emerald-500 transition-all duration-300 flex flex-col justify-between hover:shadow-lg text-center">
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-6 border border-emerald-100/50 mx-auto">
-                  <Users className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-bold text-[#0E3B66] tracking-tight text-center">Pemberdayaan Pemuda Kreatif</h3>
-                <p className="mt-3 text-xs sm:text-sm text-slate-500 font-light leading-relaxed font-inter mb-6 text-center max-w-sm">
-                  Menjaring ekosistem wirausaha muda terdidik dalam program Akselerator AWMT, pembinaan berkelanjutan KNPI/OK, pembekalan Paskibraka serta inkubasi Youth Creative Hub.
-                </p>
-                <div className="w-full flex justify-center text-left">
-                  <ul className="space-y-2.5 font-inter text-xs text-slate-600">
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span>Akselerator Wirausaha Muda (AWMT)</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span>Seleksi & Pendidikan Paskibraka</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span>Tegal Youth Co-Working Space</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-8 pt-5 border-t border-slate-100 flex justify-center">
-                <Link
-                  href="/kepemudaan"
-                  className="inline-flex items-center gap-1.5 font-bold text-xs text-[#0E3B66] uppercase tracking-widest font-mono hover:text-accent transition-colors"
-                >
-                  <span>Selengkapnya</span>
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Olahraga Card */}
-            <div className="group bg-white rounded-2xl p-8 border border-slate-100 hover:border-secondary transition-all duration-300 flex flex-col justify-between hover:shadow-lg text-center">
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-secondary mb-6 border border-blue-100 mx-auto">
-                  <Trophy className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-bold text-[#0E3B66] tracking-tight text-center">Prestasi Olahraga Berkelanjutan</h3>
-                <p className="mt-3 text-xs sm:text-sm text-slate-500 font-light leading-relaxed font-inter mb-6 text-center max-w-sm">
-                  Pembinaan atlet andalan daerah persiapan PORPROV & PON, standardisasi prasarana Stadion Yos Sudarso & GOR Wisanggeni serta transparansi sewa venue olahraga digital.
-                </p>
-                <div className="w-full flex justify-center text-left">
-                  <ul className="space-y-2.5 font-inter text-xs text-slate-600">
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
-                      <span>Pembinaan Atlet Pelari & Cabor Unggulan</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
-                      <span>Sewa Fasilitas Stadion & Kolam Olympic</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
-                      <span>Fasilitasi Insentif Bonus Medali Atlet</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-8 pt-5 border-t border-slate-100 flex justify-center">
-                <Link
-                  href="/olahraga"
-                  className="inline-flex items-center gap-1.5 font-bold text-xs text-[#0E3B66] uppercase tracking-widest font-mono hover:text-accent transition-colors"
-                >
-                  <span>Selengkapnya</span>
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. LATEST NEWS & DOCUMENTATION */}
-      <section className="py-24 bg-white bg-grid-dots relative overflow-hidden border-t border-slate-100">
-        {/* Ambient Decorative Glows */}
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-80 h-80 bg-accent/4 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-10 right-10 w-80 h-80 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
-            <div className="max-w-xl text-left">
-              <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] uppercase bg-blue-50 border border-blue-105 px-3 py-1 rounded-full inline-block mb-3 font-mono">
-                BERITA TERBARU & PENGUMUMAN
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
-                Kabar Kegiatan Terkini
-              </h2>
-              <p className="mt-3 text-slate-500 font-light text-sm sm:text-base leading-relaxed font-inter">
-                Informasi berita resmi, liputan pers, pengumuman regulasi, pembangunan fasilitas di lingkungan DISPORAPAR Kota Tegal.
-              </p>
-            </div>
-            <Link
-              href="/berita"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary uppercase tracking-widest font-mono transition-colors group"
-            >
-              <span>Semua Berita</span>
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...newsList]
-              .sort((a, b) => parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime())
-              .slice(0, 3)
-              .map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full group"
-                >
-                  {/* Thumbnail */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      className="object-cover group-hover:scale-103 transition-transform duration-500"
-                      sizes="(max-w-768px) 100vw, 33vw"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute top-4 left-4 z-10">
-                      <span className="px-2.5 py-1 text-[9px] font-bold text-white bg-[#0E3B66]/90 tracking-widest uppercase rounded-lg shadow-sm backdrop-blur-md font-mono">
-                        {item.category}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* News Details */}
-                  <div className="p-6 sm:p-8 flex-grow flex flex-col justify-between text-left">
-                    <div>
-                      <div className="flex items-center gap-3 text-[10px] sm:text-xs text-slate-400 mb-3.5 font-mono">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="h-3.5 w-3.5 shrink-0" />
-                          <span>{item.date}</span>
-                        </div>
+                      <div className="text-[#F2994A] font-extrabold text-[11px] sm:text-[12px] tracking-widest uppercase mt-2 leading-none font-sans">
+                        {monthShort}
                       </div>
-                      <h3 className="font-extrabold text-base sm:text-lg text-[#0E3B66] font-sans tracking-tight group-hover:text-primary transition-colors leading-snug line-clamp-3">
-                        {item.title}
-                      </h3>
+                      <div className="text-white/60 text-[9px] sm:text-[10px] mt-2 font-medium leading-none font-sans">
+                        {yearNum}
+                      </div>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end">
-                      <button
-                        type="button"
-                        onClick={() => setActiveNewsDetail(item)}
-                        className="text-xs font-bold text-primary hover:text-accent transition-colors flex items-center gap-1 uppercase tracking-wider font-mono bg-slate-50 hover:bg-slate-100 px-3.5 py-2 rounded-xl cursor-pointer"
-                      >
-                        <span>Baca Rilis</span>
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-
-          {/* Activity Gallery Inline */}
-          <div className="mt-16 pt-16 border-t border-slate-200">
-            <div className="text-center max-w-2xl mx-auto mb-12">
-              <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] uppercase bg-blue-50 border border-blue-105 px-3 py-1 rounded-full inline-block font-mono">
-                GALERI VISUAL KEGIATAN
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0E3B66] tracking-tight mt-4">
-                Suasana &amp; Dokumentasi Nyata
-              </h2>
-              <p className="mt-4 text-slate-500 text-sm font-light leading-relaxed font-inter">
-                Dokumentasi visual dari berbagai program, festival, dan aktivitas kedinasan di lingkungan DISPORAPAR Kota Tegal.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Full-width Gallery Marquee Container (Edge to Edge) */}
-        <div className="w-full overflow-hidden py-4 select-none">
-          <div 
-            className="flex overflow-hidden"
-            onMouseEnter={() => setIsGalleryPaused(true)}
-            onMouseLeave={() => setIsGalleryPaused(false)}
-            onTouchStart={() => setIsGalleryPaused(true)}
-            onTouchEnd={() => setIsGalleryPaused(false)}
-          >
-            <div
-              className={`flex gap-4 w-max animate-marquee ${
-                isGalleryPaused || selectedPhoto ? 'animate-marquee-paused' : 'hover:animate-marquee-paused'
-              }`}
-            >
-              {/* Duplicated list of gallery photos for infinite loop */}
-              {[...galleryPhotos, ...galleryPhotos].map((photo, idx) => (
-                <div
-                  key={`${photo.id}-${idx}`}
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent toggling the marquee state
-                    setSelectedPhoto(photo);
-                  }}
-                  className="group relative bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 aspect-square w-48 h-48 sm:w-56 sm:h-56 md:w-60 md:h-60 flex-shrink-0"
-                >
-                  {/* Visual Image container with Next.js Image component */}
-                  <div className="relative w-full h-full overflow-hidden bg-slate-50">
-                    <Image
-                      src={photo.imageUrl}
-                      alt={photo.title}
-                      fill
-                      className="object-cover group-hover:scale-104 transition-transform duration-500"
-                      sizes="(max-w-640px) 50vw, (max-w-1024px) 33vw, 20vw"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between text-left">
-                      <div>
-                        <span className="px-2 py-0.5 rounded text-[8.5px] font-extrabold text-white bg-primary hover:bg-opacity-90 w-max uppercase tracking-widest font-mono">
-                          {photo.category}
+                    {/* Right Content Panel */}
+                    <div className="flex-grow p-5 sm:p-6 flex flex-col justify-between text-left">
+                      {/* Top row: time pill */}
+                      <div className="flex items-center">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F1F5F9] text-[#0F3D6E] text-[10px] sm:text-xs font-bold tracking-wide font-mono uppercase border border-[#E2E8F0]">
+                          <Clock className="w-3.5 h-3.5 text-[#F3702A] shrink-0" />
+                          <span>{event.time}</span>
                         </span>
                       </div>
 
-                      <div className="flex flex-col gap-1.5">
-                        <h4 className="font-bold text-xs sm:text-sm text-white leading-snug tracking-tight line-clamp-2">
-                          {photo.title}
-                        </h4>
-                        <div className="flex items-center gap-1 text-white self-end mt-1">
-                          <Eye className="w-3.5 h-3.5 shrink-0 text-white" />
-                          <span className="text-[10px] font-bold tracking-wider font-mono uppercase leading-none">Buka Detail</span>
+                      {/* Middle row: event title */}
+                      <h3 className={`font-bold text-[16px] sm:text-[18px] md:text-[19px] leading-snug tracking-tight font-sans line-clamp-2 transition-colors duration-300 ${titleColorClass} my-3`}>
+                        {event.title}
+                      </h3>
+
+                      {/* Bottom row: location details */}
+                      {event.location && (
+                        <div className="flex items-center gap-2 text-[11px] sm:text-xs text-slate-500 font-medium font-sans border-t border-slate-100 pt-2.5">
+                          <MapPin className="w-4 h-4 text-[#F3702A] shrink-0" />
+                          <span className="line-clamp-1">{event.location}</span>
                         </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+          </div>
+        </section>
+      )}
+
+      {/* 6. PRIORITY PROGRAMS */}
+      {homepageSettings.programs.show && (
+        <section className="py-16 bg-slate-50/60 bg-grid-lines relative overflow-hidden border-t border-slate-100">
+          {/* Ambient Decorative Glows */}
+          <div className="absolute top-10 left-10 w-96 h-96 bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] uppercase bg-blue-50 border border-blue-100 px-3 py-1 rounded-full inline-block font-mono">
+                {homepageSettings.programs.subtitle}
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0E3B66] tracking-tight mt-4">
+                {homepageSettings.programs.title}
+              </h2>
+              <p className="mt-4 text-slate-500 text-sm sm:text-base font-light leading-relaxed font-inter">
+                {homepageSettings.programs.desc}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {homepageSettings.programs.cards?.map((prog, idx) => {
+                const icons = [
+                  <Compass className="h-6 w-6" key="prog-0" />,
+                  <Users className="h-6 w-6" key="prog-1" />,
+                  <Trophy className="h-6 w-6" key="prog-2" />
+                ];
+                const styles = [
+                  {
+                    borderHover: 'hover:border-accent',
+                    iconContainer: 'bg-orange-50 text-accent border border-orange-100/50',
+                    bullet: 'bg-accent',
+                    href: '/pariwisata'
+                  },
+                  {
+                    borderHover: 'hover:border-emerald-500',
+                    iconContainer: 'bg-emerald-50 text-emerald-600 border border-emerald-100/50',
+                    bullet: 'bg-emerald-500',
+                    href: '/kepemudaan'
+                  },
+                  {
+                    borderHover: 'hover:border-secondary',
+                    iconContainer: 'bg-blue-50 text-secondary border border-blue-100',
+                    bullet: 'bg-secondary',
+                    href: '/olahraga'
+                  }
+                ];
+                const icon = icons[idx % icons.length];
+                const style = styles[idx % styles.length];
+
+                return (
+                  <div
+                    key={idx}
+                    className={`group bg-white rounded-2xl p-8 border border-slate-100 transition-all duration-300 flex flex-col justify-between hover:shadow-lg text-center ${style.borderHover}`}
+                  >
+                    <div className="flex flex-col items-center">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 mx-auto ${style.iconContainer}`}>
+                        {icon}
+                      </div>
+                      <h3 className="text-xl font-bold text-[#0E3B66] tracking-tight text-center">
+                        {prog.title}
+                      </h3>
+                      <p className="mt-3 text-xs sm:text-sm text-slate-550 font-light leading-relaxed font-inter mb-6 text-center max-w-sm">
+                        {prog.desc}
+                      </p>
+                      <div className="w-full flex justify-center text-left">
+                        <ul className="space-y-2.5 font-inter text-xs text-slate-650">
+                          {prog.points?.map((pt, pIdx) => (
+                            <li key={pIdx} className="flex items-center gap-2">
+                              <span className={`w-1.5 h-1.5 rounded-full ${style.bullet}`} />
+                              <span>{pt}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="mt-8 pt-5 border-t border-slate-100 flex justify-center">
+                      <Link
+                        href={style.href}
+                        className="inline-flex items-center gap-1.5 font-bold text-xs text-[#0E3B66] uppercase tracking-widest font-mono hover:text-accent transition-colors"
+                      >
+                        <span>Selengkapnya</span>
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 7. LATEST NEWS & DOCUMENTATION */}
+      {homepageSettings.news.show && (
+        <section className="py-16 bg-white bg-grid-dots relative overflow-hidden border-t border-slate-100">
+          {/* Ambient Decorative Glows */}
+          <div className="absolute top-1/2 left-0 -translate-y-1/2 w-80 h-80 bg-accent/4 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-10 right-10 w-80 h-80 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
+              <div className="max-w-xl text-left">
+                <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] uppercase bg-blue-50 border border-blue-105 px-3 py-1 rounded-full inline-block mb-3 font-mono">
+                  {homepageSettings.news.subtitle}
+                </span>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
+                  {homepageSettings.news.title}
+                </h2>
+                <p className="mt-3 text-slate-500 font-light text-sm sm:text-base leading-relaxed font-inter">
+                  {homepageSettings.news.desc}
+                </p>
+              </div>
+              <Link
+                href="/berita"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary uppercase tracking-widest font-mono transition-colors group"
+              >
+                <span>Semua Berita</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-8">
+              {[...newsList]
+                .filter(item => item.showOnHomepage !== false)
+                .sort((a, b) => parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime())
+                .slice(0, 3)
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full group w-full md:w-[calc(50%-16px)] lg:w-[calc(33.333%-22px)] max-w-sm"
+                  >
+                    {/* Thumbnail */}
+                    <div className="relative aspect-[16/10] sm:aspect-[4/3] w-full overflow-hidden bg-slate-50">
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        fill
+                        className="object-cover group-hover:scale-103 transition-transform duration-500"
+                        sizes="(max-w-768px) 100vw, 33vw"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute top-4 left-4 z-10">
+                        <span className="px-2.5 py-1 text-[9px] font-bold text-white bg-[#0E3B66]/90 tracking-widest uppercase rounded-lg shadow-sm backdrop-blur-md font-mono">
+                          {item.category}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* News Details */}
+                    <div className="p-6 sm:p-8 flex-grow flex flex-col justify-between text-left">
+                      <div>
+                        <div className="flex items-center gap-3 text-[10px] sm:text-xs text-slate-400 mb-3.5 font-mono">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5 shrink-0" />
+                            <span>{item.date}</span>
+                          </div>
+                        </div>
+                        <h3 className="font-extrabold text-base sm:text-lg text-[#0E3B66] font-sans tracking-tight group-hover:text-primary transition-colors leading-snug line-clamp-3">
+                          {item.title}
+                        </h3>
+                      </div>
+
+                      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setActiveNewsDetail(item)}
+                          className="text-xs font-bold text-primary hover:text-accent transition-colors flex items-center gap-1 uppercase tracking-wider font-mono bg-slate-50 hover:bg-slate-100 px-3.5 py-2 rounded-xl cursor-pointer"
+                        >
+                          <span>Baca Rilis</span>
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
-        </div>
+        </section>
+      )}
 
-        {/* Start a new max-w-7xl container for the "Seluruh Galeri Foto" button */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-          <div className="text-center">
-            <Link
-              href="/galeri"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all font-mono"
-            >
-              <span>Seluruh Galeri Foto</span>
-              <ImageIcon className="w-4 h-4 text-slate-500" />
-            </Link>
+      {/* 7b. GALLERY VISUAL KEGIATAN */}
+      {homepageSettings.gallery.show && (
+        <section className="py-16 bg-white bg-grid-dots relative overflow-hidden border-t border-slate-100">
+          {/* Ambient Decorative Glows */}
+          <div className="absolute top-1/2 left-0 -translate-y-1/2 w-80 h-80 bg-accent/4 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-10 right-10 w-80 h-80 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="text-[10px] font-bold tracking-widest text-[#0E3B66] uppercase bg-blue-50 border border-blue-105 px-3 py-1 rounded-full inline-block font-mono">
+                {homepageSettings.gallery.subtitle}
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0E3B66] tracking-tight mt-4">
+                {homepageSettings.gallery.title}
+              </h2>
+              <p className="mt-4 text-slate-500 text-sm font-light leading-relaxed font-inter">
+                {homepageSettings.gallery.desc}
+              </p>
+            </div>
           </div>
-        </div>
 
-      </section>
+          {/* Full-width Gallery Marquee Container (Edge to Edge) */}
+          <div className="w-full overflow-hidden py-4 select-none">
+            <div
+              className="flex overflow-hidden"
+              onMouseEnter={() => setIsGalleryPaused(true)}
+              onMouseLeave={() => setIsGalleryPaused(false)}
+              onTouchStart={() => setIsGalleryPaused(true)}
+              onTouchEnd={() => setIsGalleryPaused(false)}
+            >
+              <div
+                className={`flex gap-4 w-max animate-marquee ${isGalleryPaused || selectedPhoto ? 'animate-marquee-paused' : 'hover:animate-marquee-paused'
+                  }`}
+              >
+                {/* Duplicated list of gallery photos for infinite loop */}
+                {(() => {
+                  const visiblePhotos = galleryPhotos.filter(photo => photo.showOnHomepage !== false).slice(0, 5);
+                  if (visiblePhotos.length === 0) return null;
+
+                  // If fewer than 5 photos, repeat them until we have at least 5
+                  let list = [...visiblePhotos];
+                  while (list.length < 5) {
+                    list = [...list, ...visiblePhotos];
+                  }
+
+                  return [...list, ...list].map((photo, idx) => (
+                    <div
+                      key={`${photo.id}-${idx}`}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent toggling the marquee state
+                        setSelectedPhoto(photo);
+                      }}
+                      className="group relative bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 aspect-square w-48 h-48 sm:w-56 sm:h-56 md:w-60 md:h-60 flex-shrink-0"
+                    >
+                      {/* Visual Image container with Next.js Image component */}
+                      <div className="relative w-full h-full overflow-hidden bg-slate-50">
+                        <Image
+                          src={photo.imageUrl}
+                          alt={photo.title}
+                          fill
+                          className="object-cover group-hover:scale-104 transition-transform duration-500"
+                          sizes="(max-w-640px) 50vw, (max-w-1024px) 33vw, 20vw"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between text-left">
+                          <div>
+                            <span className="px-2 py-0.5 rounded text-[8.5px] font-extrabold text-white bg-primary hover:bg-opacity-90 w-max uppercase tracking-widest font-mono">
+                              {photo.category}
+                            </span>
+                          </div>
+
+                          <div className="flex flex-col gap-1.5">
+                            <h4 className="font-bold text-xs sm:text-sm text-white leading-snug tracking-tight line-clamp-2">
+                              {photo.title}
+                            </h4>
+                            <div className="flex items-center gap-1 text-white self-end mt-1">
+                              <Eye className="w-3.5 h-3.5 shrink-0 text-white" />
+                              <span className="text-[10px] font-bold tracking-wider font-mono uppercase leading-none">Buka Detail</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
+          </div>
+
+          {/* Start a new max-w-7xl container for the "Seluruh Galeri Foto" button */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+            <div className="text-center">
+              <Link
+                href="/galeri"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all font-mono"
+              >
+                <span>Seluruh Galeri Foto</span>
+                <ImageIcon className="w-4 h-4 text-slate-500" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 8. PUBLIC SERVICES & DOWNLOADS */}
-      <section className="py-24 bg-slate-50/60 bg-grid-lines relative overflow-hidden border-t border-slate-100">
-        {/* Ambient Decorative Glows */}
-        <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-emerald-500/3 rounded-full blur-[100px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Left Column Intro */}
-            <div className="lg:col-span-4 space-y-5 text-left">
-              <span className="text-[10px] font-bold tracking-widest text-[#10B981] uppercase bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full inline-block font-mono">
-                DOKUMEN RESMI DINAS
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
-                Berkas & Formulir Layanan
-              </h2>
-              <p className="text-slate-500 text-sm font-light leading-relaxed font-inter">
-                Silakan cari dan unduh berkas standar operasional prosedur (SOP) secara mandiri di bawah ini secara cuma-cuma, bebas biaya, transparan dan berlandaskan kepatuhan bebas pungutan liar.
-              </p>
-              <div className="pt-2">
-                <Link
-                  href="/pelayanan/standar"
-                  className="px-5 py-3 rounded-xl bg-primary hover:bg-[#0c355c] text-white font-bold text-xs uppercase tracking-widest transition-colors shadow-sm flex items-center gap-2 justify-center w-max font-mono"
-                >
-                  <span>Seluruh Berkas Layanan</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Right Column Grid/Container - Simplified list with 3 samples */}
-            <div className="lg:col-span-8">
-              <div className="p-4 sm:p-6 bg-white rounded-3xl border border-slate-100 shadow-md">
-                <div className="flex items-center pb-4 mb-4 border-b border-slate-100 font-mono">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Berkas Pilihan Utama</span>
-                </div>
-
-                {/* Simplified list with exactly 3 items, no scrollbar */}
-                <div className="space-y-3.5">
-                  {publicServices.slice(0, 3).map((service) => (
-                    <div
-                      key={service.id}
-                      className="p-4 bg-slate-50 hover:bg-white border border-slate-100 hover:border-emerald-500/30 rounded-xl transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                    >
-                      <div className="flex items-start gap-3.5 min-w-0 flex-1 text-left">
-                        <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100/60 flex items-center justify-center text-emerald-600 shrink-0 mt-0.5">
-                          <FileText className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <h3 className="font-bold text-[#0E3B66] text-sm sm:text-base leading-snug">
-                            {service.title}
-                          </h3>
-                          <p className="text-[10px] sm:text-xs font-semibold text-slate-400 font-mono mt-1">
-                            Ukuran: {service.fileSize}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-end shrink-0 w-full sm:w-auto">
-                        <a
-                          href={service.downloadUrl}
-                          className="inline-flex items-center gap-2 text-xs font-bold text-white bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] px-4 py-2 rounded-lg transition-colors font-mono uppercase tracking-wider shadow-sm"
-                        >
-                          <span>Unduh</span>
-                          <Download className="w-3.5 h-3.5 shrink-0" />
-                        </a>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 9. CONTACT & LOCATION */}
-      <section className="py-24 sm:py-32 bg-white bg-grid-dots relative border-t border-slate-100 overflow-hidden">
-        {/* Ambient Decorative Glows */}
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-80 h-80 bg-accent/4 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute top-1/2 right-0 -translate-y-1/2 w-80 h-80 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-
-            {/* Form & Info Section Card */}
-            <div className="lg:col-span-5 flex flex-col justify-between bg-slate-50 p-8 sm:p-10 rounded-3xl border border-slate-100 text-left">
-              <div>
-                <span className="text-[10px] font-bold tracking-widest text-[#F2994A] uppercase block font-mono mb-2">
-                  KONTAK LAYANAN RESMI
+      {homepageSettings.documents.show && (
+        <section className="py-16 bg-slate-50/60 bg-grid-lines relative overflow-hidden border-t border-slate-100">
+          {/* Ambient Decorative Glows */}
+          <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-emerald-500/3 rounded-full blur-[100px] pointer-events-none" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              {/* Left Column Intro */}
+              <div className="lg:col-span-4 space-y-5 text-left">
+                <span className="text-[10px] font-bold tracking-widest text-[#10B981] uppercase bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full inline-block font-mono">
+                  {homepageSettings.documents.subtitle}
                 </span>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-primary tracking-tight mb-8">
-                  Pusat Informasi & Dinas Terpadu
-                </h3>
-
-                <div className="space-y-6 text-left">
-                  <div className="flex items-start gap-4 text-left">
-                    <div className="w-10 h-10 rounded-xl bg-orange-100/50 flex items-center justify-center shrink-0 text-accent border border-orange-200/30">
-                      <MapPin className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Kantor Utama</h4>
-                      <p className="mt-1 text-xs sm:text-sm text-slate-700 font-semibold font-inter leading-relaxed">
-                        {officeInfo.address}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4 text-left">
-                    <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center shrink-0 text-secondary border border-blue-200/30">
-                      <Phone className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Telepon Resmi</h4>
-                      <p className="mt-1 text-xs sm:text-sm text-slate-700 font-bold font-inter">
-                        {officeInfo.phone}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4 text-left">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100/50 flex items-center justify-center shrink-0 text-emerald-600 border border-emerald-200/30">
-                      <Mail className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Alamat E-Mail</h4>
-                      <p className="mt-1 text-xs sm:text-sm text-slate-700 font-bold font-inter">
-                        {officeInfo.email}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4 text-left">
-                    <div className="w-10 h-10 rounded-xl bg-violet-100/50 flex items-center justify-center shrink-0 text-violet-600 border border-violet-200/30">
-                      <Clock className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Operasional Kerja</h4>
-                      <p className="mt-1 text-xs sm:text-sm text-slate-650 leading-relaxed font-inter">
-                        {officeInfo.operationalHours}
-                      </p>
-                    </div>
-                  </div>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
+                  {homepageSettings.documents.title}
+                </h2>
+                <p className="text-slate-500 text-sm font-light leading-relaxed font-inter">
+                  {homepageSettings.documents.desc}
+                </p>
+                <div className="pt-2">
+                  <Link
+                    href="/pelayanan/standar"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary uppercase tracking-widest font-mono transition-colors group"
+                  >
+                    <span>Seluruh Berkas Layanan</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
+                  </Link>
                 </div>
               </div>
 
-              <div className="pt-8 border-t border-slate-200/70 mt-8">
-                <Link
-                  href="/hubungi-kami"
-                  className="w-full text-center py-3.5 rounded-xl bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] text-white font-bold text-xs uppercase tracking-widest shadow-md block transition-all font-mono"
-                >
-                  Hubungi Kami
-                </Link>
+              {/* Right Column Grid/Container - Simplified list with 3 samples */}
+              <div className="lg:col-span-8">
+                <div className="p-4 sm:p-6 bg-white rounded-3xl border border-slate-100 shadow-md">
+                  <div className="flex items-center pb-4 mb-4 border-b border-slate-100 font-mono">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Berkas Pilihan Utama</span>
+                  </div>
+
+                  {/* Simplified list with exactly 3 items, no scrollbar */}
+                  <div className="space-y-3.5">
+                    {publicServices.filter(service => service.showOnHomepage !== false).slice(0, 3).map((service) => (
+                      <div
+                        key={service.id}
+                        className="p-4 bg-slate-50 hover:bg-white border border-slate-100 hover:border-emerald-500/30 rounded-xl transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                      >
+                        <div className="flex items-start gap-3.5 min-w-0 flex-1 text-left">
+                          <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100/60 flex items-center justify-center text-emerald-600 shrink-0 mt-0.5">
+                            <FileText className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-bold text-[#0E3B66] text-sm sm:text-base leading-snug">
+                              {service.title}
+                            </h3>
+                            <p className="text-[10px] sm:text-xs font-semibold text-slate-400 font-mono mt-1">
+                              Ukuran: {service.fileSize}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end shrink-0 w-full sm:w-auto">
+                          <a
+                            href={service.downloadUrl}
+                            className="inline-flex items-center gap-2 text-xs font-bold text-white bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] px-4 py-2 rounded-lg transition-colors font-mono uppercase tracking-wider shadow-sm"
+                          >
+                            <span>Unduh</span>
+                            <Download className="w-3.5 h-3.5 shrink-0" />
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Maps Column */}
-            <div className="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-10 shadow-lg border border-slate-100 flex flex-col justify-between">
-              <div className="relative w-full h-64 sm:h-0 sm:flex-grow rounded-2xl overflow-hidden border border-slate-100 bg-slate-50">
-                <iframe
-                  id="home-map-interactive"
-                  title="Peta Lokasi Dinas"
-                  src={officeInfo.gmapsEmbedUrl}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                  className="absolute inset-0 w-full h-full"
-                />
-              </div>
-
-              {/* Maps Navigation buttons */}
-              <div className="mt-8 pt-8 border-t border-slate-200/70 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <a
-                  id="home-map-route-btn"
-                  href="https://www.google.com/maps/dir/?api=1&destination=Jl.+Melati+No.30a,+Kejambon,+Kec.+Tegal+Tim.,+Kota+Tegal,+Jawa+Tengah+52124"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-3.5 px-6 rounded-xl bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] text-white font-bold text-xs uppercase tracking-widest text-center flex items-center justify-center gap-2 transition-all hover:shadow-lg cursor-pointer font-mono"
-                >
-                  <Compass className="h-4 w-4 shrink-0 text-white" />
-                  <span>PETUNJUK RUTE ARAH</span>
-                </a>
-
-                <a
-                  id="home-map-open-btn"
-                  href="https://maps.google.com/?q=Jl.+Melati+No.30a,+Kejambon,+Kec.+Tegal+Tim.,+Kota+Tegal,+Jawa+Tengah+52124"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-3.5 px-6 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold text-xs uppercase tracking-widest text-center flex items-center justify-center gap-2 transition-all hover:shadow-sm cursor-pointer font-mono"
-                >
-                  <span>GOOGLE MAPS</span>
-                  <ExternalLink className="h-4 w-4 text-slate-500 shrink-0" />
-                </a>
-              </div>
-            </div>
-
           </div>
-        </div>
-      </section>
-
+        </section>
+      )}
       {/* PHOTO PREVIEW LIGHTBOX */}
       <AnimatePresence>
         {selectedPhoto && (
@@ -1215,7 +944,7 @@ export default function HomePage() {
                   </div>
 
                   {/* Large responsive news title */}
-                  <h2 className="text-xl sm:text-3.5xl font-extrabold text-[#0E3B66] tracking-tight leading-snug">
+                  <h2 className="text-lg sm:text-2xl md:text-3.5xl font-extrabold text-[#0E3B66] tracking-tight leading-snug">
                     {activeNewsDetail.title}
                   </h2>
 

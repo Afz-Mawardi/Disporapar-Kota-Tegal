@@ -14,6 +14,9 @@ import {
   PublicService,
   WelcomeMessage,
   HeroSlide,
+  HomepageSection,
+  HomepageSettings,
+  INITIAL_HOMEPAGE_SETTINGS as initialHomepageSettings
 } from './data';
 
 // Helper to check if running in client-side
@@ -251,14 +254,12 @@ export const saveStoredHeroSlides = (data: HeroSlide[]) => {
 export interface CategoryStore {
   news: string[];
   gallery: string[];
-  events: string[];
   services: string[];
 }
 
 export const initialCategories: CategoryStore = {
   news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
   gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
-  events: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Dinas'],
   services: ['SOP', 'Formulir', 'Berkas Layanan', 'Izin Usaha']
 };
 
@@ -309,6 +310,7 @@ const syncWithServer = async () => {
       if (db.categories) localStorage.setItem('disporapar_categories', JSON.stringify(db.categories));
       if (db.welcomeMessage) localStorage.setItem('disporapar_welcome_message', JSON.stringify(db.welcomeMessage));
       if (db.heroSlides) localStorage.setItem('disporapar_hero_slides', JSON.stringify(db.heroSlides));
+      if (db.homepageSettings) localStorage.setItem('disporapar_homepage_settings', JSON.stringify(db.homepageSettings));
       
       // Dispatch update to sync all states
       window.dispatchEvent(new Event('disporapar_data_update'));
@@ -546,6 +548,66 @@ export function useHeroSlides() {
 
   const updateData = (newData: HeroSlide[]) => {
     saveStoredHeroSlides(newData);
+    setData(newData);
+  };
+
+  return [data, updateData] as const;
+}
+
+// Homepage Section types and initial settings are imported from './data'
+
+export const getStoredHomepageSettings = (): HomepageSettings => {
+  if (!isClient) return initialHomepageSettings;
+  try {
+    const stored = localStorage.getItem('disporapar_homepage_settings');
+    if (!stored || stored === 'null' || stored === 'undefined') return initialHomepageSettings;
+    const parsed = JSON.parse(stored);
+    return (parsed && typeof parsed === 'object') ? { ...initialHomepageSettings, ...parsed } : initialHomepageSettings;
+  } catch (e) {
+    console.error('Error reading disporapar_homepage_settings from localStorage', e);
+    return initialHomepageSettings;
+  }
+};
+
+export const saveStoredHomepageSettings = (data: HomepageSettings) => {
+  if (isClient) {
+    try {
+      localStorage.setItem('disporapar_homepage_settings', JSON.stringify(data));
+      window.dispatchEvent(new Event('disporapar_data_update'));
+      fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'homepageSettings', data })
+      }).catch(err => console.error('Failed to save homepage settings to server database', err));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+};
+
+export function useHomepageSettings() {
+  const [data, setData] = useState<HomepageSettings>(initialHomepageSettings);
+
+  useEffect(() => {
+    setData(getStoredHomepageSettings());
+    
+    if (!hasSynced && isClient) {
+      hasSynced = true;
+      syncWithServer();
+    }
+    
+    const handleUpdate = () => {
+      setData(getStoredHomepageSettings());
+    };
+
+    window.addEventListener('disporapar_data_update', handleUpdate);
+    return () => {
+      window.removeEventListener('disporapar_data_update', handleUpdate);
+    };
+  }, []);
+
+  const updateData = (newData: HomepageSettings) => {
+    saveStoredHomepageSettings(newData);
     setData(newData);
   };
 

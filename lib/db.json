@@ -9,7 +9,8 @@
       "date": "24 Mei 2026",
       "imageUrl": "https://picsum.photos/seed/festival_pesisir/800/600",
       "author": "Humas DISPORAPAR",
-      "featured": true
+      "featured": true,
+      "showOnHomepage": true
     },
     {
       "id": "news-2",
@@ -20,7 +21,8 @@
       "date": "20 Mei 2026",
       "imageUrl": "https://picsum.photos/seed/pemuda_pelopor/800/600",
       "author": "Bidang Kepemudaan",
-      "featured": true
+      "featured": true,
+      "showOnHomepage": true
     },
     {
       "id": "news-3",
@@ -31,7 +33,8 @@
       "date": "15 Mei 2026",
       "imageUrl": "https://picsum.photos/seed/gor_wisanggeni_news/800/600",
       "author": "Bidang Keolahragaan",
-      "featured": true
+      "featured": true,
+      "showOnHomepage": true
     },
     {
       "id": "news-4",
@@ -41,7 +44,8 @@
       "category": "Pengumuman",
       "date": "10 Mei 2026",
       "imageUrl": "https://picsum.photos/seed/layanan_publik_news/800/600",
-      "author": "Seksi Data & Informasi"
+      "author": "Seksi Data & Informasi",
+      "showOnHomepage": false
     }
   ],
   "events": [
@@ -51,9 +55,9 @@
       "date": "14 Juni 2026",
       "time": "06:00 - 09:30 WIB",
       "location": "Start-Finish di Pantai Alam Indah (PAI)",
-      "category": "Olahraga",
       "description": "Lari santai menyusuri indahnya garis pantai utara Kota Tegal dengan target 2.000 pelari dari seluruh Jawa Tengah. Berhadiah total Rp 50 Juta dan hiburan musik lokal.",
-      "imageUrl": "https://picsum.photos/seed/fun_run/800/600"
+      "imageUrl": "https://picsum.photos/seed/fun_run/800/600",
+      "showOnHomepage": true
     },
     {
       "id": "e-2",
@@ -61,9 +65,9 @@
       "date": "28 Juni 2026",
       "time": "15:00 - 22:00 WIB",
       "location": "Taman Pancasila, Kota Tegal",
-      "category": "Pariwisata",
       "description": "Atraksi bakar sate massal terpanjang dan pemecahan rekor minum teh poci tanah liat bersama 1.000 perajin lokal Tegal, dimeriahkan kesenian tari Balo-Balo.",
-      "imageUrl": "https://picsum.photos/seed/fest_kuliner/800/600"
+      "imageUrl": "https://picsum.photos/seed/fest_kuliner/800/600",
+      "showOnHomepage": true
     },
     {
       "id": "e-3",
@@ -71,9 +75,9 @@
       "date": "02 Juli 2026",
       "time": "08:00 - 14:00 WIB",
       "location": "Gedung Pertemuan KNPI Kota Tegal",
-      "category": "Kepemudaan",
       "description": "Sinergisitas DISPORAPAR bersama BNN Kota Tegal untuk mendidik agen-agen milenial anti-narkoba di setiap kelurahan se-Kota Tegal.",
-      "imageUrl": "https://picsum.photos/seed/pemuda_anti_narkoba/800/600"
+      "imageUrl": "https://picsum.photos/seed/pemuda_anti_narkoba/800/600",
+      "showOnHomepage": true
     },
     {
       "id": "e-4",
@@ -81,9 +85,9 @@
       "date": "10 Juli 2026",
       "time": "09:00 - 16:00 WIB",
       "location": "Ruang Rapat Utama Balai Kota Swasana",
-      "category": "Dinas",
       "description": "Koordinasi teknis persiapan kontingen atlet Tegal dan penyesuaian regulasi sewa fasilitas umum keolahragaan daerah.",
-      "imageUrl": "https://picsum.photos/seed/rapat_dinas/800/600"
+      "imageUrl": "https://picsum.photos/seed/rapat_dinas/800/600",
+      "showOnHomepage": true
     }
   ],
   "gallery": [
@@ -91,49 +95,57 @@
       "id": "g-1",
       "title": "Gubernur Jateng bersama Walikota Tegal meninjau Dermaga Apung PAI",
       "category": "Pariwisata",
-      "imageUrl": "https://picsum.photos/seed/galeri1/900/600"
+      "imageUrl": "https://picsum.photos/seed/galeri1/900/600",
+      "showOnHomepage": true
     },
     {
       "id": "g-2",
       "title": "Pelepasan Kontingen Atlet Sepak Bola Kota Tegal oleh Ka Dinas",
       "category": "Olahraga",
-      "imageUrl": "https://picsum.photos/seed/galeri2/600/900"
+      "imageUrl": "https://picsum.photos/seed/galeri2/600/900",
+      "showOnHomepage": true
     },
     {
       "id": "g-3",
       "title": "Pelatihan Kewirausahaan Pemuda Kreatif di Aula Balaikota",
       "category": "Kepemudaan",
-      "imageUrl": "https://picsum.photos/seed/galeri3/800/600"
+      "imageUrl": "https://picsum.photos/seed/galeri3/800/600",
+      "showOnHomepage": true
     },
     {
       "id": "g-4",
       "title": "Suasana Sunset Romantis dengan latar Kapal Layar Tradisional di PAI",
       "category": "Pariwisata",
-      "imageUrl": "https://picsum.photos/seed/galeri4/800/800"
+      "imageUrl": "https://picsum.photos/seed/galeri4/800/800",
+      "showOnHomepage": true
     },
     {
       "id": "g-5",
       "title": "Latihan Bersama Atlet Panahan Kota Tegal di Stadion Yos Sudarso",
       "category": "Olahraga",
-      "imageUrl": "https://picsum.photos/seed/galeri5/700/900"
+      "imageUrl": "https://picsum.photos/seed/galeri5/700/900",
+      "showOnHomepage": true
     },
     {
       "id": "g-6",
       "title": "Pemberian Piala Juara Pemuda Pelopor bidang Teknologi Kreatif",
       "category": "Kepemudaan",
-      "imageUrl": "https://picsum.photos/seed/galeri6/800/600"
+      "imageUrl": "https://picsum.photos/seed/galeri6/800/600",
+      "showOnHomepage": false
     },
     {
       "id": "g-7",
       "title": "Kawasan Pedestrian Taman Pancasila yang ramai dikunjungi malam hari",
       "category": "Pariwisata",
-      "imageUrl": "https://picsum.photos/seed/galeri7/1000/600"
+      "imageUrl": "https://picsum.photos/seed/galeri7/1000/600",
+      "showOnHomepage": false
     },
     {
       "id": "g-8",
       "title": "Sinergi Pramuka dan Pemuda Tegal dalam Aksi Bersih Pantai Bahari",
       "category": "Kepemudaan",
-      "imageUrl": "https://picsum.photos/seed/galeri8/900/700"
+      "imageUrl": "https://picsum.photos/seed/galeri8/900/700",
+      "showOnHomepage": false
     }
   ],
   "services": [
@@ -143,7 +155,8 @@
       "description": "Panduan tata cara penyewaan sarana prasarana olahraga milik daerah untuk kegiatan olahraga maupun luar olahraga.",
       "category": "SOP",
       "downloadUrl": "#",
-      "fileSize": "1.2 MB"
+      "fileSize": "1.2 MB",
+      "showOnHomepage": true
     },
     {
       "id": "s-2",
@@ -151,7 +164,8 @@
       "description": "Formulir pengajuan pendaftaran pameran bagi asosiasi pariwisata, pengelola destinasi, dan perajin cinderamata binaan.",
       "category": "Formulir",
       "downloadUrl": "#",
-      "fileSize": "450 KB"
+      "fileSize": "450 KB",
+      "showOnHomepage": true
     },
     {
       "id": "s-3",
@@ -159,7 +173,8 @@
       "description": "Persyaratan lengkap, durasi penyelesaian, dan jaminan keamanan penerbitan rekomendasi teknis pariwisata.",
       "category": "Berkas Layanan",
       "downloadUrl": "#",
-      "fileSize": "1.8 MB"
+      "fileSize": "1.8 MB",
+      "showOnHomepage": true
     },
     {
       "id": "s-4",
@@ -167,7 +182,8 @@
       "description": "Formulir verifikasi legalitas kelayakan organisasi kepemudaan dalam menerima bansos dan rekomendasi kegiatan.",
       "category": "Formulir",
       "downloadUrl": "#",
-      "fileSize": "320 KB"
+      "fileSize": "320 KB",
+      "showOnHomepage": false
     },
     {
       "id": "s-5",
@@ -175,7 +191,8 @@
       "description": "Prosedur pengusulan event olahraga berskala daerah, nasional, maupun internasional agar terdata resmi di bawah naungan dinas.",
       "category": "SOP",
       "downloadUrl": "#",
-      "fileSize": "950 KB"
+      "fileSize": "950 KB",
+      "showOnHomepage": false
     },
     {
       "id": "s-6",
@@ -183,7 +200,8 @@
       "description": "Dokumen panduan standar pelayanan akomodasi rakyat untuk menunjang pariwisata bahari terpadu di Kota Tegal.",
       "category": "Berkas Layanan",
       "downloadUrl": "#",
-      "fileSize": "2.1 MB"
+      "fileSize": "2.1 MB",
+      "showOnHomepage": false
     },
     {
       "id": "s-7",
@@ -191,7 +209,8 @@
       "description": "Formulir administrasi usulan bantuan bola, net, rompi, dan perbaikan sarana olahraga tingkat RW binaan dinas.",
       "category": "Formulir",
       "downloadUrl": "#",
-      "fileSize": "380 KB"
+      "fileSize": "380 KB",
+      "showOnHomepage": false
     },
     {
       "id": "s-8",
@@ -199,7 +218,8 @@
       "description": "Tata laksana pengujian kredibilitas dan keahlian pemandu wisata bahari berkolaborasi dengan Himpunan Pramuwisata Indonesia.",
       "category": "SOP",
       "downloadUrl": "#",
-      "fileSize": "1.5 MB"
+      "fileSize": "1.5 MB",
+      "showOnHomepage": false
     },
     {
       "id": "s-9",
@@ -207,7 +227,8 @@
       "description": "Formulir basis data sertifikasi kurasi produk kriya, batik Tegalan, logam, dan makanan khas untuk event pameran daerah.",
       "category": "Berkas Layanan",
       "downloadUrl": "#",
-      "fileSize": "850 KB"
+      "fileSize": "850 KB",
+      "showOnHomepage": false
     },
     {
       "id": "s-10",
@@ -215,7 +236,8 @@
       "description": "Pendaftaran berkas seleksi delegasi pemuda andalan Kota Tegal ke tingkat provinsi untuk dikirim ke kancah global.",
       "category": "Formulir",
       "downloadUrl": "#",
-      "fileSize": "540 KB"
+      "fileSize": "540 KB",
+      "showOnHomepage": false
     }
   ],
   "officeInfo": {
@@ -235,7 +257,7 @@
     "name": "Khusnul Hidayati, S.E,. M.Si.",
     "nip": "",
     "content": "Assalamualaikum Warahmatullahi Wabarakatuh, Salam sejahtera bagi kita semua, Shalom, Om Swastyastu, Namo Buddhaya, Salam Kebajikan.\nPuji syukur kehadirat Allah SWT, berkat kemudahan teknologi digital kini DISPORAPAR Kota Tegal meluncurkan portal informasi dan database modern terpusat dalam menyongsong Smart Government Kota Tegal. Website ini kami dedikasikan sebagai jembatan penghubung antara kebijakan publik dinas dengan keterlibatan aktif masyarakat secara terbuka.\nKami meyakini bahwa generasi muda Kota Tegal memiliki elan kreatif luar biasa, atlet kita memiliki stamina bahari tangguh pemburu prestasi, dan wisata pesisir kita memiliki pesona unik yang layak memperoleh sorotan nasional. Mari berkolaborasi membangun Kota Tegal menjadi episentrum prestasi wisata dan kepemudaan.\nWassalamualaikum Warahmatullahi Wabarakatuh.",
-    "imageUrl": "/images/kabid Image 5 Jun 2026, 14.29.31.webp"
+    "imageUrl": "/sambutan/1781461848923_kabid_Image_5_Jun_2026__14.29.31.webp"
   },
   "heroSlides": [
     {
@@ -284,16 +306,95 @@
       "Olahraga",
       "Kepemudaan"
     ],
-    "events": [
-      "Pariwisata",
-      "Olahraga",
-      "Kepemudaan",
-      "Dinas"
-    ],
     "services": [
       "SOP",
       "Formulir",
       "Berkas Layanan"
     ]
+  },
+  "homepageSettings": {
+    "about": {
+      "title": "Membangun Tegal Bersama DISPORAPAR",
+      "subtitle": "TENTANG KAMI",
+      "desc": "DISPORAPAR Kota Tegal berkomitmen mengembangkan pemuda, meningkatkan prestasi olahraga, dan memajukan pariwisata untuk mendukung kesejahteraan masyarakat.",
+      "show": true,
+      "stats": [
+        {
+          "value": "15+",
+          "label": "Destinasi Wisata"
+        },
+        {
+          "value": "40+",
+          "label": "Event Tahunan"
+        },
+        {
+          "value": "25+",
+          "label": "Komunitas Pemuda"
+        },
+        {
+          "value": "10+",
+          "label": "Cabang Olahraga Binaan"
+        }
+      ]
+    },
+    "agenda": {
+      "title": "Event & Agenda Mendatang",
+      "subtitle": "AGENDA UTAMA DINAS",
+      "desc": "Agenda resmi, festival tahunan pemuda kreatif, kompetisi olahraga, serta forum rapat terbuka DISPORAPAR Kota Tegal.",
+      "show": true
+    },
+    "programs": {
+      "title": "Pilar Program Prioritas",
+      "subtitle": "PROGRAM UNGGULAN DINAS",
+      "desc": "Fokus strategis pembangunan yang diimplementasikan secara akuntabel, transparan, dan berkelanjutan untuk Kota Tegal.",
+      "show": true,
+      "cards": [
+        {
+          "title": "Pariwisata Bahari & Religi",
+          "desc": "Revitalisasi pariwisata bahari PAI terpadu, pengembangan wisata religi cagar sejarah Alun-alun & Taman Pancasila serta sertifikasi pembinaan usaha kuliner legendaris Tegal.",
+          "points": [
+            "Kampung Seni & Galeri Wisata PAI",
+            "Lembaga Pengelola Usaha Pariwisata (TDUP)",
+            "Festival Pesisir & Kuliner Tahunan"
+          ]
+        },
+        {
+          "title": "Pemberdayaan Pemuda Kreatif",
+          "desc": "Menjaring ekosistem wirausaha muda terdidik dalam program Akselerator AWMT, pembemainan berkelanjutan KNPI/OK, pembekalan Paskibraka serta inkubasi Youth Creative Hub.",
+          "points": [
+            "Akselerator Wirausaha Muda (AWMT)",
+            "Seleksi & Pendidikan Paskibraka",
+            "Tegal Youth Co-Working Space"
+          ]
+        },
+        {
+          "title": "Prestasi Olahraga Berkelanjutan",
+          "desc": "Pembinaan atlet andalan daerah persiapan PORPROV & PON, standardisasi prasarana Stadion Yos Sudarso & GOR Wisanggeni serta transparansi sewa venue olahraga digital.",
+          "points": [
+            "Pembinaan Atlet Pelari & Cabor Unggulan",
+            "Sewa Fasilitas Stadion & Kolam Olympic",
+            "Fasilitasi Insentif Bonus Medali Atlet"
+          ]
+        }
+      ]
+    },
+    "news": {
+      "title": "Kabar Kegiatan Terkini",
+      "subtitle": "BERITA TERBARU & PENGUMUMAN",
+      "desc": "Informasi berita resmi, liputan pers, pengumuman regulasi, pembangunan fasilitas di lingkungan DISPORAPAR Kota Tegal.",
+      "show": true
+    },
+    "gallery": {
+      "title": "Suasana & Dokumentasi Nyata",
+      "subtitle": "GALERI VISUAL KEGIATAN",
+      "desc": "Dokumentasi visual dari berbagai program, festival, dan aktivitas kedinasan di lingkungan DISPORAPAR Kota Tegal.",
+      "show": true
+    },
+    "documents": {
+      "title": "Berkas & Formulir Layanan",
+      "subtitle": "DOKUMEN RESMI DINAS",
+      "desc": "Silakan cari dan unduh berkas standar operasional prosedur (SOP) secara mandiri di bawah ini secara cuma-cuma, bebas biaya, transparan dan berlandaskan kepatuhan bebas pungutan liar.",
+      "show": true
+    }
   }
 }

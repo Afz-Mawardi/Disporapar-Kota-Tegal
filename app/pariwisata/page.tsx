@@ -36,7 +36,7 @@ export default function PariwisataPage() {
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
             Wonderful Tegal Bahari
           </span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-tight">
             Pesona Wisata Bahari & Pesisiran
           </h1>
         </div>
@@ -90,7 +90,7 @@ export default function PariwisataPage() {
                 className="group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between h-full"
               >
                 {/* Visual Image Frame */}
-                <div className="relative aspect-16/10 w-full overflow-hidden bg-slate-50">
+                <div className="relative aspect-[21/9] md:aspect-16/10 w-full overflow-hidden bg-slate-50">
                   <Image
                     src={destination.imageUrl}
                     alt={destination.name}
@@ -184,7 +184,7 @@ export default function PariwisataPage() {
             <span className="text-xs font-bold text-accent tracking-widest uppercase bg-accent/20 border border-accent/25 px-3.5 py-1.5 rounded-full inline-block font-mono">
               Mitra Pelaku Usaha Wisata
             </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight">
               Kembangkan Usaha Pariwisata & Kuliner Kreatif Anda Bersama Kami
             </h2>
             <p className="text-sm sm:text-base text-slate-350 leading-relaxed font-light font-inter">

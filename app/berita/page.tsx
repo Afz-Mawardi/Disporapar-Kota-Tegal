@@ -58,7 +58,7 @@ export default function BeritaPage() {
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
             Media Publikasi & Pers Rilis Resmi
           </span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-tight">
             Warta & Kabar Terbaru
           </h1>
         </div>
@@ -113,7 +113,7 @@ export default function BeritaPage() {
                 className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full group"
               >
                 {/* Visual Card Image */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
+                <div className="relative aspect-[21/9] sm:aspect-[4/3] w-full overflow-hidden bg-slate-50">
                   <Image
                     src={news.imageUrl}
                     alt={news.title}
@@ -225,7 +225,7 @@ export default function BeritaPage() {
                   </div>
 
                   {/* Large responsive news title */}
-                  <h2 className="text-xl sm:text-3.5xl font-extrabold text-[#0E3B66] tracking-tight leading-snug">
+                  <h2 className="text-lg sm:text-2xl md:text-3.5xl font-extrabold text-[#0E3B66] tracking-tight leading-snug">
                     {activeNewsDetail.title}
                   </h2>
 
