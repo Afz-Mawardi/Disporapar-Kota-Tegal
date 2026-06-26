@@ -1,0 +1,437 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import {
+  Newspaper,
+  Image as ImageIcon,
+  Calendar,
+  FileText,
+  Eye,
+  EyeOff,
+  X,
+  CheckCircle,
+  ShieldAlert
+} from 'lucide-react';
+import {
+  useNews,
+  useEvents,
+  useGallery,
+  usePublicServices
+} from '@/lib/data-store';
+import { parseIndonesianDate } from '@/lib/utils';
+
+export default function PublikasiBerandaPage() {
+  const [news, setNews] = useNews();
+  const [events, setEvents] = useEvents();
+  const [gallery, setGallery] = useGallery();
+  const [services, setServices] = usePublicServices();
+
+  const [dashboardTab, setDashboardTab] = useState<'agenda' | 'berita' | 'galeri' | 'berkas'>('agenda');
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const notificationTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    if (notificationTimerRef.current) clearTimeout(notificationTimerRef.current);
+    setNotification({ message, type });
+    notificationTimerRef.current = setTimeout(() => setNotification(null), 3000);
+  };
+
+  // Toggle Visibility Handlers
+  const toggleNewsHomepage = (id: string) => {
+    setNews(news.map(item => item.id === id ? { ...item, showOnHomepage: !(item.showOnHomepage !== false) } : item));
+    showNotification('Status tampilan berita di beranda berhasil diubah.', 'success');
+  };
+
+  const toggleGalleryHomepage = (id: string) => {
+    setGallery(gallery.map(item => item.id === id ? { ...item, showOnHomepage: !(item.showOnHomepage !== false) } : item));
+    showNotification('Status tampilan galeri di beranda berhasil diubah.', 'success');
+  };
+
+  const toggleEventsHomepage = (id: string) => {
+    setEvents(events.map(item => item.id === id ? { ...item, showOnHomepage: !(item.showOnHomepage !== false) } : item));
+    showNotification('Status tampilan agenda di beranda berhasil diubah.', 'success');
+  };
+
+  const toggleServicesHomepage = (id: string) => {
+    setServices(services.map(item => item.id === id ? { ...item, showOnHomepage: !(item.showOnHomepage !== false) } : item));
+    showNotification('Status tampilan berkas di beranda berhasil diubah.', 'success');
+  };
+
+  return (
+    <div className="space-y-6 text-left animate-fade-in relative">
+      {/* Toast Notification */}
+      {notification && (
+        <div
+          onClick={() => setNotification(null)}
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${
+            notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+          }`}
+        >
+          {notification.type === 'success' ? (
+            <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+          ) : (
+            <ShieldAlert className="w-5 h-5 text-red-600 shrink-0" />
+          )}
+          <span>{notification.message}</span>
+        </div>
+      )}
+
+      {/* Control Action bar */}
+      <div className="sticky top-0 z-20 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-md transition-all duration-300">
+        <div>
+          <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight">Manajer Publikasi Beranda</h3>
+        </div>
+
+        <div className="flex gap-1.5 p-1 bg-slate-100 rounded-xl">
+          {[
+            { id: 'agenda', name: 'Agenda' },
+            { id: 'berita', name: 'Berita' },
+            { id: 'galeri', name: 'Galeri' },
+            { id: 'berkas', name: 'Berkas' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setDashboardTab(tab.id as any)}
+              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider font-mono transition-colors text-center cursor-pointer select-none ${
+                dashboardTab === tab.id ? 'bg-[#0E3B66] text-white shadow-xs' : 'text-slate-500 hover:bg-slate-200/50 hover:text-slate-800'
+              }`}
+            >
+              {tab.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm text-left">
+        <div className="space-y-6 max-h-[450px] overflow-y-auto pr-1">
+          {/* 1. Berita Tab */}
+          {dashboardTab === 'berita' && (() => {
+            const sortedNews = [...news].sort((a, b) => {
+              try {
+                return parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime();
+              } catch {
+                return 0;
+              }
+            });
+            const activeItems = sortedNews.filter(item => item.showOnHomepage !== false);
+            const inactiveItems = sortedNews.filter(item => item.showOnHomepage === false);
+            return (
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider font-mono">Aktif di Beranda ({activeItems.length}/3)</span>
+                  {activeItems.length > 0 ? (
+                    activeItems.map(item => (
+                      <div key={item.id} className="flex items-center justify-between p-4 bg-emerald-50/15 border border-emerald-100 rounded-2xl">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="text-left min-w-0">
+                            <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • {item.date}</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => toggleNewsHomepage(item.id)}
+                          className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>TAMPIL</span>
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Belum ada berita yang ditampilkan di beranda.</p>
+                  )}
+                </div>
+
+                <div className="space-y-2 pt-5 mt-4 border-t border-slate-300">
+                  {inactiveItems.length > 0 ? (
+                    inactiveItems.map(item => (
+                      <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/30 border border-slate-100 rounded-2xl">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="text-left min-w-0">
+                            <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • {item.date}</span>
+                          </div>
+                        </div>
+                        {activeItems.length < 3 ? (
+                          <button
+                            type="button"
+                            onClick={() => toggleNewsHomepage(item.id)}
+                            className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100"
+                          >
+                            <EyeOff className="w-3.5 h-3.5" />
+                            <span>SEMBUNYI</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled
+                            className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider bg-slate-100 border border-slate-200 text-slate-350 flex items-center gap-1.5 cursor-not-allowed shrink-0 select-none"
+                            title="Limit 3 berita tercapai. Sembunyikan berita lain terlebih dahulu."
+                          >
+                            <X className="w-3.5 h-3.5 text-slate-350" />
+                            <span>LIMIT</span>
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Semua berita sudah ditampilkan di beranda.</p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* 2. Galeri Tab */}
+          {dashboardTab === 'galeri' && (() => {
+            const activeItems = gallery.filter(item => item.showOnHomepage !== false);
+            const inactiveItems = gallery.filter(item => item.showOnHomepage === false);
+            return (
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider font-mono block">Aktif di Beranda ({activeItems.length}/5)</span>
+                  {activeItems.length > 0 ? (
+                    activeItems.map(item => (
+                      <div key={item.id} className="flex items-center justify-between p-4 bg-emerald-50/15 border border-emerald-100 rounded-2xl">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="text-left min-w-0">
+                            <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category}</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => toggleGalleryHomepage(item.id)}
+                          className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>TAMPIL</span>
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Belum ada foto yang ditampilkan di beranda.</p>
+                  )}
+                </div>
+
+                <div className="space-y-2 pt-5 mt-4 border-t border-slate-300">
+                  {inactiveItems.length > 0 ? (
+                    inactiveItems.map(item => (
+                      <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/30 border border-slate-100 rounded-2xl">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="text-left min-w-0">
+                            <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category}</span>
+                          </div>
+                        </div>
+                        {activeItems.length < 5 ? (
+                          <button
+                            type="button"
+                            onClick={() => toggleGalleryHomepage(item.id)}
+                            className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100"
+                          >
+                            <EyeOff className="w-3.5 h-3.5" />
+                            <span>SEMBUNYI</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled
+                            className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider bg-slate-100 border border-slate-200 text-slate-350 flex items-center gap-1.5 cursor-not-allowed shrink-0 select-none"
+                            title="Limit 5 foto galeri tercapai. Sembunyikan foto lain terlebih dahulu."
+                          >
+                            <X className="w-3.5 h-3.5 text-slate-350" />
+                            <span>LIMIT</span>
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Semua foto sudah ditampilkan di beranda.</p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* 3. Agenda Tab */}
+          {dashboardTab === 'agenda' && (() => {
+            const sortedEvents = [...events].sort((a, b) => {
+              try {
+                return parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime();
+              } catch {
+                return 0;
+              }
+            });
+            const activeItems = sortedEvents.filter(item => item.showOnHomepage !== false);
+            const inactiveItems = sortedEvents.filter(item => item.showOnHomepage === false);
+            return (
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider font-mono block">Aktif di Beranda ({activeItems.length}/4)</span>
+                  {activeItems.length > 0 ? (
+                    activeItems.map(item => (
+                      <div key={item.id} className="flex items-center justify-between p-4 bg-emerald-50/15 border border-emerald-100 rounded-2xl">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="text-left min-w-0">
+                            <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">{item.date} • {item.location}</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => toggleEventsHomepage(item.id)}
+                          className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>TAMPIL</span>
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Belum ada agenda yang ditampilkan di beranda.</p>
+                  )}
+                </div>
+
+                <div className="space-y-2 pt-5 mt-4 border-t border-slate-300">
+                  {inactiveItems.length > 0 ? (
+                    inactiveItems.map(item => (
+                      <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/30 border border-slate-100 rounded-2xl">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="text-left min-w-0">
+                            <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">{item.date} • {item.location}</span>
+                          </div>
+                        </div>
+                        {activeItems.length < 4 ? (
+                          <button
+                            type="button"
+                            onClick={() => toggleEventsHomepage(item.id)}
+                            className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100"
+                          >
+                            <EyeOff className="w-3.5 h-3.5" />
+                            <span>SEMBUNYI</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled
+                            className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider bg-slate-100 border border-slate-200 text-slate-350 flex items-center gap-1.5 cursor-not-allowed shrink-0 select-none"
+                            title="Limit 4 agenda tercapai. Sembunyikan agenda lain terlebih dahulu."
+                          >
+                            <X className="w-3.5 h-3.5 text-slate-350" />
+                            <span>LIMIT</span>
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Semua agenda sudah ditampilkan di beranda.</p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* 4. Berkas Tab */}
+          {dashboardTab === 'berkas' && (() => {
+            const activeItems = services.filter(item => item.showOnHomepage !== false);
+            const inactiveItems = services.filter(item => item.showOnHomepage === false);
+            return (
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider font-mono block">Aktif di Beranda ({activeItems.length}/3)</span>
+                  {activeItems.length > 0 ? (
+                    activeItems.map(item => (
+                      <div key={item.id} className="flex items-center justify-between p-4 bg-emerald-50/15 border border-emerald-100 rounded-2xl">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                            <FileText className="w-5 h-5" />
+                          </div>
+                          <div className="text-left min-w-0">
+                            <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • {item.fileSize}</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => toggleServicesHomepage(item.id)}
+                          className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>TAMPIL</span>
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Belum ada berkas yang ditampilkan di beranda.</p>
+                  )}
+                </div>
+
+                <div className="space-y-2 pt-5 mt-4 border-t border-slate-300">
+                  {inactiveItems.length > 0 ? (
+                    inactiveItems.map(item => (
+                      <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/30 border border-slate-100 rounded-2xl">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center shrink-0">
+                            <FileText className="w-5 h-5" />
+                          </div>
+                          <div className="text-left min-w-0">
+                            <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • {item.fileSize}</span>
+                          </div>
+                        </div>
+                        {activeItems.length < 3 ? (
+                          <button
+                            type="button"
+                            onClick={() => toggleServicesHomepage(item.id)}
+                            className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shrink-0 bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100"
+                          >
+                            <EyeOff className="w-3.5 h-3.5" />
+                            <span>SEMBUNYI</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled
+                            className="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono tracking-wider bg-slate-100 border border-slate-200 text-slate-350 flex items-center gap-1.5 cursor-not-allowed shrink-0 select-none"
+                            title="Limit 3 berkas tercapai. Sembunyikan berkas lain terlebih dahulu."
+                          >
+                            <X className="w-3.5 h-3.5 text-slate-350" />
+                            <span>LIMIT</span>
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-left pl-2 text-xs text-slate-400 font-inter font-light">Semua berkas sudah ditampilkan di beranda.</p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      </div>
+    </div>
+  );
+}

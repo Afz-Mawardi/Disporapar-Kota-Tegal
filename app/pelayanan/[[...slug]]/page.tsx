@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { usePublicServices, useCategories } from '@/lib/data-store';
+import { usePublicServices, useCategories, useRetribusi } from '@/lib/data-store';
+
 import {
   FileText,
   Search,
@@ -23,15 +24,15 @@ const getFileFormat = (downloadUrl?: string, title?: string): 'pdf' | 'zip' | 'w
   if (!downloadUrl || downloadUrl === '#' || downloadUrl === '') return 'unknown';
   const urlLower = downloadUrl.toLowerCase();
   const titleLower = title ? title.toLowerCase() : '';
-  
+
   if (urlLower.includes('.pdf') || titleLower.includes('pdf')) return 'pdf';
   if (urlLower.includes('.zip') || urlLower.includes('.rar') || titleLower.includes('zip') || titleLower.includes('rar')) return 'zip';
   if (urlLower.includes('.doc') || urlLower.includes('.docx') || titleLower.includes('word') || titleLower.includes('doc') || titleLower.includes('docx')) return 'word';
-  
+
   if (urlLower.startsWith('data:application/pdf')) return 'pdf';
   if (urlLower.startsWith('data:application/zip') || urlLower.startsWith('data:application/x-zip-compressed')) return 'zip';
   if (urlLower.startsWith('data:application/msword') || urlLower.startsWith('data:application/vnd.openxmlformats-officedocument.wordprocessingml.document')) return 'word';
-  
+
   return 'unknown';
 };
 
@@ -46,9 +47,9 @@ const FileFormatIcon: React.FC<FileFormatIconProps> = ({ className = "w-5 h-5", 
   const format = getFileFormat(downloadUrl, title);
   const color = colorClasses !== undefined ? colorClasses : (
     format === 'pdf' ? 'text-red-500' :
-    format === 'word' ? 'text-blue-650' :
-    format === 'zip' ? 'text-amber-500' :
-    'text-slate-400'
+      format === 'word' ? 'text-blue-650' :
+        format === 'zip' ? 'text-amber-500' :
+          'text-slate-400'
   );
 
   switch (format) {
@@ -131,14 +132,16 @@ const FileFormatIcon: React.FC<FileFormatIconProps> = ({ className = "w-5 h-5", 
 export default function PelayananPublikPage() {
   const [publicServices] = usePublicServices();
   const [categoriesStore] = useCategories();
+  const [retribusi] = useRetribusi();
+
   const pathname = usePathname();
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Determine activeTab primarily from the URL route path
-  let activeTab: 'standar' | 'maklumat' | 'motto' | 'retribusi' = 'maklumat';
-  if (pathname === '/pelayanan/standar') {
-    activeTab = 'standar';
+  let activeTab: 'berkas' | 'maklumat' | 'motto' | 'retribusi' = 'maklumat';
+  if (pathname === '/pelayanan/berkas') {
+    activeTab = 'berkas';
   } else if (pathname === '/pelayanan/maklumat') {
     activeTab = 'maklumat';
   } else if (pathname === '/pelayanan/motto') {
@@ -177,7 +180,7 @@ export default function PelayananPublikPage() {
     { id: 'maklumat', name: 'Maklumat Pelayanan', icon: <ShieldCheck className="h-4 w-4" />, href: '/pelayanan/maklumat' },
     { id: 'motto', name: 'Motto Pelayanan', icon: <CheckCircle className="h-4 w-4" />, href: '/pelayanan/motto' },
     { id: 'retribusi', name: 'Retribusi', icon: <Landmark className="h-4 w-4" />, href: '/pelayanan/retribusi' },
-    { id: 'standar', name: 'Berkas Layanan', icon: <FileText className="h-4 w-4" />, href: '/pelayanan/standar' },
+    { id: 'berkas', name: 'Berkas Layanan', icon: <FileText className="h-4 w-4" />, href: '/pelayanan/berkas' },
   ] as const;
 
   return (
@@ -269,7 +272,7 @@ export default function PelayananPublikPage() {
         </div>
 
         {/* Dynamic content area following Sejarah layout */}
-        {activeTab === 'standar' ? (
+        {activeTab === 'berkas' ? (
           <div className="space-y-6 w-full">
             {/* FILTER & SEARCH INTERACTIVE BAR */}
             <div className="sticky top-[68px] lg:top-[76px] z-30 w-full bg-white/95 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-slate-100/80 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between transition-all duration-300">
@@ -541,13 +544,14 @@ export default function PelayananPublikPage() {
 
             {/* TAB 4: RETRIBUSI */}
             {activeTab === 'retribusi' && (
-              <div className="space-y-8 w-full text-left">
+              <div className="space-y-8 w-full text-left animate-fade-in">
                 <div className="space-y-2">
                   <span className="text-[10px] font-bold tracking-widest text-[#0F5A9E] font-mono uppercase bg-indigo-50 border border-indigo-100/50 px-3 py-1.5 rounded-full inline-block">TARIF RETRIBUSI RESMI</span>
                   <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight">Legalitas Tarif & Biaya Administrasi</h3>
                 </div>
 
                 <div className="space-y-6">
+                  {/* Legal base card */}
                   <div className="bg-white rounded-2xl border border-slate-100 p-6 sm:p-8 flex items-start gap-5 border-l-4 border-emerald-500 shadow-xs">
                     <div className="bg-emerald-50 p-2.5 rounded-xl text-emerald-600 shrink-0">
                       <Shield className="h-6 w-6" />
@@ -560,6 +564,48 @@ export default function PelayananPublikPage() {
                     </div>
                   </div>
 
+                  {/* Table containing all retribusis */}
+                  <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse text-xs sm:text-sm font-inter">
+                        <thead>
+                          <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
+                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6 w-16 text-center">No</th>
+                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6">Fasilitas / Layanan</th>
+                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6 w-36">Kategori</th>
+                            <th className="py-3.5 px-4 sm:py-4.5 sm:px-6 w-56 text-right">Tarif / Biaya</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                          {retribusi && retribusi.length > 0 ? (
+                            retribusi.map((item, idx) => (
+                              <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                                <td className="py-3 px-4 sm:py-4 sm:px-6 text-center font-mono text-slate-400">{idx + 1}</td>
+                                <td className="py-3 px-4 sm:py-4 sm:px-6 font-bold text-[#0E3B66]">{item.name}</td>
+                                <td className="py-3 px-4 sm:py-4 sm:px-6">
+                                  <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md uppercase font-mono tracking-wider ${item.category === 'Olahraga' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                                    item.category === 'Kepemudaan' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+                                      'bg-amber-50 text-amber-700 border border-amber-100'
+                                    }`}>
+                                    {item.category}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-4 sm:py-4 sm:px-6 text-right font-mono text-slate-900 font-bold">{item.fee}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={4} className="py-8 text-center text-slate-400 italic">
+                                Belum ada data tarif retribusi terdaftar.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* General info cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="bg-slate-50/50 p-5 rounded-xl border border-slate-100 flex items-start gap-3">
                       <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
@@ -579,6 +625,7 @@ export default function PelayananPublikPage() {
                 </div>
               </div>
             )}
+
           </div>
         )}
       </section>

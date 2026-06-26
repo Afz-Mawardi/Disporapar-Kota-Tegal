@@ -288,12 +288,21 @@ export interface HeroSlide {
   href: string;
 }
 
+export interface Retribusi {
+  id: string;
+  name: string;
+  category: string;
+  fee: string;
+}
+
 export interface PriorityProgram {
   id: string;
   title: string;
   description: string;
   points: string[];
 }
+
+
 
 
 
@@ -859,5 +868,18 @@ export const INITIAL_HOMEPAGE_SETTINGS: HomepageSettings = {
   gallery: { title: 'Suasana & Dokumentasi Nyata', subtitle: 'GALERI VISUAL KEGIATAN', desc: 'Dokumentasi visual dari berbagai program, festival, dan aktivitas kedinasan di lingkungan DISPORAPAR Kota Tegal.', show: true },
   documents: { title: 'Berkas & Formulir Layanan', subtitle: 'DOKUMEN RESMI DINAS', desc: 'Silakan cari dan unduh berkas standar operasional prosedur (SOP) secara mandiri di bawah ini secara cuma-cuma, bebas biaya, transparan dan berlandaskan kepatuhan bebas pungutan liar.', show: true }
 };
+
+export const DEFAULT_RETRIBUSI: Retribusi[] = [
+  { id: 'ret-1', name: 'Stadion Yos Sudarso Tegal', category: 'Olahraga', fee: 'Rp 250.000 / Jam' },
+  { id: 'ret-2', name: 'GOR Wisanggeni (Indoor)', category: 'Olahraga', fee: 'Rp 75.000 / Jam' },
+  { id: 'ret-3', name: 'Kolam Renang Samudra Bahari', category: 'Olahraga', fee: 'Rp 15.000 / Orang' },
+  { id: 'ret-4', name: 'Pantai Alam Indah (PAI)', category: 'Pariwisata', fee: 'Rp 5.000 (Anak) / Rp 10.000 (Dewasa)' },
+  { id: 'ret-5', name: 'Pantai Pulau Kodok', category: 'Pariwisata', fee: 'Rp 3.000' },
+  { id: 'ret-6', name: 'Alun-Alun Kota Tegal & Taman Pancasila', category: 'Pariwisata', fee: 'Gratis' },
+  { id: 'ret-7', name: 'Bumi Perkemahan Pramuka Martoloyo', category: 'Kepemudaan', fee: 'Rp 150.000 / Hari' },
+  { id: 'ret-8', name: 'Gedung Serbaguna Kepemudaan (GSG)', category: 'Kepemudaan', fee: 'Rp 100.000 / Jam' },
+  { id: 'ret-9', name: 'Co-working Space & Youth Hub Room', category: 'Kepemudaan', fee: 'Gratis (Bagi Organisasi Binaan)' }
+];
+
 
 

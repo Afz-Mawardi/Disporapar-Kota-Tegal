@@ -14,24 +14,48 @@ export default function DynamicTitle() {
       return;
     }
 
-    const segments = pathname.split('/').filter(Boolean);
-    if (segments.length === 0) {
-      document.title = 'DISPORAPAR Kota Tegal';
+    if (pathname.startsWith('/admin')) {
+      document.title = 'ADMIN - DISPORAPAR  Kota Tegal';
       return;
     }
 
-    const lastSegment = segments[segments.length - 1];
-    
-    // Replace hyphens/underscores with spaces
-    const cleanSegment = lastSegment.replace(/[-_]/g, ' ');
+    if (pathname.startsWith('/profil')) {
+      document.title = 'PROFIL - DISPORAPAR  Kota Tegal';
+      return;
+    }
 
-    // Capitalize each word
-    const capitalized = cleanSegment
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
+    if (
+      pathname.startsWith('/kepemudaan') ||
+      pathname.startsWith('/olahraga') ||
+      pathname.startsWith('/pariwisata') ||
+      pathname.startsWith('/bidang')
+    ) {
+      document.title = 'BIDANG - DISPORAPAR  Kota Tegal';
+      return;
+    }
 
-    document.title = `${capitalized} - DISPORAPAR Kota tegal`;
+    if (pathname.startsWith('/pelayanan')) {
+      document.title = 'LAYANAN - DISPORAPAR  Kota Tegal';
+      return;
+    }
+
+    if (
+      pathname.startsWith('/berita') ||
+      pathname.startsWith('/agenda') ||
+      pathname.startsWith('/galeri') ||
+      pathname.startsWith('/publikasi')
+    ) {
+      document.title = 'PUBLIKASI - DISPORAPAR  Kota Tegal';
+      return;
+    }
+
+    if (pathname.startsWith('/kontak')) {
+      document.title = 'KONTAK - DISPORAPAR  Kota Tegal';
+      return;
+    }
+
+    // Fallback if none of the above matches
+    document.title = 'DISPORAPAR Kota Tegal';
   }, [pathname]);
 
   return null;

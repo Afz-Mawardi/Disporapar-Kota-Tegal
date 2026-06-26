@@ -213,7 +213,7 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-4">
             <Link href="/kontak" className="hover:text-white transition-colors">
-              Kontak & Layanan
+              Kontak Kami
             </Link>
             <span className="text-white/20 font-light">|</span>
             <span className="text-slate-500 font-mono text-[9px] uppercase tracking-widest">Official Portal</span>

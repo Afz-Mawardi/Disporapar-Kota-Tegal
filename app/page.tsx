@@ -61,15 +61,15 @@ const getFileFormat = (downloadUrl?: string, title?: string): 'pdf' | 'zip' | 'w
   if (!downloadUrl || downloadUrl === '#' || downloadUrl === '') return 'unknown';
   const urlLower = downloadUrl.toLowerCase();
   const titleLower = title ? title.toLowerCase() : '';
-  
+
   if (urlLower.includes('.pdf') || titleLower.includes('pdf')) return 'pdf';
   if (urlLower.includes('.zip') || urlLower.includes('.rar') || titleLower.includes('zip') || titleLower.includes('rar')) return 'zip';
   if (urlLower.includes('.doc') || urlLower.includes('.docx') || titleLower.includes('word') || titleLower.includes('doc') || titleLower.includes('docx')) return 'word';
-  
+
   if (urlLower.startsWith('data:application/pdf')) return 'pdf';
   if (urlLower.startsWith('data:application/zip') || urlLower.startsWith('data:application/x-zip-compressed')) return 'zip';
   if (urlLower.startsWith('data:application/msword') || urlLower.startsWith('data:application/vnd.openxmlformats-officedocument.wordprocessingml.document')) return 'word';
-  
+
   return 'unknown';
 };
 
@@ -84,9 +84,9 @@ const FileFormatIcon: React.FC<FileFormatIconProps> = ({ className = "w-5 h-5", 
   const format = getFileFormat(downloadUrl, title);
   const color = colorClasses !== undefined ? colorClasses : (
     format === 'pdf' ? 'text-red-500' :
-    format === 'word' ? 'text-blue-650' :
-    format === 'zip' ? 'text-amber-500' :
-    'text-slate-400'
+      format === 'word' ? 'text-blue-650' :
+        format === 'zip' ? 'text-amber-500' :
+          'text-slate-400'
   );
 
   switch (format) {
@@ -394,7 +394,7 @@ export default function HomePage() {
 
             {/* Formulir & Unduhan */}
             <Link
-              href="/pelayanan/standar"
+              href="/pelayanan/berkas"
               className="group flex flex-col items-center justify-center text-center p-5 rounded-2xl bg-[#F8FAFC] hover:bg-white border border-transparent hover:border-slate-100 hover:shadow-md hover:-translate-y-1 active:scale-[0.98] transition-all duration-300"
             >
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#FFF4E5] flex items-center justify-center text-[#F2994A] mb-3.5 transition-all duration-300 group-hover:scale-105">
@@ -958,7 +958,7 @@ export default function HomePage() {
                 </p>
                 <div className="pt-2">
                   <Link
-                    href="/pelayanan/standar"
+                    href="/pelayanan/berkas"
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary uppercase tracking-widest font-mono transition-colors group"
                   >
                     <span>Seluruh Berkas Layanan</span>

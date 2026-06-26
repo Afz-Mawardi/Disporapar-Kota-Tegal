@@ -188,5 +188,12 @@ model BidangBottomCard {
   @@map("bidang_bottom_card")
 }
 
+model Retribusi {
+  id        String   @id @default(uuid())
+  name      String   @db.Text
+  category  String
+  fee       String   @db.Text
+  createdAt DateTime @default(now())
 
-
+  @@map("retribusi")
+}

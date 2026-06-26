@@ -24,8 +24,7 @@ async function main() {
   await prisma.olahragaCard.deleteMany();
   await prisma.pariwisataCard.deleteMany();
   await prisma.bidangBottomCard.deleteMany();
-
-
+  await prisma.retribusi.deleteMany();
   // 2. Hash admin password with MD5 and insert Users
   const md5Password = crypto.createHash('md5').update('admin123').digest('hex');
   await prisma.user.create({
@@ -190,6 +189,9 @@ async function main() {
     }
     if (Array.isArray(cats.services)) {
       for (const cat of cats.services) toInsert.push({ module: 'services', name: cat });
+    }
+    if (Array.isArray(cats.retribusi)) {
+      for (const cat of cats.retribusi) toInsert.push({ module: 'retribusi', name: cat });
     }
 
     for (const item of toInsert) {
@@ -382,8 +384,24 @@ async function main() {
   }
   console.log(`Seeded ${defaultBidangBottomCards.length} Bidang bottom cards.`);
 
+  // 18. Seed Retribusi
+  if (dbData.retribusi && Array.isArray(dbData.retribusi)) {
+    for (const item of dbData.retribusi) {
+      await prisma.retribusi.create({
+        data: {
+          id: item.id,
+          name: item.name || '',
+          category: item.category || '',
+          fee: item.fee || ''
+        }
+      });
+    }
+    console.log(`Seeded ${dbData.retribusi.length} retribusi items.`);
+  }
+
   console.log('Seeding completed successfully.');
 }
+
 
 main()
   .catch((e) => {

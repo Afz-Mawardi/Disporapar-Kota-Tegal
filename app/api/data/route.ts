@@ -27,6 +27,23 @@ function deleteLocalFile(fileUrl: string) {
   }
 }
 
+// Helper function to update and save changes to lib/db.json
+function saveToLocalDbJson(key: string, data: any) {
+  const dbPath = path.join(process.cwd(), 'lib', 'db.json');
+  try {
+    let dbData: any = {};
+    if (fs.existsSync(dbPath)) {
+      const fileContent = fs.readFileSync(dbPath, 'utf-8');
+      dbData = JSON.parse(fileContent);
+    }
+    dbData[key] = data;
+    fs.writeFileSync(dbPath, JSON.stringify(dbData, null, 2), 'utf-8');
+    console.log(`Successfully synced key "${key}" to local db.json`);
+  } catch (error) {
+    console.error(`Failed to sync key "${key}" to local db.json`, error);
+  }
+}
+
 // GET: Fetch all website contents from MySQL
 export async function GET() {
   try {
@@ -118,11 +135,13 @@ export async function GET() {
     const categories = categoriesDb.length > 0 ? {
       news: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'news').map((c: { module: string; name: string }) => c.name),
       gallery: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'gallery').map((c: { module: string; name: string }) => c.name),
-      services: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'services').map((c: { module: string; name: string }) => c.name)
+      services: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'services').map((c: { module: string; name: string }) => c.name),
+      retribusi: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'retribusi').map((c: { module: string; name: string }) => c.name)
     } : {
       news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
       gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
-      services: ['SOP', 'Formulir', 'Berkas Layanan']
+      services: ['SOP', 'Formulir', 'Berkas Layanan'],
+      retribusi: ['Olahraga', 'Pariwisata', 'Kepemudaan']
     };
 
     // 9. Fetch Homepage Settings
@@ -171,6 +190,10 @@ export async function GET() {
 
     const bidangBottomCards = await prisma.bidangBottomCard.findMany();
 
+    const retribusi = await prisma.retribusi.findMany({
+      orderBy: { createdAt: 'asc' }
+    });
+
     return NextResponse.json({
       news,
       events,
@@ -186,13 +209,15 @@ export async function GET() {
       kepemudaanCards,
       olahragaCards,
       pariwisataCards,
-      bidangBottomCards
+      bidangBottomCards,
+      retribusi
     });
   } catch (error) {
     console.error('Failed to read database', error);
     return NextResponse.json({ error: 'Failed to read database' }, { status: 500 });
   }
 }
+
 
 // POST: Sync frontend changes to MySQL and delete unused files
 export async function POST(request: Request) {
@@ -227,6 +252,7 @@ export async function POST(request: Request) {
         prisma.news.deleteMany(),
         prisma.news.createMany({ data: newsArray })
       ]);
+      saveToLocalDbJson('news', newsArray);
     } else if (type === 'events') {
       const eventsArray = data.map((item: any) => ({
         id: item.id,
@@ -252,6 +278,7 @@ export async function POST(request: Request) {
         prisma.event.deleteMany(),
         prisma.event.createMany({ data: eventsArray })
       ]);
+      saveToLocalDbJson('events', eventsArray);
     } else if (type === 'gallery') {
       const galleryArray = data.map((item: any) => ({
         id: item.id,
@@ -274,6 +301,7 @@ export async function POST(request: Request) {
         prisma.galleryPhoto.deleteMany(),
         prisma.galleryPhoto.createMany({ data: galleryArray })
       ]);
+      saveToLocalDbJson('gallery', galleryArray);
     } else if (type === 'services') {
       const servicesArray = data.map((item: any) => ({
         id: item.id,
@@ -298,6 +326,7 @@ export async function POST(request: Request) {
         prisma.publicService.deleteMany(),
         prisma.publicService.createMany({ data: servicesArray })
       ]);
+      saveToLocalDbJson('services', servicesArray);
     } else if (type === 'officeInfo') {
       const listStr = JSON.stringify(data.socialMediaList || []);
       await prisma.officeInfo.upsert({
@@ -326,6 +355,7 @@ export async function POST(request: Request) {
           gmapsEmbedUrl: data.gmapsEmbedUrl || ''
         }
       });
+      saveToLocalDbJson('officeInfo', data);
     } else if (type === 'categories') {
       const categoriesToInsert: { module: string; name: string }[] = [];
       if (data.news && Array.isArray(data.news)) {
@@ -337,11 +367,15 @@ export async function POST(request: Request) {
       if (data.services && Array.isArray(data.services)) {
         for (const cat of data.services) categoriesToInsert.push({ module: 'services', name: cat });
       }
+      if (data.retribusi && Array.isArray(data.retribusi)) {
+        for (const cat of data.retribusi) categoriesToInsert.push({ module: 'retribusi', name: cat });
+      }
 
       await prisma.$transaction([
         prisma.category.deleteMany(),
         prisma.category.createMany({ data: categoriesToInsert })
       ]);
+      saveToLocalDbJson('categories', data);
     } else if (type === 'welcomeMessage') {
       const existingWelcome = await prisma.welcomeMessage.findUnique({
         where: { id: 'default' }
@@ -367,6 +401,7 @@ export async function POST(request: Request) {
           imageUrl: newImageUrl
         }
       });
+      saveToLocalDbJson('welcomeMessage', data);
     } else if (type === 'heroSlides') {
       const slidesArray = data.map((item: any) => ({
         id: item.id,
@@ -390,6 +425,7 @@ export async function POST(request: Request) {
         prisma.heroSlide.deleteMany(),
         prisma.heroSlide.createMany({ data: slidesArray })
       ]);
+      saveToLocalDbJson('heroSlides', slidesArray);
     } else if (type === 'priorityPrograms') {
       const programsArray = data.map((item: any) => ({
         id: item.id,
@@ -402,6 +438,7 @@ export async function POST(request: Request) {
         prisma.priorityProgram.deleteMany(),
         prisma.priorityProgram.createMany({ data: programsArray })
       ]);
+      saveToLocalDbJson('priorityPrograms', programsArray);
     } else if (type === 'kepemudaanCards') {
       const now = new Date();
       const cardsArray = data.map((item: any, index: number) => ({
@@ -429,6 +466,7 @@ export async function POST(request: Request) {
         prisma.kepemudaanCard.deleteMany(),
         prisma.kepemudaanCard.createMany({ data: cardsArray })
       ]);
+      saveToLocalDbJson('kepemudaanCards', cardsArray);
     } else if (type === 'olahragaCards') {
       const now = new Date();
       const cardsArray = data.map((item: any, index: number) => ({
@@ -456,6 +494,7 @@ export async function POST(request: Request) {
         prisma.olahragaCard.deleteMany(),
         prisma.olahragaCard.createMany({ data: cardsArray })
       ]);
+      saveToLocalDbJson('olahragaCards', cardsArray);
     } else if (type === 'pariwisataCards') {
       const now = new Date();
       const cardsArray = data.map((item: any, index: number) => ({
@@ -483,6 +522,7 @@ export async function POST(request: Request) {
         prisma.pariwisataCard.deleteMany(),
         prisma.pariwisataCard.createMany({ data: cardsArray })
       ]);
+      saveToLocalDbJson('pariwisataCards', cardsArray);
     } else if (type === 'bidangBottomCards') {
       const bottomCardsArray = data.map((item: any) => ({
         id: item.id,
@@ -508,13 +548,30 @@ export async function POST(request: Request) {
         prisma.bidangBottomCard.deleteMany(),
         prisma.bidangBottomCard.createMany({ data: bottomCardsArray })
       ]);
+      saveToLocalDbJson('bidangBottomCards', bottomCardsArray);
     } else if (type === 'homepageSettings') {
+
       await prisma.homepageSetting.upsert({
         where: { id: 'default' },
         update: { data: data },
         create: { id: 'default', data: data }
       });
-    } else if (type === 'adminAccount') {
+      saveToLocalDbJson('homepageSettings', data);
+    } else if (type === 'retribusi') {
+      const retribusiArray = data.map((item: any) => ({
+        id: item.id,
+        name: item.name || '',
+        category: item.category || '',
+        fee: item.fee || ''
+      }));
+
+      await prisma.$transaction([
+        prisma.retribusi.deleteMany(),
+        prisma.retribusi.createMany({ data: retribusiArray })
+      ]);
+      saveToLocalDbJson('retribusi', retribusiArray);
+    }
+ else if (type === 'adminAccount') {
       const { username: oldUsername, newUsername, newPassword } = data;
       const user = await prisma.user.findUnique({
         where: { username: oldUsername }

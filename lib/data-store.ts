@@ -22,8 +22,11 @@ import {
   DEFAULT_KEPEMUDAAN_CARDS as initialKepemudaanCards,
   DEFAULT_OLAHRAGA_CARDS as initialOlahragaCards,
   DEFAULT_PARIWISATA_CARDS as initialPariwisataCards,
-  BidangCard
+  BidangCard,
+  Retribusi,
+  DEFAULT_RETRIBUSI as initialRetribusi
 } from './data';
+
 
 export interface BidangBottomCard {
   id: 'kepemudaan' | 'olahraga' | 'pariwisata';
@@ -341,12 +344,14 @@ export interface CategoryStore {
   news: string[];
   gallery: string[];
   services: string[];
+  retribusi: string[];
 }
 
 export const initialCategories: CategoryStore = {
   news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
   gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
-  services: ['SOP', 'Formulir', 'Berkas Layanan', 'Izin Usaha']
+  services: ['SOP', 'Formulir', 'Berkas Layanan', 'Izin Usaha'],
+  retribusi: ['Olahraga', 'Pariwisata', 'Kepemudaan']
 };
 
 export const getStoredCategories = (): CategoryStore => {
@@ -405,9 +410,12 @@ const syncWithServer = async () => {
         if (db.olahragaCards) localStorage.setItem('disporapar_olahraga_cards', JSON.stringify(db.olahragaCards));
         if (db.pariwisataCards) localStorage.setItem('disporapar_pariwisata_cards', JSON.stringify(db.pariwisataCards));
         if (db.bidangBottomCards) localStorage.setItem('disporapar_bidang_bottom_cards', JSON.stringify(db.bidangBottomCards));
+        if (db.retribusi) localStorage.setItem('disporapar_retribusi', JSON.stringify(db.retribusi));
+
         
         // Dispatch update to sync all states
         window.dispatchEvent(new Event('disporapar_data_update'));
+
       }
     } catch (e) {
       console.error('Failed to sync data with server database', e);
@@ -971,5 +979,63 @@ export function useBidangBottomCards() {
 
   return [data, updateData] as const;
 }
+
+export const getStoredRetribusi = (): Retribusi[] => {
+  if (!isClient) return initialRetribusi;
+  try {
+    const stored = localStorage.getItem('disporapar_retribusi');
+    if (!stored || stored === 'null' || stored === 'undefined') return initialRetribusi;
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : initialRetribusi;
+  } catch (e) {
+    console.error('Error reading disporapar_retribusi', e);
+    return initialRetribusi;
+  }
+};
+
+export const saveStoredRetribusi = (data: Retribusi[]) => {
+  if (isClient) {
+    try {
+      localStorage.setItem('disporapar_retribusi', JSON.stringify(data));
+      window.dispatchEvent(new Event('disporapar_data_update'));
+      fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'retribusi', data })
+      }).catch(err => console.error('Failed to save retribusi to database', err));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+};
+
+export function useRetribusi() {
+  const [data, setData] = useState<Retribusi[]>(initialRetribusi);
+
+  useEffect(() => {
+    setData(getStoredRetribusi());
+    
+    if (isClient) {
+      syncWithServer();
+    }
+    
+    const handleUpdate = () => {
+      setData(getStoredRetribusi());
+    };
+
+    window.addEventListener('disporapar_data_update', handleUpdate);
+    return () => {
+      window.removeEventListener('disporapar_data_update', handleUpdate);
+    };
+  }, []);
+
+  const updateData = (newData: Retribusi[]) => {
+    saveStoredRetribusi(newData);
+    setData(newData);
+  };
+
+  return [data, updateData] as const;
+}
+
 
 

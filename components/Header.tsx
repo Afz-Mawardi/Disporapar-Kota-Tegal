@@ -70,8 +70,8 @@ export default function Header() {
       name: 'PROFIL',
       items: [
         { name: 'Sambutan', href: '/profil' },
-        { name: 'Struktur Organisasi', href: '/profil/struktur-organisasi' },
-        { name: 'Tugas Pokok & Fungsi', href: '/profil/tupoksi' },
+        { name: 'Struktur', href: '/profil/struktur-organisasi' },
+        { name: 'Tupoksi', href: '/profil/tupoksi' },
       ],
     },
     {
@@ -89,7 +89,7 @@ export default function Header() {
         { name: 'Maklumat Pelayanan', href: '/pelayanan/maklumat' },
         { name: 'Motto Pelayanan', href: '/pelayanan/motto' },
         { name: 'Retribusi', href: '/pelayanan/retribusi' },
-        { name: 'Berkas Layanan', href: '/pelayanan/standar' },
+        { name: 'Berkas Layanan', href: '/pelayanan/berkas' },
       ],
     },
     {
