@@ -20,6 +20,115 @@ import {
 } from '@/lib/data-store';
 import { parseIndonesianDate } from '@/lib/utils';
 
+const getFileFormat = (downloadUrl?: string, title?: string): 'pdf' | 'zip' | 'word' | 'unknown' => {
+  if (!downloadUrl || downloadUrl === '#' || downloadUrl === '') return 'unknown';
+  const urlLower = downloadUrl.toLowerCase();
+  const titleLower = title ? title.toLowerCase() : '';
+
+  if (urlLower.includes('.pdf') || titleLower.includes('pdf')) return 'pdf';
+  if (urlLower.includes('.zip') || urlLower.includes('.rar') || titleLower.includes('zip') || titleLower.includes('rar')) return 'zip';
+  if (urlLower.includes('.doc') || urlLower.includes('.docx') || titleLower.includes('word') || titleLower.includes('doc') || titleLower.includes('docx')) return 'word';
+
+  if (urlLower.startsWith('data:application/pdf')) return 'pdf';
+  if (urlLower.startsWith('data:application/zip') || urlLower.startsWith('data:application/x-zip-compressed')) return 'zip';
+  if (urlLower.startsWith('data:application/msword') || urlLower.startsWith('data:application/vnd.openxmlformats-officedocument.wordprocessingml.document')) return 'word';
+
+  return 'unknown';
+};
+
+interface FileFormatIconProps {
+  className?: string;
+  downloadUrl?: string;
+  title?: string;
+  colorClasses?: string;
+}
+
+const FileFormatIcon: React.FC<FileFormatIconProps> = ({ className = "w-5 h-5", downloadUrl, title, colorClasses }) => {
+  const format = getFileFormat(downloadUrl, title);
+  const color = colorClasses !== undefined ? colorClasses : (
+    format === 'pdf' ? 'text-red-500' :
+      format === 'word' ? 'text-blue-650' :
+        format === 'zip' ? 'text-amber-500' :
+          'text-slate-400'
+  );
+
+  switch (format) {
+    case 'pdf':
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="M9 15H7v-4h2" />
+          <path d="M9 13H7" />
+          <path d="M12 11v4h1a1.5 1.5 0 0 0 1.5-1.5v-1A1.5 1.5 0 0 0 13 11h-1z" />
+          <path d="M17 11h2" />
+          <path d="M17 13h1.5" />
+        </svg>
+      );
+    case 'zip':
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="M10 6v2" />
+          <path d="M10 10v2" />
+          <path d="M10 14v2" />
+          <path d="M10 18h2" />
+        </svg>
+      );
+    case 'word':
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="M9 11.5l1.5 4 1.5-4 1.5 4 1.5-4.5" />
+        </svg>
+      );
+    default:
+      return (
+        <svg
+          className={`${className} ${color} shrink-0`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <line x1="10" y1="9" x2="8" y2="9" />
+        </svg>
+      );
+  }
+};
+
 export default function PublikasiBerandaPage() {
   const [news, setNews] = useNews();
   const [events, setEvents] = useEvents();
@@ -355,8 +464,12 @@ export default function PublikasiBerandaPage() {
 
           {/* 4. Berkas Tab */}
           {dashboardTab === 'berkas' && (() => {
-            const activeItems = services.filter(item => item.showOnHomepage !== false);
-            const inactiveItems = services.filter(item => item.showOnHomepage === false);
+            const activeItems = services
+              .filter(item => item.showOnHomepage !== false)
+              .sort((a, b) => a.title.localeCompare(b.title, 'id', { sensitivity: 'base' }));
+            const inactiveItems = services
+              .filter(item => item.showOnHomepage === false)
+              .sort((a, b) => a.title.localeCompare(b.title, 'id', { sensitivity: 'base' }));
             return (
               <div className="space-y-5">
                 <div className="space-y-2">
@@ -365,12 +478,12 @@ export default function PublikasiBerandaPage() {
                     activeItems.map(item => (
                       <div key={item.id} className="flex items-center justify-between p-4 bg-emerald-50/15 border border-emerald-100 rounded-2xl">
                         <div className="flex items-center gap-4 min-w-0">
-                          <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                            <FileText className="w-5 h-5" />
+                          <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0">
+                            <FileFormatIcon downloadUrl={item.downloadUrl} title={item.title} className="w-5 h-5 shrink-0" />
                           </div>
                           <div className="text-left min-w-0">
                             <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
-                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • {item.fileSize}</span>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category}</span>
                           </div>
                         </div>
                         <button
@@ -393,12 +506,12 @@ export default function PublikasiBerandaPage() {
                     inactiveItems.map(item => (
                       <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/30 border border-slate-100 rounded-2xl">
                         <div className="flex items-center gap-4 min-w-0">
-                          <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center shrink-0">
-                            <FileText className="w-5 h-5" />
+                          <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0">
+                            <FileFormatIcon downloadUrl={item.downloadUrl} title={item.title} className="w-5 h-5 shrink-0" />
                           </div>
                           <div className="text-left min-w-0">
                             <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
-                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category} • {item.fileSize}</span>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">KATEGORI: {item.category}</span>
                           </div>
                         </div>
                         {activeItems.length < 3 ? (

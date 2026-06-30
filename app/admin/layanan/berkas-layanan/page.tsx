@@ -349,12 +349,14 @@ export default function BerkasLayananAdminPage() {
     showNotification('Kategori berhasil dihapus.', 'success');
   };
 
-  const filteredServices = services.filter(item => {
-    const q = searchQuery.toLowerCase().trim();
-    const matchQuery = !q || item.title.toLowerCase().includes(q);
-    const matchCategory = selectedCategoryFilter === 'Semua' || item.category === selectedCategoryFilter;
-    return matchQuery && matchCategory;
-  });
+  const filteredServices = services
+    .filter(item => {
+      const q = searchQuery.toLowerCase().trim();
+      const matchQuery = !q || item.title.toLowerCase().includes(q);
+      const matchCategory = selectedCategoryFilter === 'Semua' || item.category === selectedCategoryFilter;
+      return matchQuery && matchCategory;
+    })
+    .sort((a, b) => a.title.localeCompare(b.title, 'id', { sensitivity: 'base' }));
 
   return (
     <div className="space-y-8 text-left animate-fade-in relative font-inter">
@@ -440,9 +442,6 @@ export default function BerkasLayananAdminPage() {
                         <FileFormatIcon downloadUrl={item.downloadUrl} title={item.title} className="w-5 h-5 shrink-0" />
                         <div>
                           <h4 className="font-extrabold text-[#0E3B66] leading-snug line-clamp-2">{item.title}</h4>
-                          <span className="text-[9px] text-slate-400 font-bold block mt-1 uppercase font-mono">
-                            Ukuran: {item.fileSize || '1.2 MB'}
-                          </span>
                         </div>
                       </div>
                     </td>

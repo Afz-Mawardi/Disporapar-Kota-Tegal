@@ -154,9 +154,18 @@
       "title": "SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)",
       "description": "Panduan tata cara penyewaan sarana prasarana olahraga milik daerah untuk kegiatan olahraga maupun luar olahraga.",
       "category": "SOP",
-      "downloadUrl": "#",
-      "fileSize": "1.2 MB",
-      "showOnHomepage": true
+      "downloadUrl": "/uploads/dokumen/1781977938236_Strategi_responden_IPP.zip",
+      "fileSize": "16 KB",
+      "showOnHomepage": false
+    },
+    {
+      "id": "s-10",
+      "title": "Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)",
+      "description": "Pendaftaran berkas seleksi delegasi pemuda andalan Kota Tegal ke tingkat provinsi untuk dikirim ke kancah global.",
+      "category": "Formulir",
+      "downloadUrl": "/uploads/dokumen/1781977908230_wmp.docx",
+      "fileSize": "934 KB",
+      "showOnHomepage": false
     },
     {
       "id": "s-2",
@@ -165,7 +174,7 @@
       "category": "Formulir",
       "downloadUrl": "#",
       "fileSize": "450 KB",
-      "showOnHomepage": true
+      "showOnHomepage": false
     },
     {
       "id": "s-3",
@@ -174,7 +183,7 @@
       "category": "Berkas Layanan",
       "downloadUrl": "#",
       "fileSize": "1.8 MB",
-      "showOnHomepage": true
+      "showOnHomepage": false
     },
     {
       "id": "s-4",
@@ -226,32 +235,50 @@
       "title": "Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan",
       "description": "Formulir basis data sertifikasi kurasi produk kriya, batik Tegalan, logam, dan makanan khas untuk event pameran daerah.",
       "category": "Berkas Layanan",
-      "downloadUrl": "#",
-      "fileSize": "850 KB",
-      "showOnHomepage": false
-    },
-    {
-      "id": "s-10",
-      "title": "Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)",
-      "description": "Pendaftaran berkas seleksi delegasi pemuda andalan Kota Tegal ke tingkat provinsi untuk dikirim ke kancah global.",
-      "category": "Formulir",
-      "downloadUrl": "#",
-      "fileSize": "540 KB",
+      "downloadUrl": "/uploads/dokumen/1781977188734_souvenir.pdf",
+      "fileSize": "190 KB",
       "showOnHomepage": false
     }
   ],
   "officeInfo": {
-    "address": "Jl. Melati No.30a, Kejambon, Kec. Tegal Timur, Kota Tegal, Jawa Tengah 52124, Indonesia",
-    "phone": "(0283) 321253",
+    "address": "Jl. Melati No.30a, Kejambon, Kec. Tegal Tim., Kota Tegal, Jawa Tengah 52124, Indonesia",
+    "phone": "(0283) 351052",
     "email": "dinpora.tegalkota@gmail.com",
-    "operationalHours": "Senin - Kamis: 07:30 - 16.00 WIB | Jumat: 07:30 - 11:00 WIB",
+    "operationalHours": "Senin - Kamis: 07:15 - 15:45 WIB | Jumat: 07:15 - 11:30 WIB",
     "socialMedia": {
       "instagramResmi": "https://www.instagram.com/disporapartegalkota",
       "instagramTourism": "https://www.instagram.com/tegal.tourism",
       "instagramPemuda": "https://www.instagram.com/bidpemuda_disporapartegal",
       "youtube": "https://www.youtube.com/@disporapartegalkota"
     },
-    "gmapsEmbedUrl": "https://maps.google.com/maps?q=Jl.+Melati+No.30a,+Kejambon,+Kec.+Tegal+Tim.,+Kota+Tegal,+Jawa+Tengah+52124&t=&z=17&hl=id&output=embed"
+    "gmapsEmbedUrl": "https://maps.google.com/maps?q=Jl.+Melati+No.30a,+Kejambon,+Kec.+Tegal+Tim.,+Kota+Tegal,+Jawa+Tengah+52124&t=&z=17&hl=id&output=embed",
+    "socialMediaList": [
+      {
+        "platform": "instagram",
+        "label": "Dinas",
+        "url": "https://www.instagram.com/disporapartegalkota"
+      },
+      {
+        "platform": "instagram",
+        "label": "Pemuda",
+        "url": "https://www.instagram.com/bidpemuda_disporapartegal"
+      },
+      {
+        "platform": "instagram",
+        "label": "Olahraga",
+        "url": "https://www.instagram.com/bidornews.kotategal"
+      },
+      {
+        "platform": "instagram",
+        "label": "Wisata",
+        "url": "https://www.instagram.com/tegal.tourism"
+      },
+      {
+        "platform": "youtube",
+        "label": "YouTube",
+        "url": "https://www.youtube.com/@disporapartegalkota"
+      }
+    ]
   },
   "welcomeMessage": {
     "name": "Khusnul Hidayati, S.E,. M.Si.",
