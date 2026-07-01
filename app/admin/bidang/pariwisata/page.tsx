@@ -63,12 +63,21 @@ export default function PariwisataAdminPage() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<'add' | 'edit' | 'delete'>('add');
   const [editingItem, setEditingItem] = useState<any | null>(null);
-  
+
   // Form states
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [uploadedImageBase64, setUploadedImageBase64] = useState<string>('');
   const [isDragOverModal, setIsDragOverModal] = useState<boolean>(false);
   const [modalDetails, setModalDetails] = useState<{ value: string; icon: string }[]>([]);
+
+  // Banner states
+  const [sectionTitle, setSectionTitle] = useState<string>('');
+  const [bannerTitle, setBannerTitle] = useState<string>('');
+  const [bannerDescription, setBannerDescription] = useState<string>('');
+  const [buttonText, setButtonText] = useState<string>('');
+  const [buttonLink, setButtonLink] = useState<string>('');
+  const [bannerImageUrl, setBannerImageUrl] = useState<string>('');
+  const [isEditingBanner, setIsEditingBanner] = useState<boolean>(false);
 
   // Notifications
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -264,17 +273,8 @@ export default function PariwisataAdminPage() {
 
   const handleUpdateBottomCard = (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const tag = formData.get('tag') as string;
-    const title = formData.get('title') as string;
-    const description = formData.get('description') as string;
-    const buttonText = formData.get('buttonText') as string;
-    const buttonLink = formData.get('buttonLink') as string || '/pelayanan';
-    const imageUrl = uploadedImageBase64 || formData.get('imageUrl') as string || '';
-    const sectionTag = formData.get('sectionTag') as string;
-    const sectionTitle = formData.get('sectionTitle') as string;
 
-    if (!tag.trim() || !title.trim() || !description.trim() || !buttonText.trim() || !sectionTag.trim() || !sectionTitle.trim()) {
+    if (!bannerTitle.trim() || !bannerDescription.trim() || !buttonText.trim() || !sectionTitle.trim()) {
       showNotification('Semua kolom wajib diisi.', 'error');
       return;
     }
@@ -285,13 +285,13 @@ export default function PariwisataAdminPage() {
         exists = true;
         return {
           id: c.id,
-          tag,
-          title,
-          description,
+          tag: '',
+          title: bannerTitle,
+          description: bannerDescription,
           buttonText,
-          buttonLink,
-          imageUrl,
-          sectionTag,
+          buttonLink: buttonLink || '/pelayanan',
+          imageUrl: bannerImageUrl,
+          sectionTag: '',
           sectionTitle
         };
       }
@@ -301,20 +301,20 @@ export default function PariwisataAdminPage() {
     if (!exists) {
       updated.push({
         id: 'pariwisata',
-        tag,
-        title,
-        description,
+        tag: '',
+        title: bannerTitle,
+        description: bannerDescription,
         buttonText,
-        buttonLink,
-        imageUrl,
-        sectionTag,
+        buttonLink: buttonLink || '/pelayanan',
+        imageUrl: bannerImageUrl,
+        sectionTag: '',
         sectionTitle
       });
     }
 
     setBidangBottomCards(updated);
+    setIsEditingBanner(false);
     showNotification('Banner informasi bawah berhasil diperbarui!', 'success');
-    setUploadedImageBase64('');
   };
 
   const bottomCard = bidangBottomCards.find(c => c.id === 'pariwisata') || {
@@ -327,6 +327,35 @@ export default function PariwisataAdminPage() {
     imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800',
     sectionTag: 'Destinasi Wisata',
     sectionTitle: 'Destinasi Wisata Terpopuler & Unggulan'
+  };
+
+  useEffect(() => {
+    if (bottomCard) {
+      setSectionTitle(bottomCard.sectionTitle || '');
+      setBannerTitle(bottomCard.title || '');
+      setBannerDescription(bottomCard.description || '');
+      setButtonText(bottomCard.buttonText || '');
+      setButtonLink(bottomCard.buttonLink || '/pelayanan');
+      setBannerImageUrl(bottomCard.imageUrl || '');
+    }
+  }, [bottomCard]);
+
+  useEffect(() => {
+    return () => {
+      setIsEditingBanner(false);
+    };
+  }, []);
+
+  const handleCancelBanner = () => {
+    if (bottomCard) {
+      setSectionTitle(bottomCard.sectionTitle || '');
+      setBannerTitle(bottomCard.title || '');
+      setBannerDescription(bottomCard.description || '');
+      setButtonText(bottomCard.buttonText || '');
+      setButtonLink(bottomCard.buttonLink || '/pelayanan');
+      setBannerImageUrl(bottomCard.imageUrl || '');
+    }
+    setIsEditingBanner(false);
   };
 
   const filteredCards = pariwisataCards.filter(item => {
@@ -344,9 +373,8 @@ export default function PariwisataAdminPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${
-            notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-          }`}
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+            }`}
         >
           {notification.type === 'success' ? (
             <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -485,47 +513,23 @@ export default function PariwisataAdminPage() {
       {/* Banner Bottom Card Editor */}
       <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm text-left">
         <div className="border-b border-slate-100 pb-4 mb-6">
-          <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight">Banner Promo Bawah Halaman Pariwisata</h3>
-          <p className="text-[10px] text-slate-400 mt-1 font-inter">Kustomisasi seksi promo khusus di bagian bawah sub-halaman Pariwisata di website.</p>
+          <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight">Judul Card dan Banner Pariwisata</h3>
         </div>
 
         <form onSubmit={handleUpdateBottomCard} className="space-y-5 font-inter">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-450 tracking-wider uppercase font-mono">Tag Section Atas (Kategori Utama)</label>
-              <input
-                type="text"
-                name="sectionTag"
-                required
-                defaultValue={bottomCard.sectionTag || ''}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
-                placeholder="Contoh: Destinasi Wisata"
-              />
-            </div>
-
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-slate-450 tracking-wider uppercase font-mono">Judul Section Halaman Utama (Daftar Card)</label>
               <input
                 type="text"
                 name="sectionTitle"
                 required
-                defaultValue={bottomCard.sectionTitle || ''}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                value={sectionTitle}
+                onChange={(e) => setSectionTitle(e.target.value)}
+                disabled={!isEditingBanner}
+                className={`w-full px-4 py-2.5 border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium ${isEditingBanner ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'
+                  }`}
                 placeholder="Contoh: Destinasi Wisata Terpopuler & Unggulan"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-450 tracking-wider uppercase font-mono">Tag / Label Kategori Banner Bawah</label>
-              <input
-                type="text"
-                name="tag"
-                required
-                defaultValue={bottomCard.tag || ''}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
-                placeholder="Contoh: Mitra Pelaku Usaha Wisata"
               />
             </div>
 
@@ -535,8 +539,11 @@ export default function PariwisataAdminPage() {
                 type="text"
                 name="title"
                 required
-                defaultValue={bottomCard.title || ''}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                value={bannerTitle}
+                onChange={(e) => setBannerTitle(e.target.value)}
+                disabled={!isEditingBanner}
+                className={`w-full px-4 py-2.5 border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium ${isEditingBanner ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'
+                  }`}
                 placeholder="Masukkan judul banner..."
               />
             </div>
@@ -548,8 +555,11 @@ export default function PariwisataAdminPage() {
               name="description"
               required
               rows={3}
-              defaultValue={bottomCard.description || ''}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium resize-none"
+              value={bannerDescription}
+              onChange={(e) => setBannerDescription(e.target.value)}
+              disabled={!isEditingBanner}
+              className={`w-full px-4 py-2.5 border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 transition-all resize-none ${isEditingBanner ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'
+                }`}
               placeholder="Masukkan deskripsi banner..."
             />
           </div>
@@ -561,20 +571,26 @@ export default function PariwisataAdminPage() {
                 type="text"
                 name="buttonText"
                 required
-                defaultValue={bottomCard.buttonText || ''}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                value={buttonText}
+                onChange={(e) => setButtonText(e.target.value)}
+                disabled={!isEditingBanner}
+                className={`w-full px-4 py-2.5 border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 transition-all ${isEditingBanner ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'
+                  }`}
                 placeholder="Contoh: Urus Izin Wisata"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-mono">Tautan / Link Tombol (CTA)</label>
+              <label className="text-[10px] font-bold text-[#0E3B66] tracking-wider uppercase font-mono font-extrabold">Tautan / Link Tombol (CTA)</label>
               <input
                 type="text"
                 name="buttonLink"
                 required
-                defaultValue={bottomCard.buttonLink || '/pelayanan'}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                value={buttonLink}
+                onChange={(e) => setButtonLink(e.target.value)}
+                disabled={!isEditingBanner}
+                className={`w-full px-4 py-2.5 border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 transition-all ${isEditingBanner ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'
+                  }`}
                 placeholder="Contoh: /pelayanan atau https://wa.me/..."
               />
             </div>
@@ -584,33 +600,56 @@ export default function PariwisataAdminPage() {
               <input
                 type="text"
                 name="imageUrl"
-                defaultValue={bottomCard.imageUrl || ''}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent text-slate-800 transition-all font-medium"
+                value={bannerImageUrl}
+                onChange={(e) => setBannerImageUrl(e.target.value)}
+                disabled={!isEditingBanner}
+                className={`w-full px-4 py-2.5 border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 transition-all ${isEditingBanner ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'
+                  }`}
                 placeholder="https://images.unsplash.com/..."
               />
             </div>
           </div>
 
-          <div className="flex justify-end pt-2">
-            <button
-              type="submit"
-              className="h-10 px-6 bg-[#0E3B66] hover:bg-[#0c3359] text-white font-extrabold rounded-xl transition-all shadow-md font-mono text-xs uppercase tracking-wider cursor-pointer border border-transparent"
-            >
-              Simpan Perubahan Banner
-            </button>
+          <div className="flex justify-end gap-3 pt-2">
+            {!isEditingBanner ? (
+              <button
+                type="button"
+                onClick={() => setIsEditingBanner(true)}
+                className="px-5 py-2.5 bg-[#0E3B66] hover:bg-sky-900 text-white font-extrabold rounded-xl transition-all shadow-md cursor-pointer font-mono text-xs uppercase tracking-wider"
+              >
+                Edit Banner
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={handleCancelBanner}
+                  className="px-5 py-2.5 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all cursor-pointer font-bold text-xs uppercase tracking-wider font-mono"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md cursor-pointer font-mono text-xs uppercase tracking-wider"
+                >
+                  Simpan Banner
+                </button>
+              </>
+            )}
           </div>
         </form>
       </div>
 
       {/* FORM MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-inter">
-          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-150 overflow-hidden">
-            <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-inter animate-fade-in">
+          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-150 overflow-hidden flex flex-col max-h-[90vh] transition-all duration-300">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
               <h3 className="text-sm font-black text-[#0E3B66] uppercase tracking-wider font-mono">
                 {modalType === 'add' ? 'Tambah Destinasi Wisata' : modalType === 'edit' ? 'Ubah Destinasi Wisata' : 'Konfirmasi Hapus'}
               </h3>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
                 className="p-1.5 text-slate-450 hover:text-slate-700 hover:bg-slate-200/50 rounded-xl transition-colors cursor-pointer"
               >
@@ -618,9 +657,9 @@ export default function PariwisataAdminPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 text-left">
+            <form onSubmit={handleSubmit} className="flex flex-col overflow-hidden flex-1 text-left">
               {modalType === 'delete' ? (
-                <div className="space-y-4">
+                <div className="p-6 space-y-4">
                   <p className="text-xs text-slate-500 leading-relaxed">
                     Apakah Anda yakin ingin menghapus data destinasi wisata <span className="font-bold text-slate-850">"{editingItem?.title}"</span>? Tindakan ini tidak dapat dibatalkan.
                   </p>
@@ -642,126 +681,126 @@ export default function PariwisataAdminPage() {
                 </div>
               ) : (
                 <>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Nama / Judul Sarana</label>
-                    <input
-                      type="text"
-                      required
-                      name="title"
-                      defaultValue={editingItem?.title || ''}
-                      placeholder="Masukkan nama sarana..."
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Deskripsi Lengkap</label>
-                    <textarea
-                      required
-                      name="description"
-                      rows={3}
-                      defaultValue={editingItem?.description || ''}
-                      placeholder="Masukkan deskripsi sarana..."
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 resize-none"
-                    />
-                  </div>
-
-                  {/* Details List Config */}
-                  <div className="space-y-2.5 border-t border-b border-slate-150/60 py-4 text-left">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono block">
-                        Detail Keterangan &amp; Icon (Urutan Fleksibel)
-                      </label>
-                      <button
-                        type="button"
-                        onClick={handleAddDetail}
-                        className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-600 hover:text-white border border-emerald-250 text-emerald-600 rounded-lg text-[10px] font-bold uppercase tracking-wider font-mono transition-colors cursor-pointer"
-                      >
-                        + Tambah Detail
-                      </button>
+                  <div className="p-6 overflow-y-auto flex-1 space-y-5 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Nama / Judul Sarana</label>
+                      <input
+                        type="text"
+                        required
+                        name="title"
+                        defaultValue={editingItem?.title || ''}
+                        placeholder="Masukkan nama sarana..."
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                      />
                     </div>
 
-                    {modalDetails.length > 0 ? (
-                      <div className="overflow-x-auto w-full">
-                        <table className="w-full text-left border-collapse min-w-[400px]">
-                          <thead>
-                            <tr className="border-b border-slate-100 text-[9px] uppercase font-mono text-slate-400">
-                              <th className="pb-2 font-bold w-[15%] text-center">Urutan</th>
-                              <th className="pb-2 font-bold w-[50%]">Isi Nilai</th>
-                              <th className="pb-2 font-bold w-[25%]">Pilih Icon</th>
-                              <th className="pb-2 font-bold w-[10%] text-center">Aksi</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-100/50">
-                            {modalDetails.map((item, idx) => (
-                              <tr key={idx} className="align-middle">
-                                <td className="py-2 px-1">
-                                  <div className="flex items-center justify-center gap-1">
-                                    <button
-                                      type="button"
-                                      disabled={idx === 0}
-                                      onClick={() => handleMoveDetail(idx, 'up')}
-                                      className="p-1 border border-slate-200 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer text-slate-500 font-bold text-xs"
-                                    >
-                                      ▲
-                                    </button>
-                                    <button
-                                      type="button"
-                                      disabled={idx === modalDetails.length - 1}
-                                      onClick={() => handleMoveDetail(idx, 'down')}
-                                      className="p-1 border border-slate-200 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer text-slate-500 font-bold text-xs"
-                                    >
-                                      ▼
-                                    </button>
-                                  </div>
-                                </td>
-                                <td className="py-2 px-1">
-                                  <input
-                                    type="text"
-                                    required
-                                    value={item.value}
-                                    onChange={(e) => handleUpdateDetailField(idx, 'value', e.target.value)}
-                                    placeholder="Masukkan detail..."
-                                    className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-accent font-medium text-slate-800"
-                                  />
-                                </td>
-                                <td className="py-2 px-1">
-                                  <select
-                                    value={item.icon}
-                                    onChange={(e) => handleUpdateDetailField(idx, 'icon', e.target.value)}
-                                    className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-accent text-slate-700 font-medium"
-                                  >
-                                    <option value="MapPin">📍 MapPin</option>
-                                    <option value="Clock">🕒 Clock</option>
-                                    <option value="Users">👥 Users</option>
-                                    <option value="Ticket">🎫 Ticket</option>
-                                    <option value="Calendar">📅 Calendar</option>
-                                    <option value="Circle">⚫ Poin Titik</option>
-                                  </select>
-                                </td>
-                                <td className="py-2 px-1 text-center">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRemoveDetail(idx)}
-                                    className="p-1.5 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <div className="py-6 text-center text-slate-400 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-xs">Tidak ada detail keterangan. Silakan klik "+ Tambah Detail"</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Deskripsi Lengkap</label>
+                      <textarea
+                        required
+                        name="description"
+                        rows={3}
+                        defaultValue={editingItem?.description || ''}
+                        placeholder="Masukkan deskripsi sarana..."
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 resize-none"
+                      />
+                    </div>
+
+                    {/* Details List Config */}
+                    <div className="space-y-2.5 border-t border-slate-150/60 pt-4">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono block">
+                          Detail Keterangan &amp; Icon (Urutan Fleksibel)
+                        </label>
+                        <button
+                          type="button"
+                          onClick={handleAddDetail}
+                          className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-600 hover:text-white border border-emerald-250 text-emerald-600 rounded-lg text-[10px] font-bold uppercase tracking-wider font-mono transition-colors cursor-pointer"
+                        >
+                          + Tambah Detail
+                        </button>
+                      </div>
+
+                      {modalDetails.length > 0 ? (
+                        <div className="overflow-x-auto w-full">
+                          <table className="w-full text-left border-collapse min-w-[400px]">
+                            <thead>
+                              <tr className="border-b border-slate-100 text-[9px] uppercase font-mono text-slate-400">
+                                <th className="pb-2 font-bold w-[15%] text-center">Urutan</th>
+                                <th className="pb-2 font-bold w-[50%]">Isi Nilai</th>
+                                <th className="pb-2 font-bold w-[25%]">Pilih Icon</th>
+                                <th className="pb-2 font-bold w-[10%] text-center">Aksi</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100/50">
+                              {modalDetails.map((item, idx) => (
+                                <tr key={idx} className="align-middle">
+                                  <td className="py-2 px-1">
+                                    <div className="flex items-center justify-center gap-1">
+                                      <button
+                                        type="button"
+                                        disabled={idx === 0}
+                                        onClick={() => handleMoveDetail(idx, 'up')}
+                                        className="p-1 border border-slate-200 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer text-slate-500 font-bold text-xs"
+                                      >
+                                        ▲
+                                      </button>
+                                      <button
+                                        type="button"
+                                        disabled={idx === modalDetails.length - 1}
+                                        onClick={() => handleMoveDetail(idx, 'down')}
+                                        className="p-1 border border-slate-200 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer text-slate-500 font-bold text-xs"
+                                      >
+                                        ▼
+                                      </button>
+                                    </div>
+                                  </td>
+                                  <td className="py-2 px-1">
+                                    <input
+                                      type="text"
+                                      required
+                                      value={item.value}
+                                      onChange={(e) => handleUpdateDetailField(idx, 'value', e.target.value)}
+                                      placeholder="Masukkan detail..."
+                                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-accent font-medium text-slate-800"
+                                    />
+                                  </td>
+                                  <td className="py-2 px-1">
+                                    <select
+                                      value={item.icon}
+                                      onChange={(e) => handleUpdateDetailField(idx, 'icon', e.target.value)}
+                                      className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-accent text-slate-700 font-medium"
+                                    >
+                                      <option value="MapPin">📍 MapPin</option>
+                                      <option value="Clock">🕒 Clock</option>
+                                      <option value="Users">👥 Users</option>
+                                      <option value="Ticket">🎫 Ticket</option>
+                                      <option value="Calendar">📅 Calendar</option>
+                                      <option value="Circle">⚫ Poin Titik</option>
+                                    </select>
+                                  </td>
+                                  <td className="py-2 px-1 text-center">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveDetail(idx)}
+                                      className="p-1.5 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="py-6 text-center text-slate-400 bg-slate-50 rounded-xl border border-slate-100">
+                          <span className="text-xs">Tidak ada detail keterangan. Silakan klik "+ Tambah Detail"</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5 border-t border-slate-150/60 pt-4">
                       <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Teks Judul Fasilitas</label>
                       <input
                         type="text"
@@ -782,64 +821,64 @@ export default function PariwisataAdminPage() {
                         className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                       />
                     </div>
-                  </div>
 
-                  <div className="space-y-2 pt-2 border-t border-slate-100">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Foto Sarana</label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* Local Upload */}
-                      <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${isDragOverModal
-                        ? 'border-accent bg-accent/5 scale-[1.02] shadow-md'
-                        : 'border-slate-350 bg-slate-50/50 hover:bg-slate-50'
-                        }`}>
-                        <Upload className="w-5 h-5 text-slate-400" />
-                        <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Foto</span>
-                        <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (WEBP/PNG/JPG)</span>
-                        <input
-                          type="file"
-                          accept="image/webp, image/png, image/jpeg, image/jpg"
-                          onChange={handleFileChange}
-                          onDragEnter={() => setIsDragOverModal(true)}
-                          onDragLeave={() => setIsDragOverModal(false)}
-                          onDrop={() => setIsDragOverModal(false)}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        />
-                      </div>
-
-                      {/* URL input */}
-                      <div className="space-y-1.5 flex flex-col justify-center">
-                        <span className="text-[8.5px] font-bold text-slate-440 font-mono">Atau Masukkan URL Link Foto:</span>
-                        <input
-                          type="text"
-                          name="imageUrl"
-                          value={uploadedImageBase64.startsWith('data:') ? '' : uploadedImageBase64 || editingItem?.imageUrl || ''}
-                          onChange={(e) => setUploadedImageBase64(e.target.value)}
-                          placeholder="https://images.unsplash.com/..."
-                          className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
-                        />
-                      </div>
-                    </div>
-
-                    {(uploadedImageBase64 || editingItem?.imageUrl) && (
-                      <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <ImageIcon className="w-4 h-4 text-accent shrink-0" />
-                          <span className="text-slate-800 font-bold truncate max-w-[200px]">
-                            {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64 || editingItem?.imageUrl}
-                          </span>
+                    <div className="space-y-2 pt-4 border-t border-slate-150/60">
+                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Foto Sarana</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Local Upload */}
+                        <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${isDragOverModal
+                          ? 'border-accent bg-accent/5 scale-[1.02] shadow-md'
+                          : 'border-slate-350 bg-slate-50/50 hover:bg-slate-50'
+                          }`}>
+                          <Upload className="w-5 h-5 text-slate-400" />
+                          <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Foto</span>
+                          <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (WEBP/PNG/JPG)</span>
+                          <input
+                            type="file"
+                            accept="image/webp, image/png, image/jpeg, image/jpg"
+                            onChange={handleFileChange}
+                            onDragEnter={() => setIsDragOverModal(true)}
+                            onDragLeave={() => setIsDragOverModal(false)}
+                            onDrop={() => setIsDragOverModal(false)}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          />
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setUploadedImageBase64('')}
-                          className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer"
-                        >
-                          Hapus
-                        </button>
+
+                        {/* URL input */}
+                        <div className="space-y-1.5 flex flex-col justify-center">
+                          <span className="text-[8.5px] font-bold text-slate-440 font-mono">Atau Masukkan URL Link Foto:</span>
+                          <input
+                            type="text"
+                            name="imageUrl"
+                            value={uploadedImageBase64.startsWith('data:') ? '' : uploadedImageBase64 || editingItem?.imageUrl || ''}
+                            onChange={(e) => setUploadedImageBase64(e.target.value)}
+                            placeholder="https://images.unsplash.com/..."
+                            className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
+                          />
+                        </div>
                       </div>
-                    )}
+
+                      {(uploadedImageBase64 || editingItem?.imageUrl) && (
+                        <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <ImageIcon className="w-4 h-4 text-accent shrink-0" />
+                            <span className="text-slate-800 font-bold truncate max-w-[200px]">
+                              {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64 || editingItem?.imageUrl}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setUploadedImageBase64('')}
+                            className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100 shrink-0">
+                  <div className="p-6 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
                     <button
                       type="button"
                       onClick={() => {

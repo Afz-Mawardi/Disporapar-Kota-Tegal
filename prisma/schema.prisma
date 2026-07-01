@@ -180,6 +180,7 @@ model BidangBottomCard {
   title        String   @db.Text
   description  String   @db.Text
   buttonText   String   @db.Text
+  buttonLink   String?  @db.Text
   imageUrl     String   @db.Text
   sectionTag   String?  @db.Text
   sectionTitle String?  @db.Text

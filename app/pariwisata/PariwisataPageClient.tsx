@@ -63,14 +63,9 @@ export default function PariwisataPageClient({
       {/* DESTINATION CARDS SHOWCASE */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
         <div className="space-y-8 text-left mb-8">
-          <div className="space-y-2">
-            <span className="text-xs font-bold text-amber-800 tracking-widest uppercase font-mono bg-[#FFD200]/15 border border-[#FFD200]/30 px-3.5 py-1.5 rounded-full inline-block">
-              {bottomCard.sectionTag || 'Destinasi Wisata'}
-            </span>
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
-              {bottomCard.sectionTitle || 'Destinasi Wisata Terpopuler & Unggulan'}
-            </h2>
-          </div>
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+            {bottomCard.sectionTitle || 'Destinasi Wisata Terpopuler & Unggulan'}
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -158,14 +153,9 @@ export default function PariwisataPageClient({
 
             {/* Promotion Details Column */}
             <div className="lg:col-span-7 space-y-8 text-left">
-              <div className="space-y-2">
-                <span className="text-xs font-bold text-amber-800 tracking-widest uppercase bg-[#FFD200]/15 border border-[#FFD200]/30 px-3.5 py-1.5 rounded-full inline-block font-mono">
-                  {bottomCard.tag}
-                </span>
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                  {bottomCard.title}
-                </h2>
-              </div>
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                {bottomCard.title}
+              </h2>
               <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-inter font-light">
                 {bottomCard.description}
               </p>

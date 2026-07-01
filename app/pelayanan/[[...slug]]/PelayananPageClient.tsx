@@ -362,7 +362,7 @@ export default function PelayananPageClient({
                             disabled
                             className="inline-flex items-center justify-center gap-2 text-xs font-bold text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-mono uppercase tracking-wider cursor-not-allowed border border-slate-200 shrink-0 w-full sm:w-auto"
                           >
-                            <span>Tidak Tersedia</span>
+                            <span>Unduh</span>
                             <Download className="w-3.5 h-3.5 shrink-0" />
                           </button>
                         ) : (

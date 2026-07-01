@@ -429,231 +429,70 @@ const syncWithServer = async () => {
 
 // Reactive custom hooks that listen to changes
 // Initialize with static default data to guarantee SSR matches initial client render
-export function useNews(initialData?: News[]) {
-  const [data, setData] = useState<News[]>(initialData !== undefined ? initialData : initialNews);
+function useDataStore<T>(
+  initialData: T | undefined,
+  fallbackData: T,
+  getStored: () => T,
+  saveStored: (data: T) => void
+) {
+  const [data, setData] = useState<T>(initialData !== undefined ? initialData : fallbackData);
 
   useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredNews());
+    setData(getStored());
     
     if (isClient) {
       syncWithServer();
     }
     
     const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredNews());
+      setData(getStored());
     };
 
     window.addEventListener('disporapar_data_update', handleUpdate);
     return () => {
       window.removeEventListener('disporapar_data_update', handleUpdate);
     };
-  }, [initialData]);
+  }, [getStored]);
 
-  const updateData = (newData: News[]) => {
-    saveStoredNews(newData);
+  const updateData = (newData: T) => {
+    saveStored(newData);
     setData(newData);
   };
 
   return [data, updateData] as const;
+}
+
+export function useNews(initialData?: News[]) {
+  return useDataStore(initialData, initialNews, getStoredNews, saveStoredNews);
 }
 
 export function useEvents(initialData?: EventAgenda[]) {
-  const [data, setData] = useState<EventAgenda[]>(initialData !== undefined ? initialData : initialEvents);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredEvents());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredEvents());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: EventAgenda[]) => {
-    saveStoredEvents(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialEvents, getStoredEvents, saveStoredEvents);
 }
 
 export function useGallery(initialData?: typeof initialGallery) {
-  const [data, setData] = useState<typeof initialGallery>(initialData !== undefined ? initialData : initialGallery);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredGallery());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredGallery());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: typeof initialGallery) => {
-    saveStoredGallery(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialGallery, getStoredGallery, saveStoredGallery);
 }
 
 export function usePublicServices(initialData?: PublicService[]) {
-  const [data, setData] = useState<PublicService[]>(initialData !== undefined ? initialData : initialServices);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredServices());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredServices());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: PublicService[]) => {
-    saveStoredServices(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialServices, getStoredServices, saveStoredServices);
 }
 
 export function useOfficeInfo(initialData?: typeof initialOfficeInfo) {
-  const [data, setData] = useState<typeof initialOfficeInfo>(initialData !== undefined ? initialData : initialOfficeInfo);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredOfficeInfo());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredOfficeInfo());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: typeof initialOfficeInfo) => {
-    saveStoredOfficeInfo(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialOfficeInfo, getStoredOfficeInfo, saveStoredOfficeInfo);
 }
 
 export function useCategories(initialData?: CategoryStore) {
-  const [data, setData] = useState<CategoryStore>(initialData !== undefined ? initialData : initialCategories);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredCategories());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredCategories());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: CategoryStore) => {
-    saveStoredCategories(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialCategories, getStoredCategories, saveStoredCategories);
 }
 
 export function useWelcomeMessage(initialData?: WelcomeMessage) {
-  const [data, setData] = useState<WelcomeMessage>(initialData !== undefined ? initialData : initialWelcomeMessage);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredWelcomeMessage());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredWelcomeMessage());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: WelcomeMessage) => {
-    saveStoredWelcomeMessage(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialWelcomeMessage, getStoredWelcomeMessage, saveStoredWelcomeMessage);
 }
 
 export function useHeroSlides(initialData?: HeroSlide[]) {
-  const [data, setData] = useState<HeroSlide[]>(initialData !== undefined ? initialData : initialHeroSlides);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredHeroSlides());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredHeroSlides());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: HeroSlide[]) => {
-    saveStoredHeroSlides(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialHeroSlides, getStoredHeroSlides, saveStoredHeroSlides);
 }
-
-// Homepage Section types and initial settings are imported from './data'
 
 export const getStoredHomepageSettings = (): HomepageSettings => {
   if (!isClient) return initialHomepageSettings;
@@ -685,59 +524,11 @@ export const saveStoredHomepageSettings = (data: HomepageSettings) => {
 };
 
 export function useHomepageSettings(initialData?: HomepageSettings) {
-  const [data, setData] = useState<HomepageSettings>(initialData !== undefined ? initialData : initialHomepageSettings);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredHomepageSettings());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredHomepageSettings());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: HomepageSettings) => {
-    saveStoredHomepageSettings(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialHomepageSettings, getStoredHomepageSettings, saveStoredHomepageSettings);
 }
 
 export function usePriorityPrograms(initialData?: PriorityProgram[]) {
-  const [data, setData] = useState<PriorityProgram[]>(initialData !== undefined ? initialData : initialPriorityPrograms);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredPriorityPrograms());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredPriorityPrograms());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: PriorityProgram[]) => {
-    saveStoredPriorityPrograms(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialPriorityPrograms, getStoredPriorityPrograms, saveStoredPriorityPrograms);
 }
 
 // ==========================================
@@ -773,31 +564,7 @@ export const saveStoredKepemudaanCards = (data: BidangCard[]) => {
 };
 
 export function useKepemudaanCards(initialData?: BidangCard[]) {
-  const [data, setData] = useState<BidangCard[]>(initialData !== undefined ? initialData : initialKepemudaanCards);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredKepemudaanCards());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredKepemudaanCards());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: BidangCard[]) => {
-    saveStoredKepemudaanCards(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialKepemudaanCards, getStoredKepemudaanCards, saveStoredKepemudaanCards);
 }
 
 // ==========================================
@@ -833,31 +600,7 @@ export const saveStoredOlahragaCards = (data: BidangCard[]) => {
 };
 
 export function useOlahragaCards(initialData?: BidangCard[]) {
-  const [data, setData] = useState<BidangCard[]>(initialData !== undefined ? initialData : initialOlahragaCards);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredOlahragaCards());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredOlahragaCards());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: BidangCard[]) => {
-    saveStoredOlahragaCards(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialOlahragaCards, getStoredOlahragaCards, saveStoredOlahragaCards);
 }
 
 // ==========================================
@@ -893,31 +636,7 @@ export const saveStoredPariwisataCards = (data: BidangCard[]) => {
 };
 
 export function usePariwisataCards(initialData?: BidangCard[]) {
-  const [data, setData] = useState<BidangCard[]>(initialData !== undefined ? initialData : initialPariwisataCards);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredPariwisataCards());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredPariwisataCards());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: BidangCard[]) => {
-    saveStoredPariwisataCards(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialPariwisataCards, getStoredPariwisataCards, saveStoredPariwisataCards);
 }
 
 // ==========================================
@@ -953,33 +672,12 @@ export const saveStoredBidangBottomCards = (data: BidangBottomCard[]) => {
 };
 
 export function useBidangBottomCards(initialData?: BidangBottomCard[]) {
-  const [data, setData] = useState<BidangBottomCard[]>(initialData !== undefined ? initialData : initialBidangBottomCards);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredBidangBottomCards());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredBidangBottomCards());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: BidangBottomCard[]) => {
-    saveStoredBidangBottomCards(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialBidangBottomCards, getStoredBidangBottomCards, saveStoredBidangBottomCards);
 }
 
+// ==========================================
+// Retribusi Store
+// ==========================================
 export const getStoredRetribusi = (): Retribusi[] => {
   if (!isClient) return initialRetribusi;
   try {
@@ -1010,31 +708,7 @@ export const saveStoredRetribusi = (data: Retribusi[]) => {
 };
 
 export function useRetribusi(initialData?: Retribusi[]) {
-  const [data, setData] = useState<Retribusi[]>(initialData !== undefined ? initialData : initialRetribusi);
-
-  useEffect(() => {
-    setData(initialData !== undefined ? initialData : getStoredRetribusi());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(initialData !== undefined ? initialData : getStoredRetribusi());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, [initialData]);
-
-  const updateData = (newData: Retribusi[]) => {
-    saveStoredRetribusi(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+  return useDataStore(initialData, initialRetribusi, getStoredRetribusi, saveStoredRetribusi);
 }
 
 

@@ -999,54 +999,54 @@ export default function HomePageClient({
                       .sort((a, b) => a.title.localeCompare(b.title, 'id', { sensitivity: 'base' }))
                       .slice(0, 3)
                       .map((service) => (
-                      <div
-                        key={service.id}
-                        className="p-4 bg-slate-50 hover:bg-white border border-slate-100 hover:border-emerald-500/30 rounded-xl transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                      >
-                        <div className="flex items-start gap-3.5 min-w-0 flex-1 text-left">
-                          {(() => {
-                            const format = getFileFormat(service.downloadUrl, service.title);
-                            let bgBorderText = 'bg-slate-50 border border-slate-200/60 text-slate-400';
-                            if (format === 'pdf') bgBorderText = 'bg-red-50 border border-red-100/60 text-red-650';
-                            else if (format === 'word') bgBorderText = 'bg-blue-50 border border-blue-100/60 text-blue-600';
-                            else if (format === 'zip') bgBorderText = 'bg-amber-50 border border-amber-100/60 text-amber-600';
+                        <div
+                          key={service.id}
+                          className="p-4 bg-slate-50 hover:bg-white border border-slate-100 hover:border-emerald-500/30 rounded-xl transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                        >
+                          <div className="flex items-start gap-3.5 min-w-0 flex-1 text-left">
+                            {(() => {
+                              const format = getFileFormat(service.downloadUrl, service.title);
+                              let bgBorderText = 'bg-slate-50 border border-slate-200/60 text-slate-400';
+                              if (format === 'pdf') bgBorderText = 'bg-red-50 border border-red-100/60 text-red-650';
+                              else if (format === 'word') bgBorderText = 'bg-blue-50 border border-blue-100/60 text-blue-600';
+                              else if (format === 'zip') bgBorderText = 'bg-amber-50 border border-amber-100/60 text-amber-600';
 
-                            return (
-                              <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${bgBorderText}`}>
-                                <FileFormatIcon downloadUrl={service.downloadUrl} title={service.title} className="w-5 h-5" colorClasses="text-current" />
-                              </div>
-                            );
-                          })()}
-                          <div className="min-w-0 flex-1">
-                            <h3 className="font-bold text-[#0E3B66] text-sm sm:text-base leading-snug">
-                              {service.title}
-                            </h3>
+                              return (
+                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${bgBorderText}`}>
+                                  <FileFormatIcon downloadUrl={service.downloadUrl} title={service.title} className="w-5 h-5" colorClasses="text-current" />
+                                </div>
+                              );
+                            })()}
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-bold text-[#0E3B66] text-sm sm:text-base leading-snug">
+                                {service.title}
+                              </h3>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-end shrink-0 w-full sm:w-auto">
+                            {!service.downloadUrl || service.downloadUrl === '#' || service.downloadUrl === '' ? (
+                              <button
+                                disabled
+                                className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-mono uppercase tracking-wider cursor-not-allowed border border-slate-200"
+                              >
+                                <span>Unduh</span>
+                                <Download className="w-3.5 h-3.5 shrink-0" />
+                              </button>
+                            ) : (
+                              <a
+                                href={service.downloadUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 text-xs font-bold text-white bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] px-4 py-2 rounded-lg transition-colors font-mono uppercase tracking-wider shadow-sm"
+                              >
+                                <span>Unduh</span>
+                                <Download className="w-3.5 h-3.5 shrink-0" />
+                              </a>
+                            )}
                           </div>
                         </div>
-
-                        <div className="flex items-center justify-end shrink-0 w-full sm:w-auto">
-                          {!service.downloadUrl || service.downloadUrl === '#' || service.downloadUrl === '' ? (
-                            <button
-                              disabled
-                              className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-mono uppercase tracking-wider cursor-not-allowed border border-slate-200"
-                            >
-                              <span>Tidak Tersedia</span>
-                              <Download className="w-3.5 h-3.5 shrink-0" />
-                            </button>
-                          ) : (
-                            <a
-                              href={service.downloadUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 text-xs font-bold text-white bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] px-4 py-2 rounded-lg transition-colors font-mono uppercase tracking-wider shadow-sm"
-                            >
-                              <span>Unduh</span>
-                              <Download className="w-3.5 h-3.5 shrink-0" />
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
               </div>

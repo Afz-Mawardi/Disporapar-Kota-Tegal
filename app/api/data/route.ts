@@ -530,6 +530,7 @@ export async function POST(request: Request) {
         title: item.title || '',
         description: item.description || '',
         buttonText: item.buttonText || '',
+        buttonLink: item.buttonLink || '',
         imageUrl: item.imageUrl || '',
         sectionTag: item.sectionTag || '',
         sectionTitle: item.sectionTitle || ''
