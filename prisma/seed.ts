@@ -17,8 +17,6 @@ async function main() {
   await prisma.officeInfo.deleteMany();
   await prisma.welcomeMessage.deleteMany();
   await prisma.heroSlide.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.homepageSetting.deleteMany();
   await prisma.priorityProgram.deleteMany();
   await prisma.kepemudaanCard.deleteMany();
   await prisma.olahragaCard.deleteMany();
@@ -30,16 +28,18 @@ async function main() {
   await prisma.user.create({
     data: {
       username: 'admin123',
-      password: md5Password
+      password: md5Password,
+      role: 'SUPER_ADMIN'
     }
   });
   await prisma.user.create({
     data: {
       username: 'admin',
-      password: md5Password
+      password: md5Password,
+      role: 'SUPER_ADMIN'
     }
   });
-  console.log('Admin users seeded with MD5 (admin and admin123).');
+  console.log('Admin users seeded with MD5 (admin and admin123) as SUPER_ADMIN.');
 
   // 3. Read db.json
   const dbPath = path.join(process.cwd(), 'lib', 'db.json');
@@ -177,41 +177,7 @@ async function main() {
     console.log(`Seeded ${dbData.heroSlides.length} hero slides.`);
   }
 
-  // 11. Seed Categories
-  if (dbData.categories) {
-    const cats = dbData.categories;
-    const toInsert = [];
-    if (Array.isArray(cats.news)) {
-      for (const cat of cats.news) toInsert.push({ module: 'news', name: cat });
-    }
-    if (Array.isArray(cats.gallery)) {
-      for (const cat of cats.gallery) toInsert.push({ module: 'gallery', name: cat });
-    }
-    if (Array.isArray(cats.services)) {
-      for (const cat of cats.services) toInsert.push({ module: 'services', name: cat });
-    }
-    if (Array.isArray(cats.retribusi)) {
-      for (const cat of cats.retribusi) toInsert.push({ module: 'retribusi', name: cat });
-    }
 
-    for (const item of toInsert) {
-      await prisma.category.create({
-        data: item
-      });
-    }
-    console.log(`Seeded ${toInsert.length} categories.`);
-  }
-
-  // 12. Seed Homepage Settings
-  if (dbData.homepageSettings) {
-    await prisma.homepageSetting.create({
-      data: {
-        id: 'default',
-        data: dbData.homepageSettings
-      }
-    });
-    console.log('Seeded homepage settings.');
-  }
 
   // 13. Seed Priority Programs
   if (dbData.priorityPrograms && Array.isArray(dbData.priorityPrograms)) {

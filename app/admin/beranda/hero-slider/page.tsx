@@ -258,17 +258,17 @@ export default function HeroSliderPage() {
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => openForm('edit', slide)}
-                          className="p-2 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
+                          className="p-1.5 text-[#0E3B66] bg-transparent border border-transparent hover:!bg-[#0E3B66] hover:!text-white hover:!border-[#0E3B66] rounded-xl transition-all cursor-pointer"
                           title="Ubah slide"
                         >
-                          <Edit2 className="w-3.5 h-3.5" />
+                          <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => openDeleteConfirm(slide)}
-                          className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-600 transition-colors cursor-pointer"
+                          className="p-1.5 text-red-600 bg-transparent border border-transparent hover:!bg-red-600 hover:!text-white hover:!border-red-600 rounded-xl transition-all cursor-pointer"
                           title="Hapus slide"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -308,7 +308,7 @@ export default function HeroSliderPage() {
               {modalType === 'delete' ? (
                 <div className="space-y-4">
                   <p className="text-xs text-slate-500 leading-relaxed font-inter">
-                    Apakah Anda yakin ingin menghapus slide hero dengan judul <span className="font-bold text-slate-850">"{editingItem?.title}"</span>? Tindakan ini tidak dapat dibatalkan.
+                    Apakah Anda yakin ingin menghapus slide hero dengan judul <span className="font-bold text-slate-850">&quot;{editingItem?.title}&quot;</span>? Tindakan ini tidak dapat dibatalkan.
                   </p>
                   <div className="flex justify-end gap-3 pt-2">
                     <button

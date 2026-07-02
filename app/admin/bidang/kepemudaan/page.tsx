@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Plus,
   Edit2,
@@ -317,7 +317,7 @@ export default function KepemudaanAdminPage() {
     showNotification('Banner informasi bawah berhasil diperbarui!', 'success');
   };
 
-  const bottomCard = bidangBottomCards.find(c => c.id === 'kepemudaan') || {
+  const bottomCard = useMemo(() => bidangBottomCards.find(c => c.id === 'kepemudaan') || {
     id: 'kepemudaan',
     tag: 'Layanan & Kemitraan Pemuda',
     title: 'Kemitraan Organisasi & Legalitas Kepemudaan',
@@ -327,7 +327,7 @@ export default function KepemudaanAdminPage() {
     imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800',
     sectionTag: 'Program Strategis & Layanan Pemuda',
     sectionTitle: 'Fasilitas Pembinaan Pemuda Kota Tegal'
-  };
+  }, [bidangBottomCards]);
 
   useEffect(() => {
     if (bottomCard) {
@@ -403,7 +403,7 @@ export default function KepemudaanAdminPage() {
           className="w-full md:w-auto px-5 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>Tambah Layanan Sewa Pemuda</span>
+          <span>Tambah</span>
         </button>
       </div>
 
@@ -479,17 +479,17 @@ export default function KepemudaanAdminPage() {
                           </button>
                           <button
                             onClick={() => openForm('edit', item)}
-                            className="p-2 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
+                            className="p-1.5 text-[#0E3B66] bg-transparent border border-transparent hover:!bg-[#0E3B66] hover:!text-white hover:!border-[#0E3B66] rounded-xl transition-all cursor-pointer"
                             title="Ubah data"
                           >
-                            <Edit2 className="w-3.5 h-3.5" />
+                            <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => openDeleteConfirm(item)}
-                            className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-600 transition-colors cursor-pointer"
+                            className="p-1.5 text-red-600 bg-transparent border border-transparent hover:!bg-red-600 hover:!text-white hover:!border-red-600 rounded-xl transition-all cursor-pointer"
                             title="Hapus data"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -646,7 +646,7 @@ export default function KepemudaanAdminPage() {
           <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-150 overflow-hidden flex flex-col max-h-[90vh] transition-all duration-300">
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
               <h3 className="text-sm font-black text-[#0E3B66] uppercase tracking-wider font-mono">
-                {modalType === 'add' ? 'Tambah Layanan Sewa Pemuda' : modalType === 'edit' ? 'Ubah Layanan Sewa Pemuda' : 'Konfirmasi Hapus'}
+                {modalType === 'add' ? 'Tambah' : modalType === 'edit' ? 'Ubah Layanan Sewa Pemuda' : 'Konfirmasi Hapus'}
               </h3>
               <button
                 type="button"
@@ -661,7 +661,7 @@ export default function KepemudaanAdminPage() {
               {modalType === 'delete' ? (
                 <div className="p-6 space-y-4">
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Apakah Anda yakin ingin menghapus data layanan kepemudaan <span className="font-bold text-slate-850">"{editingItem?.title}"</span>? Tindakan ini tidak dapat dibatalkan.
+                    Apakah Anda yakin ingin menghapus data layanan kepemudaan <span className="font-bold text-slate-850">&quot;{editingItem?.title}&quot;</span>? Tindakan ini tidak dapat dibatalkan.
                   </p>
                   <div className="flex justify-end gap-3 pt-2">
                     <button
@@ -796,7 +796,7 @@ export default function KepemudaanAdminPage() {
                         </div>
                       ) : (
                         <div className="py-6 text-center text-slate-400 bg-slate-50 rounded-xl border border-slate-100">
-                          <span className="text-xs">Tidak ada detail keterangan. Silakan klik "+ Tambah Detail"</span>
+                          <span className="text-xs">Tidak ada detail keterangan. Silakan klik &quot;+ Tambah Detail&quot;</span>
                         </div>
                       )}
                     </div>

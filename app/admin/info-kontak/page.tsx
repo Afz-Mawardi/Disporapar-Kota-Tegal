@@ -335,10 +335,10 @@ export default function InfoKontakAdminPage() {
                               <button
                                 type="button"
                                 onClick={removeRow}
-                                className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-600 shrink-0 cursor-pointer transition-colors flex items-center justify-center"
+                                className="p-1.5 text-red-600 bg-transparent border border-transparent hover:!bg-red-600 hover:!text-white hover:!border-red-600 rounded-xl transition-all cursor-pointer flex items-center justify-center"
                                 title="Hapus"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
+                                <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
                           ) : (

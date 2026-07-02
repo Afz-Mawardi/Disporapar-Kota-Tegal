@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import PelayananPageClient from './page.client';
+import dbData from '@/lib/db.json';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,17 +14,13 @@ export default async function Page() {
     createdAt: c.createdAt.toISOString()
   }));
 
-  const categoriesDb = await prisma.category.findMany();
-  const initialCategories = {
-    news: categoriesDb.filter(c => c.module === 'news').map(c => c.name),
-    gallery: categoriesDb.filter(c => c.module === 'gallery').map(c => c.name),
-    services: categoriesDb.filter(c => c.module === 'services').map(c => c.name),
-    retribusi: categoriesDb.filter(c => c.module === 'retribusi').map(c => c.name)
+  // Load categories directly from db.json since it has no admin CRUD
+  const initialCategories = dbData.categories || {
+    news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
+    gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
+    services: ['SOP', 'Formulir', 'Berkas Layanan'],
+    retribusi: ['Olahraga', 'Pariwisata', 'Kepemudaan']
   };
-
-  if (initialCategories.services.length === 0) {
-    initialCategories.services = ['SOP', 'Formulir', 'Berkas Layanan'];
-  }
 
   const retribusiDb = await prisma.retribusi.findMany({
     orderBy: { createdAt: 'asc' }

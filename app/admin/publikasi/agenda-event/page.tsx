@@ -11,10 +11,11 @@ import {
   Search,
   Calendar,
   MapPin,
-  Clock
+  Clock,
+  SquareDot,
+  CheckSquare
 } from 'lucide-react';
 import { useEvents } from '@/lib/data-store';
-import { parseIndonesianDate } from '@/lib/utils';
 
 // Helper to parse Indonesian date format (e.g. "24 Mei 2026") to YYYY-MM-DD
 const parseIndonesianDateToYYYYMMDD = (dateStr: string): string => {
@@ -56,11 +57,29 @@ export default function AgendaEventAdminPage() {
 
   // Local CRUD states
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [modalType, setModalType] = useState<'add' | 'edit' | 'delete'>('add');
+  const [modalType, setModalType] = useState<'add' | 'edit'>('add');
   const [editingItem, setEditingItem] = useState<any | null>(null);
+
+  // Checkbox Selection State
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isSelectMode, setIsSelectMode] = useState(false);
+
+  // Delete Confirmation Modal State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | 'bulk' | null>(null);
+  const [deleteWarningMessage, setDeleteWarningMessage] = useState('');
 
   // Form states
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  const filteredEvents = events.filter(item => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return true;
+    return (
+      item.title.toLowerCase().includes(q) ||
+      (item.location && item.location.toLowerCase().includes(q))
+    );
+  });
 
   // Notifications
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -78,10 +97,81 @@ export default function AgendaEventAdminPage() {
     setIsModalOpen(true);
   };
 
-  const openDeleteConfirm = (item: any) => {
-    setModalType('delete');
-    setEditingItem(item);
-    setIsModalOpen(true);
+  const handleToggleSelectMode = () => {
+    if (isSelectMode) {
+      setIsSelectMode(false);
+      setSelectedIds([]);
+    } else {
+      setIsSelectMode(true);
+    }
+  };
+
+  // Bulk select helpers
+  const isAllSelected = filteredEvents.length > 0 && filteredEvents.every(item => selectedIds.includes(item.id));
+
+  const handleSelectAllToggle = () => {
+    if (isAllSelected) {
+      // Deselect all filtered
+      const filteredIds = filteredEvents.map(item => item.id);
+      setSelectedIds(prev => prev.filter(id => !filteredIds.includes(id)));
+    } else {
+      // Select all filtered
+      const filteredIds = filteredEvents.map(item => item.id);
+      setSelectedIds(prev => {
+        const newSelection = [...prev];
+        filteredIds.forEach(id => {
+          if (!newSelection.includes(id)) {
+            newSelection.push(id);
+          }
+        });
+        return newSelection;
+      });
+    }
+  };
+
+  const handleSelectToggle = (id: string) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const openDeleteModal = (id: string) => {
+    const item = events.find(ev => ev.id === id);
+    if (!item) return;
+    setDeleteTargetId(id);
+    setDeleteWarningMessage(`Apakah Anda yakin ingin menghapus agenda "${item.title}" secara permanen? Tindakan ini tidak dapat dibatalkan.`);
+    setIsDeleteModalOpen(true);
+  };
+
+  const openBulkDeleteModal = () => {
+    if (selectedIds.length === 0) return;
+    setDeleteTargetId('bulk');
+    setDeleteWarningMessage(`Apakah Anda yakin ingin menghapus ${selectedIds.length} agenda terpilih secara permanen? Tindakan ini tidak dapat dibatalkan.`);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deleteTargetId) return;
+
+    if (deleteTargetId === 'bulk') {
+      const remainingEvents = events.filter(item => !selectedIds.includes(item.id));
+      setEvents(remainingEvents);
+      showNotification(`${selectedIds.length} agenda berhasil dihapus.`, 'success');
+      setSelectedIds([]);
+      setIsSelectMode(false);
+    } else {
+      const remainingEvents = events.filter(item => item.id !== deleteTargetId);
+      setEvents(remainingEvents);
+      showNotification('Agenda berhasil dihapus.', 'success');
+      setSelectedIds(prev => prev.filter(id => id !== deleteTargetId));
+    }
+    setIsDeleteModalOpen(false);
+    setDeleteTargetId(null);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteTargetId(null);
   };
 
 
@@ -89,16 +179,6 @@ export default function AgendaEventAdminPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-
-    if (modalType === 'delete') {
-      if (editingItem) {
-        setEvents(events.filter(ev => ev.id !== editingItem.id));
-        showNotification('Agenda berhasil dihapus.', 'success');
-      }
-      setIsModalOpen(false);
-      setEditingItem(null);
-      return;
-    }
 
     const title = formData.get('title') as string;
     const dateVal = formData.get('date') as string;
@@ -152,24 +232,14 @@ export default function AgendaEventAdminPage() {
     setEditingItem(null);
   };
 
-  const filteredEvents = events.filter(item => {
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return true;
-    return (
-      item.title.toLowerCase().includes(q) ||
-      (item.location && item.location.toLowerCase().includes(q))
-    );
-  });
-
   return (
     <div className="space-y-8 text-left animate-fade-in relative font-inter">
       {/* Toast Notification */}
       {notification && (
         <div
           onClick={() => setNotification(null)}
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${
-            notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-          }`}
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+            }`}
         >
           {notification.type === 'success' ? (
             <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -181,25 +251,54 @@ export default function AgendaEventAdminPage() {
       )}
 
       {/* Control Action Bar */}
-      <div className="sticky top-0 z-20 flex flex-col md:flex-row items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-md transition-all duration-300">
-        <div className="relative w-full md:max-w-xs shrink-0">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-          <input
-            type="text"
-            placeholder="Cari Agenda Event..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#0E3B66]"
-          />
+      <div className="sticky top-0 z-20 flex flex-col xl:flex-row items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-md transition-all duration-300">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+          {/* Search bar */}
+          <div className="relative w-full sm:w-60 shrink-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Cari Agenda Event..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#0E3B66]"
+            />
+          </div>
         </div>
 
-        <button
-          onClick={() => openForm('add')}
-          className="w-full md:w-auto px-5 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Tambah Agenda Event</span>
-        </button>
+        <div className="flex flex-col sm:flex-row items-center gap-3 justify-end w-full xl:w-auto self-stretch xl:self-auto">
+          <div className="flex flex-wrap items-center gap-2 justify-start sm:justify-end w-full sm:w-auto">
+            <button
+              onClick={handleToggleSelectMode}
+              className={`px-5 py-2.5 text-xs font-mono font-extrabold uppercase tracking-wider rounded-full transition-all shadow-md active:scale-98 flex items-center gap-2 cursor-pointer ${isSelectMode
+                ? 'bg-slate-700 hover:bg-slate-600 text-white'
+                : 'bg-[#0E3B66] hover:bg-[#0c3359] text-white'
+                }`}
+            >
+              {isSelectMode ? <CheckSquare className="w-4 h-4" /> : <SquareDot className="w-4 h-4" />}
+              <span>{isSelectMode ? 'BATAL' : 'PILIH'}</span>
+            </button>
+            {isSelectMode && selectedIds.length > 0 && (
+              <button
+                onClick={openBulkDeleteModal}
+                className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-mono font-extrabold uppercase tracking-wider rounded-full transition-all shadow-md active:scale-98 flex items-center gap-2 cursor-pointer animate-fade-in"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>HAPUS ({selectedIds.length})</span>
+              </button>
+            )}
+            <button
+              onClick={() => openForm('add')}
+              className="px-5 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Tambah</span>
+            </button>
+          </div>
+          <div className="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider shrink-0 ml-auto sm:ml-0">
+            Total: {events.length} Event
+          </div>
+        </div>
       </div>
 
       {/* Agenda Table */}
@@ -208,6 +307,16 @@ export default function AgendaEventAdminPage() {
           <table className="w-full text-left border-collapse text-xs sm:text-sm font-inter">
             <thead>
               <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
+                {isSelectMode && (
+                  <th className="py-4 px-3 text-center w-12 animate-fade-in">
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected}
+                      onChange={handleSelectAllToggle}
+                      className="w-4 h-4 rounded border-slate-350 text-[#0E3B66] focus:ring-[#0E3B66] cursor-pointer accent-[#0E3B66]"
+                    />
+                  </th>
+                )}
                 <th className="py-3 px-3 sm:py-4.5 sm:px-6">Nama Event</th>
                 <th className="py-3 px-3 sm:py-4.5 sm:px-6">Jadwal & Lokasi</th>
                 <th className="py-3 px-3 sm:py-4.5 sm:px-6 text-center w-36">Aksi</th>
@@ -216,7 +325,17 @@ export default function AgendaEventAdminPage() {
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
               {filteredEvents.length > 0 ? (
                 filteredEvents.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={item.id} className={`group hover:bg-slate-50/50 transition-colors ${selectedIds.includes(item.id) ? 'bg-slate-50/80' : ''}`}>
+                    {isSelectMode && (
+                      <td className="py-4 px-3 text-center animate-fade-in">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(item.id)}
+                          onChange={() => handleSelectToggle(item.id)}
+                          className="w-4 h-4 rounded border-slate-350 text-[#0E3B66] focus:ring-[#0E3B66] cursor-pointer accent-[#0E3B66]"
+                        />
+                      </td>
+                    )}
                     <td className="py-4 px-3 sm:py-5 sm:px-6 max-w-xs">
                       <div className="flex items-center gap-3">
                         <div>
@@ -244,17 +363,17 @@ export default function AgendaEventAdminPage() {
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => openForm('edit', item)}
-                          className="p-2 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
+                          className="p-1.5 text-[#0E3B66] bg-transparent border border-transparent hover:!bg-[#0E3B66] hover:!text-white hover:!border-[#0E3B66] rounded-xl transition-all cursor-pointer"
                           title="Ubah agenda"
                         >
-                          <Edit2 className="w-3.5 h-3.5" />
+                          <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => openDeleteConfirm(item)}
-                          className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-600 transition-colors cursor-pointer"
+                          onClick={() => openDeleteModal(item.id)}
+                          className="p-1.5 text-red-600 bg-transparent border border-transparent hover:!bg-red-600 hover:!text-white hover:!border-red-600 rounded-xl transition-all cursor-pointer"
                           title="Hapus agenda"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -262,7 +381,7 @@ export default function AgendaEventAdminPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={3} className="py-16 text-center text-slate-400">
+                  <td colSpan={isSelectMode ? 4 : 3} className="py-16 text-center text-slate-400">
                     <ShieldAlert className="w-10 h-10 mx-auto mb-3 opacity-30" />
                     <h4 className="font-extrabold text-slate-800 text-sm">Tidak ada agenda ditemukan</h4>
                     <p className="text-xs text-slate-400 mt-1 font-light">Coba tambahkan agenda event baru.</p>
@@ -280,7 +399,7 @@ export default function AgendaEventAdminPage() {
           <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-150 overflow-hidden">
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <h3 className="text-sm font-black text-[#0E3B66] uppercase tracking-wider font-mono">
-                {modalType === 'add' ? 'Tambah Agenda Event' : modalType === 'edit' ? 'Ubah Agenda Event' : 'Konfirmasi Hapus'}
+                {modalType === 'add' ? 'Tambah Agenda Event' : 'Ubah Agenda Event'}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -291,109 +410,130 @@ export default function AgendaEventAdminPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4 text-left">
-              {modalType === 'delete' ? (
-                <div className="space-y-4">
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Apakah Anda yakin ingin menghapus agenda <span className="font-bold text-slate-850">"{editingItem?.title}"</span>? Tindakan ini tidak dapat dibatalkan.
-                  </p>
-                  <div className="flex justify-end gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsModalOpen(false)}
-                      className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
-                    >
-                      Batal
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
-                      style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
-                    >
-                      Ya, Hapus
-                    </button>
-                  </div>
+              <>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Judul Agenda</label>
+                  <input
+                    type="text"
+                    required
+                    name="title"
+                    defaultValue={editingItem?.title || ''}
+                    placeholder="Contoh: Pembukaan Turnamen Walikota Cup"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
+                  />
                 </div>
-              ) : (
-                <>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Judul Agenda</label>
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Tanggal Publikasi</label>
                     <input
-                      type="text"
+                      type="date"
                       required
-                      name="title"
-                      defaultValue={editingItem?.title || ''}
-                      placeholder="Contoh: Pembukaan Turnamen Walikota Cup"
+                      name="date"
+                      defaultValue={editingItem ? parseIndonesianDateToYYYYMMDD(editingItem.date) : ''}
                       className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Tanggal Publikasi</label>
-                      <input
-                        type="date"
-                        required
-                        name="date"
-                        defaultValue={editingItem ? parseIndonesianDateToYYYYMMDD(editingItem.date) : ''}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Lokasi Event</label>
-                      <input
-                        type="text"
-                        required
-                        name="location"
-                        defaultValue={editingItem?.location || ''}
-                        placeholder="Contoh: GOR Wisanggeni Kota Tegal"
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
-                      />
-                    </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Lokasi Event</label>
+                    <input
+                      type="text"
+                      required
+                      name="location"
+                      defaultValue={editingItem?.location || ''}
+                      placeholder="Contoh: GOR Wisanggeni Kota Tegal"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
+                    />
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Jam Mulai</label>
-                      <input
-                        type="time"
-                        name="startTime"
-                        defaultValue={editingItem ? parseTimeRange(editingItem.time).start : '08:00'}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Jam Selesai</label>
-                      <input
-                        type="time"
-                        name="endTime"
-                        defaultValue={editingItem ? parseTimeRange(editingItem.time).end : '12:00'}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
-                      />
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Jam Mulai</label>
+                    <input
+                      type="time"
+                      name="startTime"
+                      defaultValue={editingItem ? parseTimeRange(editingItem.time).start : '08:00'}
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
+                    />
                   </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Jam Selesai</label>
+                    <input
+                      type="time"
+                      name="endTime"
+                      defaultValue={editingItem ? parseTimeRange(editingItem.time).end : '12:00'}
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
+                    />
+                  </div>
+                </div>
 
-                  <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsModalOpen(false);
-                        setEditingItem(null);
-                      }}
-                      className="px-5 py-2.5 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all cursor-pointer font-bold text-xs uppercase tracking-wider font-mono"
-                    >
-                      Batal
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-6 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer font-mono text-xs uppercase tracking-wider"
-                    >
-                      Simpan
-                    </button>
-                  </div>
-                </>
-              )}
+                <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setEditingItem(null);
+                    }}
+                    className="px-5 py-2.5 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all cursor-pointer font-bold text-xs uppercase tracking-wider font-mono"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer font-mono text-xs uppercase tracking-wider"
+                  >
+                    Simpan
+                  </button>
+                </div>
+              </>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE CONFIRMATION MODAL */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in font-inter">
+          <div className="absolute inset-0" onClick={handleCancelDelete} />
+          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-150 overflow-hidden flex flex-col relative z-10 animate-scale-in text-left">
+            {/* Modal Header */}
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+              <h3 className="text-sm font-black text-[#0E3B66] uppercase tracking-wider font-mono">
+                Konfirmasi Hapus
+              </h3>
+              <button
+                onClick={handleCancelDelete}
+                className="p-1.5 text-slate-450 hover:text-slate-700 hover:bg-slate-200/50 rounded-xl transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-4">
+              <p className="text-xs text-slate-500 leading-relaxed">
+                {deleteWarningMessage}
+              </p>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleCancelDelete}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                  style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
+                >
+                  Ya, Hapus
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

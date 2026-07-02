@@ -189,9 +189,8 @@ export default function Footer() {
 
       {/* Bottom copyright segment */}
       <div className="font-mono w-full bg-black border-t border-white/10 py-6 mt-12 relative z-10">
-        <div className="text-center leading-relaxed max-w-[1200px] mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-center text-[12px] uppercase font-bold  text-slate-300 tracking-wider">
-          Copyright @ 2026 <br />
-          Dinas Kepemudaan dan Olahraga dan Pariwisata Kota Tegal
+        <div className="text-center leading-relaxed max-w-[1200px] mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-center text-[10px] uppercase font-bold  text-slate-300 tracking-wider">
+          copyright © 2026 Dinas Kepemudaan dan Olahraga dan Pariwisata Kota Tegal | Seluruh Hak Cipta Dilindungi
         </div>
       </div>
     </footer>

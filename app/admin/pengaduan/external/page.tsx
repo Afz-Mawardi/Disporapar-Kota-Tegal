@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Link2,
   Save,
@@ -27,13 +27,13 @@ export default function AdminExternalLinksPage() {
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const notificationTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const showNotification = (message: string, type: 'success' | 'error') => {
+  const showNotification = useCallback((message: string, type: 'success' | 'error') => {
     if (notificationTimerRef.current) clearTimeout(notificationTimerRef.current);
     setNotification({ message, type });
     notificationTimerRef.current = setTimeout(() => setNotification(null), 3000);
-  };
+  }, [setNotification]);
 
-  const fetchLinks = async () => {
+  const fetchLinks = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await fetch('/api/external-links');
@@ -68,11 +68,11 @@ export default function AdminExternalLinksPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [showNotification]);
 
   useEffect(() => {
     fetchLinks();
-  }, []);
+  }, [fetchLinks]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

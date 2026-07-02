@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import HomePageClient from './page.client';
+import dbData from '@/lib/db.json';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,11 +63,8 @@ export default async function Page() {
     createdAt: item.createdAt.toISOString()
   }));
 
-  // 8. Fetch Homepage Settings
-  const homepageSettingsDb = await prisma.homepageSetting.findUnique({
-    where: { id: 'default' }
-  });
-  const homepageSettings = homepageSettingsDb ? homepageSettingsDb.data : null;
+  // 8. Load Homepage Settings directly from db.json since it has no admin CRUD
+  const homepageSettings = dbData.homepageSettings || null;
 
   // 9. Fetch Priority Programs
   const priorityProgramsDb = await prisma.priorityProgram.findMany({

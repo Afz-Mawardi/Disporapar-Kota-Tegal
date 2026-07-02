@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Plus,
   Edit2,
@@ -317,7 +317,7 @@ export default function PariwisataAdminPage() {
     showNotification('Banner informasi bawah berhasil diperbarui!', 'success');
   };
 
-  const bottomCard = bidangBottomCards.find(c => c.id === 'pariwisata') || {
+  const bottomCard = useMemo(() => bidangBottomCards.find(c => c.id === 'pariwisata') || {
     id: 'pariwisata',
     tag: 'Mitra Pelaku Usaha Wisata',
     title: 'Kembangkan Usaha Pariwisata & Kuliner Kreatif Anda Bersama Kami',
@@ -327,7 +327,7 @@ export default function PariwisataAdminPage() {
     imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800',
     sectionTag: 'Destinasi Wisata',
     sectionTitle: 'Destinasi Wisata Terpopuler & Unggulan'
-  };
+  }, [bidangBottomCards]);
 
   useEffect(() => {
     if (bottomCard) {
@@ -403,7 +403,7 @@ export default function PariwisataAdminPage() {
           className="w-full md:w-auto px-5 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>Tambah Destinasi Wisata</span>
+          <span>Tambah</span>
         </button>
       </div>
 
@@ -479,17 +479,17 @@ export default function PariwisataAdminPage() {
                           </button>
                           <button
                             onClick={() => openForm('edit', item)}
-                            className="p-2 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
+                            className="p-1.5 text-[#0E3B66] bg-transparent border border-transparent hover:!bg-[#0E3B66] hover:!text-white hover:!border-[#0E3B66] rounded-xl transition-all cursor-pointer"
                             title="Ubah data"
                           >
-                            <Edit2 className="w-3.5 h-3.5" />
+                            <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => openDeleteConfirm(item)}
-                            className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-600 transition-colors cursor-pointer"
+                            className="p-1.5 text-red-600 bg-transparent border border-transparent hover:!bg-red-600 hover:!text-white hover:!border-red-600 rounded-xl transition-all cursor-pointer"
                             title="Hapus data"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -646,7 +646,7 @@ export default function PariwisataAdminPage() {
           <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-150 overflow-hidden flex flex-col max-h-[90vh] transition-all duration-300">
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
               <h3 className="text-sm font-black text-[#0E3B66] uppercase tracking-wider font-mono">
-                {modalType === 'add' ? 'Tambah Destinasi Wisata' : modalType === 'edit' ? 'Ubah Destinasi Wisata' : 'Konfirmasi Hapus'}
+                {modalType === 'add' ? 'Tambah' : modalType === 'edit' ? 'Ubah Destinasi Wisata' : 'Konfirmasi Hapus'}
               </h3>
               <button
                 type="button"
@@ -661,7 +661,7 @@ export default function PariwisataAdminPage() {
               {modalType === 'delete' ? (
                 <div className="p-6 space-y-4">
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Apakah Anda yakin ingin menghapus data destinasi wisata <span className="font-bold text-slate-850">"{editingItem?.title}"</span>? Tindakan ini tidak dapat dibatalkan.
+                    Apakah Anda yakin ingin menghapus data destinasi wisata <span className="font-bold text-slate-850">&quot;{editingItem?.title}&quot;</span>? Tindakan ini tidak dapat dibatalkan.
                   </p>
                   <div className="flex justify-end gap-3 pt-2">
                     <button
@@ -796,7 +796,7 @@ export default function PariwisataAdminPage() {
                         </div>
                       ) : (
                         <div className="py-6 text-center text-slate-400 bg-slate-50 rounded-xl border border-slate-100">
-                          <span className="text-xs">Tidak ada detail keterangan. Silakan klik "+ Tambah Detail"</span>
+                          <span className="text-xs">Tidak ada detail keterangan. Silakan klik &quot;+ Tambah Detail&quot;</span>
                         </div>
                       )}
                     </div>

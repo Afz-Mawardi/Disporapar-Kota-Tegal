@@ -55,8 +55,8 @@ export default function AgendaPageClient({
       try {
         const evDate = parseIndonesianDate(event.date);
         return evDate.getDate() === date.getDate() &&
-               evDate.getMonth() === date.getMonth() &&
-               evDate.getFullYear() === date.getFullYear();
+          evDate.getMonth() === date.getMonth() &&
+          evDate.getFullYear() === date.getFullYear();
       } catch {
         return false;
       }
@@ -172,77 +172,77 @@ export default function AgendaPageClient({
           {/* CALENDAR */}
           <div className="lg:col-span-7 bg-white border border-slate-150 rounded-[2rem] p-4 sm:p-5 shadow-sm overflow-hidden">
 
-              {/* Days of Week Header */}
-              <div className="grid grid-cols-7 gap-1 text-center font-extrabold font-mono text-xs sm:text-sm uppercase tracking-wider pb-2 border-b border-slate-100">
-                {daysOfWeek.map((day) => (
-                  <div key={day} className="py-1.5 text-[#F3702A]">
-                    {day}
-                  </div>
-                ))}
-              </div>
+            {/* Days of Week Header */}
+            <div className="grid grid-cols-7 gap-1 text-center font-extrabold font-mono text-xs sm:text-sm uppercase tracking-wider pb-2 border-b border-slate-100">
+              {daysOfWeek.map((day) => (
+                <div key={day} className="py-1.5 text-[#F3702A]">
+                  {day}
+                </div>
+              ))}
+            </div>
 
-              {/* Calendar Grid */}
-              <div className="grid grid-cols-7 gap-1 mt-1.5">
-                {calendarCells.map((cell, idx) => {
-                  const cellEvents = getEventsForDate(cell.date);
-                  const hasEvents = cellEvents.length > 0;
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7 gap-1 mt-1.5">
+              {calendarCells.map((cell, idx) => {
+                const cellEvents = getEventsForDate(cell.date);
+                const hasEvents = cellEvents.length > 0;
 
-                  const isSelected =
-                    selectedDate.getDate() === cell.date.getDate() &&
-                    selectedDate.getMonth() === cell.date.getMonth() &&
-                    selectedDate.getFullYear() === cell.date.getFullYear();
+                const isSelected =
+                  selectedDate.getDate() === cell.date.getDate() &&
+                  selectedDate.getMonth() === cell.date.getMonth() &&
+                  selectedDate.getFullYear() === cell.date.getFullYear();
 
-                  const isToday =
-                    cell.date.getDate() === todayWIB.getDate() &&
-                    cell.date.getMonth() === todayWIB.getMonth() &&
-                    cell.date.getFullYear() === todayWIB.getFullYear();
+                const isToday =
+                  cell.date.getDate() === todayWIB.getDate() &&
+                  cell.date.getMonth() === todayWIB.getMonth() &&
+                  cell.date.getFullYear() === todayWIB.getFullYear();
 
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setSelectedDate(cell.date)}
-                      className={[
-                        'aspect-square flex flex-col items-center justify-center gap-1.5 rounded-xl transition-all duration-150 cursor-pointer border',
-                        isSelected
-                          ? 'border-2 border-primary bg-primary'
-                          : isToday
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setSelectedDate(cell.date)}
+                    className={[
+                      'aspect-square flex flex-col items-center justify-center gap-1.5 rounded-xl transition-all duration-150 cursor-pointer border',
+                      isSelected
+                        ? 'border-2 border-primary bg-primary'
+                        : isToday
                           ? 'border-[2.5px] border-primary bg-white'
                           : cell.isCurrentMonth
-                          ? 'border-slate-100 bg-white hover:border-slate-300 hover:bg-slate-50'
-                          : 'border-transparent bg-transparent',
-                      ].join(' ')}
-                    >
-                      {/* Date number — centered */}
-                      <span className={[
-                        'text-sm font-extrabold leading-none',
-                        isSelected
-                          ? 'text-white'
-                          : isToday
+                            ? 'border-slate-100 bg-white hover:border-slate-300 hover:bg-slate-50'
+                            : 'border-transparent bg-transparent',
+                    ].join(' ')}
+                  >
+                    {/* Date number — centered */}
+                    <span className={[
+                      'text-sm font-extrabold leading-none',
+                      isSelected
+                        ? 'text-white'
+                        : isToday
                           ? 'text-primary'
                           : cell.isCurrentMonth
-                          ? 'text-slate-700'
-                          : 'text-slate-300',
-                      ].join(' ')}>
-                        {cell.day}
-                      </span>
+                            ? 'text-slate-700'
+                            : 'text-slate-300',
+                    ].join(' ')}>
+                      {cell.day}
+                    </span>
 
-                      {/* Event dots — directly below number */}
-                      <div className="flex items-center justify-center gap-1 h-2">
-                        {hasEvents && cellEvents.slice(0, 3).map((_, i) => (
-                          <span
-                            key={i}
-                            className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white/80' : 'bg-[#F3702A]'}`}
-                          />
-                        ))}
-                        {hasEvents && cellEvents.length > 3 && (
-                          <span className={`w-1.5 h-1.5 rounded-full opacity-40 ${isSelected ? 'bg-white' : 'bg-[#F3702A]'}`} />
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+                    {/* Event dots — directly below number */}
+                    <div className="flex items-center justify-center gap-1 h-2">
+                      {hasEvents && cellEvents.slice(0, 3).map((_, i) => (
+                        <span
+                          key={i}
+                          className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white/80' : 'bg-[#F3702A]'}`}
+                        />
+                      ))}
+                      {hasEvents && cellEvents.length > 3 && (
+                        <span className={`w-1.5 h-1.5 rounded-full opacity-40 ${isSelected ? 'bg-white' : 'bg-[#F3702A]'}`} />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* DETAIL PANEL */}
@@ -274,7 +274,7 @@ export default function AgendaPageClient({
                             try {
                               const evDate = parseIndonesianDate(event.date);
                               isPast = evDate.getTime() < todayWIB.getTime();
-                            } catch {}
+                            } catch { }
                             return isPast ? (
                               <span className="inline-flex items-center text-[10px] font-bold font-mono uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full shrink-0">
                                 Selesai
@@ -326,7 +326,7 @@ export default function AgendaPageClient({
                             try {
                               const evDate = parseIndonesianDate(event.date);
                               isPast = evDate.getTime() < todayWIB.getTime();
-                            } catch {}
+                            } catch { }
                             return isPast ? (
                               <span className="inline-flex items-center text-[10px] font-bold font-mono uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full shrink-0">
                                 Selesai
@@ -363,14 +363,14 @@ export default function AgendaPageClient({
 
                     {upcomingEvents.length > 0 && (
                       <div className="pt-4 border-t border-slate-100">
-                        <h4 className="font-bold text-xs text-slate-400 uppercase tracking-widest font-mono mb-4">Agenda Terdekat:</h4>
+                        <h4 className="font-bold text-xs text-slate-400 uppercase tracking-widest font-mono mb-4">Agenda Mendatang:</h4>
                         <div className="space-y-4">
                           {upcomingEvents.map((event) => (
                             <button
                               key={event.id}
                               type="button"
                               onClick={() => {
-                                try { setSelectedDate(parseIndonesianDate(event.date)); } catch {}
+                                try { setSelectedDate(parseIndonesianDate(event.date)); } catch { }
                               }}
                               className="w-full text-left pl-3.5 border-l-2 border-slate-200 hover:border-[#353086] py-0.5 group cursor-pointer transition-all"
                             >

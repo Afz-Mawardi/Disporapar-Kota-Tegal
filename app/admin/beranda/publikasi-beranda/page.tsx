@@ -129,6 +129,25 @@ const FileFormatIcon: React.FC<FileFormatIconProps> = ({ className = "w-5 h-5", 
   }
 };
 
+const getItemTimestamp = (item: any): number => {
+  if (item.createdAt) {
+    const t = new Date(item.createdAt).getTime();
+    if (!isNaN(t)) return t;
+  }
+  if (item.id && typeof item.id === 'string') {
+    const match = item.id.match(/\d+/);
+    if (match) {
+      const val = parseInt(match[0], 10);
+      if (val > 946684800000) return val;
+    }
+  }
+  try {
+    return parseIndonesianDate(item.date).getTime();
+  } catch {
+    return 0;
+  }
+};
+
 export default function PublikasiBerandaPage() {
   const [news, setNews] = useNews();
   const [events, setEvents] = useEvents();
@@ -217,11 +236,7 @@ export default function PublikasiBerandaPage() {
           {/* 1. Berita Tab */}
           {dashboardTab === 'berita' && (() => {
             const sortedNews = [...news].sort((a, b) => {
-              try {
-                return parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime();
-              } catch {
-                return 0;
-              }
+              return getItemTimestamp(b) - getItemTimestamp(a);
             });
             const activeItems = sortedNews.filter(item => item.showOnHomepage !== false);
             const inactiveItems = sortedNews.filter(item => item.showOnHomepage === false);
@@ -380,11 +395,7 @@ export default function PublikasiBerandaPage() {
           {/* 3. Agenda Tab */}
           {dashboardTab === 'agenda' && (() => {
             const sortedEvents = [...events].sort((a, b) => {
-              try {
-                return parseIndonesianDate(b.date).getTime() - parseIndonesianDate(a.date).getTime();
-              } catch {
-                return 0;
-              }
+              return getItemTimestamp(b) - getItemTimestamp(a);
             });
             const activeItems = sortedEvents.filter(item => item.showOnHomepage !== false);
             const inactiveItems = sortedEvents.filter(item => item.showOnHomepage === false);
@@ -396,12 +407,9 @@ export default function PublikasiBerandaPage() {
                     activeItems.map(item => (
                       <div key={item.id} className="flex items-center justify-between p-4 bg-emerald-50/15 border border-emerald-100 rounded-2xl">
                         <div className="flex items-center gap-4 min-w-0">
-                          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
-                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
-                          </div>
                           <div className="text-left min-w-0">
                             <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
-                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">{item.date} • {item.location}</span>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">WAKTU: {item.time} • {item.date} • {item.location}</span>
                           </div>
                         </div>
                         <button
@@ -424,12 +432,9 @@ export default function PublikasiBerandaPage() {
                     inactiveItems.map(item => (
                       <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50/30 border border-slate-100 rounded-2xl">
                         <div className="flex items-center gap-4 min-w-0">
-                          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
-                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
-                          </div>
                           <div className="text-left min-w-0">
                             <h4 className="font-bold text-xs sm:text-sm text-[#0E3B66] leading-snug tracking-tight truncate max-w-md sm:max-w-xl">{item.title}</h4>
-                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">{item.date} • {item.location}</span>
+                            <span className="text-[9px] font-bold text-slate-400 font-mono tracking-wider block mt-1 uppercase">WAKTU: {item.time} • {item.date} • {item.location}</span>
                           </div>
                         </div>
                         {activeItems.length < 4 ? (

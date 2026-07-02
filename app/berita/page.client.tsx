@@ -136,7 +136,11 @@ export default function BeritaPageClient({
                     </div>
                   )}
                   <div className="absolute top-4 left-4 z-10">
-                    <span className="px-2.5 py-1 text-[9px] font-bold text-white bg-[#0E3B66]/90 tracking-widest uppercase rounded-lg shadow-sm backdrop-blur-md font-mono">
+                    <span className={`px-2.5 py-1 text-[9px] font-bold font-mono uppercase tracking-widest rounded-lg shadow-sm border ${
+                      news.category === 'Olahraga' ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40 backdrop-blur-xs' :
+                      news.category === 'Kepemudaan' ? 'bg-blue-950/80 text-blue-400 border-blue-500/40 backdrop-blur-xs' :
+                      'bg-amber-950/80 text-amber-400 border-amber-500/40 backdrop-blur-xs'
+                    }`}>
                       {news.category}
                     </span>
                   </div>

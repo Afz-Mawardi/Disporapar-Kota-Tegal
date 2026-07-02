@@ -800,7 +800,10 @@ export default function HomePageClient({
                         </div>
                       )}
                       <div className="absolute top-4 left-4 z-10">
-                        <span className="px-2.5 py-1 text-[9px] font-bold text-white bg-[#0E3B66]/90 tracking-widest uppercase rounded-lg shadow-sm backdrop-blur-md font-mono">
+                        <span className={`px-2.5 py-1 text-[9px] font-bold font-mono uppercase tracking-widest rounded-lg shadow-sm border ${item.category === 'Olahraga' ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40 backdrop-blur-xs' :
+                          item.category === 'Kepemudaan' ? 'bg-blue-950/80 text-blue-400 border-blue-500/40 backdrop-blur-xs' :
+                            'bg-amber-950/80 text-amber-400 border-amber-500/40 backdrop-blur-xs'
+                          }`}>
                           {item.category}
                         </span>
                       </div>
@@ -909,21 +912,20 @@ export default function HomePageClient({
                             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-450 font-mono">Gambar Tidak Tersedia</span>
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between text-left">
-                          <div>
-                            <span className="px-2 py-0.5 rounded text-[8.5px] font-extrabold text-white bg-primary hover:bg-opacity-90 w-max uppercase tracking-widest font-mono">
-                              {photo.category}
-                            </span>
-                          </div>
+                        <div className="absolute top-4 left-4 z-10 transition-opacity duration-300 group-hover:opacity-0 pointer-events-none">
+                          <span className={`px-2 py-0.5 text-[8.5px] font-extrabold font-mono uppercase tracking-widest rounded-lg shadow-sm border ${photo.category === 'Olahraga' ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40 backdrop-blur-xs' :
+                            photo.category === 'Kepemudaan' ? 'bg-blue-950/80 text-blue-400 border-blue-500/40 backdrop-blur-xs' :
+                              'bg-amber-950/80 text-amber-400 border-amber-500/40 backdrop-blur-xs'
+                            }`}>
+                            {photo.category}
+                          </span>
+                        </div>
 
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end text-left">
                           <div className="flex flex-col gap-1.5">
-                            <h4 className="font-bold text-xs sm:text-sm text-white leading-snug tracking-tight line-clamp-2">
+                            <h4 className="font-bold text-xs sm:text-sm text-white leading-snug tracking-tight">
                               {photo.title}
                             </h4>
-                            <div className="flex items-center gap-1 text-white self-end mt-1">
-                              <Eye className="w-3.5 h-3.5 shrink-0 text-white" />
-                              <span className="text-[10px] font-bold tracking-wider font-mono uppercase leading-none">Buka Detail</span>
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -947,106 +949,109 @@ export default function HomePageClient({
             </div>
           </div>
         </section>
-      )}
+      )
+      }
 
       {/* 8. PUBLIC SERVICES & DOWNLOADS */}
-      {homepageSettings.documents.show && (
-        <section className="py-16 bg-slate-50/60 bg-grid-lines relative overflow-hidden border-t border-slate-100">
-          {/* Ambient Decorative Glows */}
-          <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-emerald-500/3 rounded-full blur-[100px] pointer-events-none" />
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-              {/* Left Column Intro */}
-              <div className="lg:col-span-4 space-y-5 text-left">
-                <span className="text-[10px] font-bold tracking-widest text-[#10B981] uppercase bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full inline-block font-mono">
-                  {homepageSettings.documents.subtitle}
-                </span>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
-                  {homepageSettings.documents.title}
-                </h2>
-                <p className="text-slate-500 text-sm font-light leading-relaxed font-inter">
-                  {homepageSettings.documents.desc}
-                </p>
-                <div className="pt-2">
-                  <Link
-                    href="/pelayanan/berkas"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary uppercase tracking-widest font-mono transition-colors group"
-                  >
-                    <span>Seluruh Berkas Layanan</span>
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Right Column Grid/Container - Simplified list with 3 samples */}
-              <div className="lg:col-span-8">
-                <div className="p-4 sm:p-6 bg-white rounded-3xl border border-slate-100 shadow-md">
-                  <div className="flex items-center pb-4 mb-4 border-b border-slate-100 font-mono">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Berkas Pilihan Utama</span>
+      {
+        homepageSettings.documents.show && (
+          <section className="py-16 bg-slate-50/60 bg-grid-lines relative overflow-hidden border-t border-slate-100">
+            {/* Ambient Decorative Glows */}
+            <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-emerald-500/3 rounded-full blur-[100px] pointer-events-none" />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                {/* Left Column Intro */}
+                <div className="lg:col-span-4 space-y-5 text-left">
+                  <span className="text-[10px] font-bold tracking-widest text-[#10B981] uppercase bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full inline-block font-mono">
+                    {homepageSettings.documents.subtitle}
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
+                    {homepageSettings.documents.title}
+                  </h2>
+                  <p className="text-slate-500 text-sm font-light leading-relaxed font-inter">
+                    {homepageSettings.documents.desc}
+                  </p>
+                  <div className="pt-2">
+                    <Link
+                      href="/pelayanan/berkas"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary uppercase tracking-widest font-mono transition-colors group"
+                    >
+                      <span>Seluruh Berkas Layanan</span>
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
+                    </Link>
                   </div>
+                </div>
 
-                  {/* Simplified list with exactly 3 items, no scrollbar */}
-                  <div className="space-y-3.5">
-                    {publicServices
-                      .filter(service => service.showOnHomepage !== false)
-                      .sort((a, b) => a.title.localeCompare(b.title, 'id', { sensitivity: 'base' }))
-                      .slice(0, 3)
-                      .map((service) => (
-                        <div
-                          key={service.id}
-                          className="p-4 bg-slate-50 hover:bg-white border border-slate-100 hover:border-emerald-500/30 rounded-xl transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                        >
-                          <div className="flex items-start gap-3.5 min-w-0 flex-1 text-left">
-                            {(() => {
-                              const format = getFileFormat(service.downloadUrl, service.title);
-                              let bgBorderText = 'bg-slate-50 border border-slate-200/60 text-slate-400';
-                              if (format === 'pdf') bgBorderText = 'bg-red-50 border border-red-100/60 text-red-650';
-                              else if (format === 'word') bgBorderText = 'bg-blue-50 border border-blue-100/60 text-blue-600';
-                              else if (format === 'zip') bgBorderText = 'bg-amber-50 border border-amber-100/60 text-amber-600';
+                {/* Right Column Grid/Container - Simplified list with 3 samples */}
+                <div className="lg:col-span-8">
+                  <div className="p-4 sm:p-6 bg-white rounded-3xl border border-slate-100 shadow-md">
+                    <div className="flex items-center pb-4 mb-4 border-b border-slate-100 font-mono">
+                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Berkas Pilihan Utama</span>
+                    </div>
 
-                              return (
-                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${bgBorderText}`}>
-                                  <FileFormatIcon downloadUrl={service.downloadUrl} title={service.title} className="w-5 h-5" colorClasses="text-current" />
-                                </div>
-                              );
-                            })()}
-                            <div className="min-w-0 flex-1">
-                              <h3 className="font-bold text-[#0E3B66] text-sm sm:text-base leading-snug">
-                                {service.title}
-                              </h3>
+                    {/* Simplified list with exactly 3 items, no scrollbar */}
+                    <div className="space-y-3.5">
+                      {publicServices
+                        .filter(service => service.showOnHomepage !== false)
+                        .sort((a, b) => a.title.localeCompare(b.title, 'id', { sensitivity: 'base' }))
+                        .slice(0, 3)
+                        .map((service) => (
+                          <div
+                            key={service.id}
+                            className="p-4 bg-slate-50 hover:bg-white border border-slate-100 hover:border-emerald-500/30 rounded-xl transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                          >
+                            <div className="flex items-start gap-3.5 min-w-0 flex-1 text-left">
+                              {(() => {
+                                const format = getFileFormat(service.downloadUrl, service.title);
+                                let bgBorderText = 'bg-slate-50 border border-slate-200/60 text-slate-400';
+                                if (format === 'pdf') bgBorderText = 'bg-red-50 border border-red-100/60 text-red-650';
+                                else if (format === 'word') bgBorderText = 'bg-blue-50 border border-blue-100/60 text-blue-600';
+                                else if (format === 'zip') bgBorderText = 'bg-amber-50 border border-amber-100/60 text-amber-600';
+
+                                return (
+                                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${bgBorderText}`}>
+                                    <FileFormatIcon downloadUrl={service.downloadUrl} title={service.title} className="w-5 h-5" colorClasses="text-current" />
+                                  </div>
+                                );
+                              })()}
+                              <div className="min-w-0 flex-1">
+                                <h3 className="font-bold text-[#0E3B66] text-sm sm:text-base leading-snug">
+                                  {service.title}
+                                </h3>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-end shrink-0 w-full sm:w-auto">
+                              {!service.downloadUrl || service.downloadUrl === '#' || service.downloadUrl === '' ? (
+                                <button
+                                  disabled
+                                  className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-mono uppercase tracking-wider cursor-not-allowed border border-slate-200"
+                                >
+                                  <span>Unduh</span>
+                                  <Download className="w-3.5 h-3.5 shrink-0" />
+                                </button>
+                              ) : (
+                                <a
+                                  href={service.downloadUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 text-xs font-bold text-white bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] px-4 py-2 rounded-lg transition-colors font-mono uppercase tracking-wider shadow-sm"
+                                >
+                                  <span>Unduh</span>
+                                  <Download className="w-3.5 h-3.5 shrink-0" />
+                                </a>
+                              )}
                             </div>
                           </div>
-
-                          <div className="flex items-center justify-end shrink-0 w-full sm:w-auto">
-                            {!service.downloadUrl || service.downloadUrl === '#' || service.downloadUrl === '' ? (
-                              <button
-                                disabled
-                                className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-mono uppercase tracking-wider cursor-not-allowed border border-slate-200"
-                              >
-                                <span>Unduh</span>
-                                <Download className="w-3.5 h-3.5 shrink-0" />
-                              </button>
-                            ) : (
-                              <a
-                                href={service.downloadUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 text-xs font-bold text-white bg-primary hover:bg-[#0c355c] active:bg-[#0a2c4e] px-4 py-2 rounded-lg transition-colors font-mono uppercase tracking-wider shadow-sm"
-                              >
-                                <span>Unduh</span>
-                                <Download className="w-3.5 h-3.5 shrink-0" />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        )
+      }
       {/* PHOTO PREVIEW LIGHTBOX */}
       <AnimatePresence>
         {selectedPhoto && (
@@ -1085,10 +1090,7 @@ export default function HomePageClient({
                   </div>
                 )}
               </div>
-              <div className="text-center mt-6 max-w-xl">
-                <span className="px-2.5 py-0.5 rounded text-[10px] font-bold text-[#F2994A] uppercase tracking-widest bg-orange-100/10 border border-orange-200/10 font-mono inline-block">
-                  {selectedPhoto.category}
-                </span>
+              <div className="text-center mt-0 max-w-xl">
                 <p className="text-white font-bold text-sm sm:text-base tracking-tight leading-snug mt-2 select-none">
                   {selectedPhoto.title}
                 </p>
@@ -1192,6 +1194,6 @@ export default function HomePageClient({
         )}
       </AnimatePresence>
 
-    </div>
+    </div >
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   ShieldAlert,
   Upload,
@@ -57,6 +57,7 @@ export default function PengaduanInternalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Notification
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -67,6 +68,16 @@ export default function PengaduanInternalPage() {
     setNotification({ message, type });
     notificationTimerRef.current = setTimeout(() => setNotification(null), 4000);
   };
+
+  // Auto-close success modal after 3 seconds
+  useEffect(() => {
+    if (showSuccessModal) {
+      const timer = setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessModal]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -175,7 +186,7 @@ export default function PengaduanInternalPage() {
         throw new Error(complaintData.error || 'Gagal mengirim pengaduan.');
       }
 
-      showNotification('Pengaduan Anda berhasil dikirim', 'success');
+      setShowSuccessModal(true);
 
       // Reset form fields
       setTitle('');
@@ -224,6 +235,38 @@ export default function PengaduanInternalPage() {
               <ShieldAlert className="w-5 h-5 text-red-600 shrink-0" />
             )}
             <span>{notification.message}</span>
+          </div>
+        )}
+
+        {/* Success Modal */}
+        {showSuccessModal && (
+          <div
+            onClick={() => setShowSuccessModal(false)}
+            className="fixed inset-0 z-[100] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 cursor-pointer"
+          >
+            <div
+              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-100 flex flex-col items-center text-center"
+            >
+              <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 mb-5">
+                <CheckCircle className="w-10 h-10" />
+              </div>
+              
+              <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
+                Terima Kasih!
+              </h3>
+              
+              <p className="text-sm text-slate-500 font-inter font-light mt-3 leading-relaxed">
+                Pengaduan Anda berhasil dikirim dan akan segera ditindaklanjuti.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => setShowSuccessModal(false)}
+                className="mt-6 w-full py-2.5 bg-[#0E3B66] hover:bg-[#0c355c] active:bg-[#0a2c4e] text-white font-bold rounded-xl transition-colors cursor-pointer text-xs uppercase tracking-wider font-mono shadow-md"
+              >
+                Tutup
+              </button>
+            </div>
           </div>
         )}
 

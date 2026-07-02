@@ -147,6 +147,7 @@ export default function PelayananPageClient({
   const pathname = usePathname();
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const isFirstLoad = React.useRef(true);
 
   // Determine activeTab primarily from the URL route path
   let activeTab: 'berkas' | 'maklumat' | 'motto' | 'retribusi' = 'maklumat';
@@ -175,16 +176,31 @@ export default function PelayananPageClient({
   // Handle automatic scroll to the tabs section if a subpath is accessed directly
   useEffect(() => {
     if (pathname !== '/pelayanan') {
-      setTimeout(() => {
-        const element = document.getElementById('pelayanan-tabs-section');
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+      const element = document.getElementById('pelayanan-tabs-section');
+      if (element) {
+        if (isFirstLoad.current) {
+          isFirstLoad.current = false;
+          element.scrollIntoView({ behavior: 'auto' });
+          const handle = requestAnimationFrame(() => {
+            const el = document.getElementById('pelayanan-tabs-section');
+            if (el) el.scrollIntoView({ behavior: 'auto' });
+          });
+          return () => cancelAnimationFrame(handle);
+        } else {
+          const rect = element.getBoundingClientRect();
+          const isAligned = rect.top >= 40 && rect.top <= 140;
+          if (!isAligned) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
         }
-      }, 150);
+      }
     } else {
-      setTimeout(() => {
+      if (isFirstLoad.current) {
+        isFirstLoad.current = false;
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 150);
+      }
     }
   }, [pathname]);
 
@@ -270,7 +286,8 @@ export default function PelayananPageClient({
             return (
               <Link
                 key={tab.id}
-                href={`${tab.href}#pelayanan-tabs-section`}
+                href={tab.href}
+                scroll={false}
                 className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-bold font-mono tracking-wide shrink-0 transition-colors w-full sm:w-auto ${isActive
                   ? 'bg-primary text-white shadow-sm font-bold'
                   : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
@@ -596,10 +613,11 @@ export default function PelayananPageClient({
                                 <td className="py-3.5 px-4 sm:py-4.5 sm:px-6 text-center font-mono text-slate-900 font-normal text-xs sm:text-sm">{idx + 1}</td>
                                 <td className="py-3.5 px-4 sm:py-4.5 sm:px-6 font-sans text-slate-900 font-normal text-xs sm:text-sm">{item.name}</td>
                                 <td className="py-3.5 px-4 sm:py-4.5 sm:px-6 text-center">
-                                  <span className={`px-2.5 py-1 text-xs font-bold rounded-md uppercase font-mono tracking-wider inline-block ${item.category === 'Olahraga' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
-                                    item.category === 'Kepemudaan' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
-                                      'bg-amber-50 text-amber-700 border border-amber-100'
-                                    }`}>
+                                  <span className={`px-2.5 py-1 text-xs font-bold font-mono uppercase tracking-wider rounded-lg border inline-block ${
+                                    item.category === 'Olahraga' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                                    item.category === 'Kepemudaan' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                    'bg-amber-50 text-amber-700 border-amber-100'
+                                  }`}>
                                     {item.category}
                                   </span>
                                 </td>

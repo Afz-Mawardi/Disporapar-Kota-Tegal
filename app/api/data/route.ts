@@ -131,25 +131,16 @@ export async function GET() {
     });
     const heroSlides = heroSlidesDb;
 
-    // 8. Fetch Categories
-    const categoriesDb = await prisma.category.findMany();
-    const categories = categoriesDb.length > 0 ? {
-      news: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'news').map((c: { module: string; name: string }) => c.name),
-      gallery: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'gallery').map((c: { module: string; name: string }) => c.name),
-      services: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'services').map((c: { module: string; name: string }) => c.name),
-      retribusi: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'retribusi').map((c: { module: string; name: string }) => c.name)
-    } : {
+    // 8. Fetch Categories (Load directly from db.json since they have no admin CRUD)
+    const categories = dbData.categories || {
       news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
       gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
       services: ['SOP', 'Formulir', 'Berkas Layanan'],
       retribusi: ['Olahraga', 'Pariwisata', 'Kepemudaan']
     };
 
-    // 9. Fetch Homepage Settings
-    const homepageSettingsDb = await prisma.homepageSetting.findUnique({
-      where: { id: 'default' }
-    });
-    const homepageSettings = homepageSettingsDb ? homepageSettingsDb.data : INITIAL_HOMEPAGE_SETTINGS;
+    // 9. Fetch Homepage Settings (Load directly from db.json since they have no admin CRUD)
+    const homepageSettings = dbData.homepageSettings || INITIAL_HOMEPAGE_SETTINGS;
 
     // 10. Fetch Priority Programs (No fallback to mock data)
     const priorityProgramsDb = await prisma.priorityProgram.findMany({
@@ -358,24 +349,6 @@ export async function POST(request: Request) {
       });
       saveToLocalDbJson('officeInfo', data);
     } else if (type === 'categories') {
-      const categoriesToInsert: { module: string; name: string }[] = [];
-      if (data.news && Array.isArray(data.news)) {
-        for (const cat of data.news) categoriesToInsert.push({ module: 'news', name: cat });
-      }
-      if (data.gallery && Array.isArray(data.gallery)) {
-        for (const cat of data.gallery) categoriesToInsert.push({ module: 'gallery', name: cat });
-      }
-      if (data.services && Array.isArray(data.services)) {
-        for (const cat of data.services) categoriesToInsert.push({ module: 'services', name: cat });
-      }
-      if (data.retribusi && Array.isArray(data.retribusi)) {
-        for (const cat of data.retribusi) categoriesToInsert.push({ module: 'retribusi', name: cat });
-      }
-
-      await prisma.$transaction([
-        prisma.category.deleteMany(),
-        prisma.category.createMany({ data: categoriesToInsert })
-      ]);
       saveToLocalDbJson('categories', data);
     } else if (type === 'welcomeMessage') {
       const existingWelcome = await prisma.welcomeMessage.findUnique({
@@ -552,12 +525,6 @@ export async function POST(request: Request) {
       ]);
       saveToLocalDbJson('bidangBottomCards', bottomCardsArray);
     } else if (type === 'homepageSettings') {
-
-      await prisma.homepageSetting.upsert({
-        where: { id: 'default' },
-        update: { data: data },
-        create: { id: 'default', data: data }
-      });
       saveToLocalDbJson('homepageSettings', data);
     } else if (type === 'retribusi') {
       const retribusiArray = data.map((item: any) => ({
@@ -583,6 +550,7 @@ export async function POST(request: Request) {
       }
 
       const updateData: any = {};
+      const changes: string[] = [];
       if (newUsername) {
         if (newUsername !== oldUsername) {
           const existing = await prisma.user.findUnique({
@@ -591,6 +559,7 @@ export async function POST(request: Request) {
           if (existing) {
             return NextResponse.json({ error: 'Username sudah digunakan' }, { status: 400 });
           }
+          changes.push(`username diubah menjadi "${newUsername}"`);
         }
         updateData.username = newUsername;
       }
@@ -598,12 +567,22 @@ export async function POST(request: Request) {
         const crypto = require('crypto');
         const md5Password = crypto.createHash('md5').update(newPassword).digest('hex');
         updateData.password = md5Password;
+        changes.push('password diperbarui');
       }
 
       await prisma.user.update({
         where: { id: user.id },
         data: updateData
       });
+
+      // Log the action
+      if (changes.length > 0) {
+        await prisma.adminLog.create({
+          data: {
+            action: `Admin "${oldUsername}" memperbarui akunnya sendiri (${changes.join(', ')})`
+          }
+        });
+      }
     } else {
       return NextResponse.json({ error: 'Invalid data type' }, { status: 400 });
     }

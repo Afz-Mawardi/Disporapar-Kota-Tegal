@@ -7,9 +7,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const session = await getServerSession(authOptions);
   const isLoggedIn = !!session;
   const username = session?.user?.name || '';
+  const role = (session?.user as any)?.role || 'ADMIN';
 
   return (
-    <AdminLayoutClient isLoggedIn={isLoggedIn} username={username}>
+    <AdminLayoutClient isLoggedIn={isLoggedIn} username={username} role={role}>
       {children}
     </AdminLayoutClient>
   );

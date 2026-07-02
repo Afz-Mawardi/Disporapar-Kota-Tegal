@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { signIn, signOut } from 'next-auth/react';
+import { signIn, signOut, SessionProvider } from 'next-auth/react';
 import {
   ShieldAlert,
   LayoutDashboard,
@@ -26,7 +26,8 @@ import {
   X,
   Eye,
   EyeOff,
-  Landmark
+  Landmark,
+  Clock
 } from 'lucide-react';
 import Link from 'next/link';
 import Logo from '@/components/ui/Logo';
@@ -34,11 +35,13 @@ import Logo from '@/components/ui/Logo';
 export default function AdminLayoutClient({
   children,
   isLoggedIn: initialIsLoggedIn,
-  username: initialUsername
+  username: initialUsername,
+  role: initialRole
 }: {
   children: React.ReactNode;
   isLoggedIn: boolean;
   username: string;
+  role: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -54,10 +57,15 @@ export default function AdminLayoutClient({
   const [showAccountPassword, setShowAccountPassword] = useState<boolean>(false);
   const [accountSuccess, setAccountSuccess] = useState<string>('');
   const [accountError, setAccountError] = useState<string>('');
+  const [role, setRole] = useState<string>(initialRole || 'ADMIN');
 
   useEffect(() => {
     setCurrentAdminUsername(initialUsername || '');
   }, [initialUsername]);
+
+  useEffect(() => {
+    setRole(initialRole || 'ADMIN');
+  }, [initialRole]);
 
   // Profile Dropdown & Password Modals
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState<boolean>(false);
@@ -74,7 +82,8 @@ export default function AdminLayoutClient({
     bidang: pathname.includes('/admin/bidang'),
     publikasi: pathname.includes('/admin/publikasi'),
     layanan: pathname.includes('/admin/layanan'),
-    pengaduan: pathname.includes('/admin/pengaduan')
+    pengaduan: pathname.includes('/admin/pengaduan'),
+    manajerAdmin: pathname.includes('/admin/manajer-admin')
   });
 
   const toggleMenu = (key: string) => {
@@ -88,6 +97,7 @@ export default function AdminLayoutClient({
     if (pathname.includes('/admin/publikasi')) setExpandedMenus((prev) => ({ ...prev, publikasi: true }));
     if (pathname.includes('/admin/layanan')) setExpandedMenus((prev) => ({ ...prev, layanan: true }));
     if (pathname.includes('/admin/pengaduan')) setExpandedMenus((prev) => ({ ...prev, pengaduan: true }));
+    if (pathname.includes('/admin/manajer-admin')) setExpandedMenus((prev) => ({ ...prev, manajerAdmin: true }));
   }, [pathname]);
 
   // Global click listener to close notification when active
@@ -123,8 +133,8 @@ export default function AdminLayoutClient({
       const TWENTY_MINUTES = 20 * 60 * 1000;
 
       if (elapsed >= TWENTY_MINUTES) {
-        handleLogout(true);
-        showNotification('Sesi Anda telah berakhir karena tidak ada aktivitas selama 20 menit. Silakan masuk kembali.', 'error');
+        handleLogoutRef.current(true);
+        showNotificationRef.current('Sesi Anda telah berakhir karena tidak ada aktivitas selama 20 menit. Silakan masuk kembali.', 'error');
       }
     };
 
@@ -184,6 +194,17 @@ export default function AdminLayoutClient({
     }
   };
 
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    if (notificationTimerRef.current) clearTimeout(notificationTimerRef.current);
+    setNotification({ message, type });
+    notificationTimerRef.current = setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  };
+
+  const showNotificationRef = React.useRef(showNotification);
+  showNotificationRef.current = showNotification;
+
   // Handle Logout
   const handleLogout = async (skipNotification = false) => {
     try {
@@ -193,26 +214,20 @@ export default function AdminLayoutClient({
       localStorage.removeItem('disporapar_admin_last_activity');
       await signOut({ redirect: false });
       if (!skipNotification) {
-        showNotification('Berhasil keluar.', 'success');
+        showNotificationRef.current('Berhasil keluar.', 'success');
       }
       router.push('/admin');
       router.refresh();
     } catch (err) {
       console.error(err);
       if (!skipNotification) {
-        showNotification('Gagal keluar dari sesi.', 'error');
+        showNotificationRef.current('Gagal keluar dari sesi.', 'error');
       }
     }
   };
 
-  const showNotification = (message: string, type: 'success' | 'error') => {
-    if (notificationTimerRef.current) clearTimeout(notificationTimerRef.current);
-    setNotification({ message, type });
-    notificationTimerRef.current = setTimeout(() => {
-      setNotification(null);
-      notificationTimerRef.current = null;
-    }, 3000);
-  };
+  const handleLogoutRef = React.useRef(handleLogout);
+  handleLogoutRef.current = handleLogout;
 
   // Update account information (password/username)
   const handleUpdateAccount = async (e: React.FormEvent) => {
@@ -271,90 +286,92 @@ export default function AdminLayoutClient({
   // Render Login Panel if not logged in
   if (!isLoggedIn) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-tr from-[#051424] via-[#0E3B66] to-[#124b82] flex items-center justify-center p-4 selection:bg-accent selection:text-white font-sans text-slate-800 overflow-y-auto z-50">
-        {notification && (
-          <div
-            onClick={() => setNotification(null)}
-            className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-              }`}
-          >
-            {notification.type === 'success' ? (
-              <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
-            ) : (
-              <ShieldAlert className="w-5 h-5 text-red-600 shrink-0" />
-            )}
-            <span>{notification.message}</span>
-          </div>
-        )}
-
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/15 rounded-full blur-[100px] pointer-events-none" />
-
-        <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 p-6 sm:p-10 rounded-3xl shadow-2xl relative z-10 text-white flex flex-col justify-between">
-          <div className="text-center space-y-3.5">
-            <div className="flex justify-center mb-6">
-              <Logo variant="dark" className="scale-110" />
+      <SessionProvider>
+        <div className="fixed inset-0 bg-gradient-to-tr from-[#051424] via-[#0E3B66] to-[#124b82] flex items-center justify-center p-4 selection:bg-accent selection:text-white font-sans text-slate-800 overflow-y-auto z-50">
+          {notification && (
+            <div
+              onClick={() => setNotification(null)}
+              className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+                }`}
+            >
+              {notification.type === 'success' ? (
+                <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+              ) : (
+                <ShieldAlert className="w-5 h-5 text-red-600 shrink-0" />
+              )}
+              <span>{notification.message}</span>
             </div>
-            <p className="text-xs text-slate-200 leading-relaxed font-inter max-w-[280px] mx-auto">
-              Portal Keamanan Administrasi Dinas. Masukkan kredensial admin untuk mengakses panel kendali
-            </p>
-          </div>
+          )}
 
-          <form onSubmit={handleLogin} className="mt-8 space-y-5 text-left font-inter text-slate-700">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-200 tracking-wider uppercase font-mono">Username</label>
-              <input
-                type="text"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Masukkan username"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-white placeholder-slate-400 transition-all font-medium"
-              />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/15 rounded-full blur-[100px] pointer-events-none" />
+
+          <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 p-6 sm:p-10 rounded-3xl shadow-2xl relative z-10 text-white flex flex-col justify-between">
+            <div className="text-center space-y-3.5">
+              <div className="flex justify-center mb-6">
+                <Logo variant="dark" className="scale-110" />
+              </div>
+              <p className="text-xs text-slate-200 leading-relaxed font-inter max-w-[280px] mx-auto">
+                Portal Keamanan Administrasi Dinas. Masukkan kredensial admin untuk mengakses panel kendali
+              </p>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-200 tracking-wider uppercase font-mono">Password</label>
-              <div className="relative">
+            <form onSubmit={handleLogin} className="mt-8 space-y-5 text-left font-inter text-slate-700">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-200 tracking-wider uppercase font-mono">Username</label>
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type="text"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Masukkan password"
-                  className="w-full pl-4 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-white placeholder-slate-400 transition-all font-medium"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Masukkan username"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-white placeholder-slate-400 transition-all font-medium"
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-200 tracking-wider uppercase font-mono">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Masukkan password"
+                    className="w-full pl-4 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent text-white placeholder-slate-400 transition-all font-medium"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
+                  >
+                    {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-2">
                 <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
+                  type="submit"
+                  className="w-full py-3.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-lg active:scale-98 font-mono text-xs uppercase tracking-wider cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                  MASUK PANEL ADMIN
                 </button>
               </div>
-            </div>
+            </form>
 
-            <div className="pt-2">
-              <button
-                type="submit"
-                className="w-full py-3.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-lg active:scale-98 font-mono text-xs uppercase tracking-wider cursor-pointer"
+            <div className="mt-8 border-t border-white/10 pt-4 text-center">
+              <Link
+                href="/"
+                className="text-[10px] font-bold text-sky-300 hover:text-white uppercase tracking-widest font-mono flex items-center justify-center gap-1.5 transition-colors"
               >
-                MASUK PANEL ADMIN
-              </button>
+                <span>Kembali Ke website</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </Link>
             </div>
-          </form>
-
-          <div className="mt-8 border-t border-white/10 pt-4 text-center">
-            <Link
-              href="/"
-              className="text-[10px] font-bold text-sky-300 hover:text-white uppercase tracking-widest font-mono flex items-center justify-center gap-1.5 transition-colors"
-            >
-              <span>Kembali Ke website</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </Link>
           </div>
         </div>
-      </div>
+      </SessionProvider>
     );
   }
 
@@ -376,7 +393,8 @@ export default function AdminLayoutClient({
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-slate-50 flex flex-col md:flex-row font-sans text-slate-800">
+    <SessionProvider>
+      <div className="fixed inset-0 overflow-hidden bg-slate-50 flex flex-col md:flex-row font-sans text-slate-800">
       {/* Toast Notification */}
       {notification && (
         <div
@@ -510,6 +528,25 @@ export default function AdminLayoutClient({
                   </div>
                 )}
               </div>
+
+              {/* Manajer Admin Category Accordion (Only for SUPER_ADMIN) */}
+              {role === 'SUPER_ADMIN' && (
+                <div className="space-y-1">
+                  <button
+                    onClick={() => toggleMenu('manajerAdmin')}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-mono font-black uppercase tracking-wider`}
+                  >
+                    <span>Manajer Admin</span>
+                    {expandedMenus.manajerAdmin ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                  </button>
+                  {expandedMenus.manajerAdmin && (
+                    <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
+                      {renderSidebarLink('daftar-admin', 'Kelola Admin', '/admin/manajer-admin', <Users className="w-3.5 h-3.5" />)}
+                      {renderSidebarLink('riwayat-admin', 'Riwayat Perubahan', '/admin/manajer-admin/riwayat', <Clock className="w-3.5 h-3.5" />)}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Info Kontak Link */}
               {renderSidebarLink('info-kontak', 'Info Kontak', '/admin/info-kontak', <Phone className="w-4 h-4" />)}
@@ -710,6 +747,7 @@ export default function AdminLayoutClient({
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </SessionProvider>
   );
 }

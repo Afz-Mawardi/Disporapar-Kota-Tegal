@@ -8,11 +8,21 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  username String @unique
-  password String
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
 
   @@map("user")
+}
+
+model AdminLog {
+  id        String   @id @default(uuid())
+  action    String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@map("riwayat_admin")
 }
 
 model News {
@@ -104,22 +114,6 @@ model HeroSlide {
   createdAt DateTime @default(now())
 
   @@map("beranda")
-}
-
-model Category {
-  id     String @id @default(uuid())
-  module String
-  name   String
-
-  @@unique([module, name])
-  @@map("kategori")
-}
-
-model HomepageSetting {
-  id   String @id @default("default")
-  data Json
-
-  @@map("pengaturan_beranda")
 }
 
 model PriorityProgram {
