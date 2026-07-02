@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import ProfilPageClient from './ProfilPageClient';
+import ProfilPageClient from './page.client';
 
 export const dynamic = 'force-dynamic';
 

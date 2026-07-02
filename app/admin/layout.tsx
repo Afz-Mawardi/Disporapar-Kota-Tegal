@@ -1,7 +1,7 @@
 import React from 'react';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import AdminLayoutClient from '@/app/admin/AdminLayoutClient';
+import AdminLayoutClient from '@/app/admin/layout.client';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);

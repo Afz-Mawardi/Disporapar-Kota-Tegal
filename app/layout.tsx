@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, Inter, Poppins } from 'next/font/google';
 import './globals.css';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import ScrollToTop from '@/components/ScrollToTop';
-import DynamicTitle from '@/components/DynamicTitle';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import ScrollToTop from '@/components/ui/ScrollToTop';
+import DynamicTitle from '@/components/ui/DynamicTitle';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -30,7 +30,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: 'DISPORAPAR Kota Tegal',
   icons: {
-    icon: '/aset/tegal-emblem.svg',
+    icon: '/assets/tegal-emblem.svg',
   },
 };
 

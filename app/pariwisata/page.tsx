@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import PariwisataPageClient from './PariwisataPageClient';
+import PariwisataPageClient from './page.client';
 
 export const dynamic = 'force-dynamic';
 

@@ -3,11 +3,12 @@ import { prisma } from '@/lib/prisma';
 import fs from 'fs';
 import path from 'path';
 
-import {
-  OFFICE_INFO,
-  WELCOME_MESSAGE,
-  INITIAL_HOMEPAGE_SETTINGS
-} from '@/lib/data';
+import dbData from '@/lib/db.json';
+import { OfficeInfo, WelcomeMessage, HomepageSettings } from '@/lib/types';
+
+const OFFICE_INFO = dbData.officeInfo as unknown as OfficeInfo;
+const WELCOME_MESSAGE = dbData.welcomeMessage as unknown as WelcomeMessage;
+const INITIAL_HOMEPAGE_SETTINGS = dbData.homepageSettings as unknown as HomepageSettings;
 
 export const dynamic = 'force-dynamic';
 

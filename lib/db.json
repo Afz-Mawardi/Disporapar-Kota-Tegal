@@ -241,6 +241,16 @@
         "platform": "youtube",
         "label": "YouTube",
         "url": "https://www.youtube.com/@disporapartegalkota"
+      },
+      {
+        "platform": "linkedin",
+        "label": "ok",
+        "url": "https://www.youtube.com/@disporapartegalkota"
+      },
+      {
+        "platform": "telegram",
+        "label": "ok",
+        "url": "https://www.youtube.com/@disporapartegalkota"
       }
     ]
   },
@@ -248,7 +258,7 @@
     "name": "Khusnul Hidayati, S.E,. M.Si.",
     "nip": "",
     "content": "Assalamualaikum Warahmatullahi Wabarakatuh, Salam sejahtera bagi kita semua, Shalom, Om Swastyastu, Namo Buddhaya, Salam Kebajikan.\nPuji syukur kehadirat Allah SWT, berkat kemudahan teknologi digital kini DISPORAPAR Kota Tegal meluncurkan portal informasi dan database modern terpusat dalam menyongsong Smart Government Kota Tegal. Website ini kami dedikasikan sebagai jembatan penghubung antara kebijakan publik dinas dengan keterlibatan aktif masyarakat secara terbuka.\nKami meyakini bahwa generasi muda Kota Tegal memiliki elan kreatif luar biasa, atlet kita memiliki stamina bahari tangguh pemburu prestasi, dan wisata pesisir kita memiliki pesona unik yang layak memperoleh sorotan nasional. Mari berkolaborasi membangun Kota Tegal menjadi episentrum prestasi wisata dan kepemudaan.\nWassalamualaikum Warahmatullahi Wabarakatuh.",
-    "imageUrl": "/sambutan/1781461848923_kabid_Image_5_Jun_2026__14.29.31.webp"
+    "imageUrl": "/uploads/sambutan/1781461848923_kabid_Image_5_Jun_2026__14.29.31.webp"
   },
   "heroSlides": [
     {
@@ -489,6 +499,319 @@
       "imageUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800",
       "sectionTag": "",
       "sectionTitle": "Destinasi Wisata Terpopuler & Unggulan"
+    }
+  ],
+  "kepemudaanCards": [
+    {
+      "id": "kc-1",
+      "title": "Bumi Perkemahan Pramuka Martoloyo",
+      "description": "Area perkemahan yang representatif dan asri untuk kegiatan luar ruangan gerakan pramuka, latihan kepemimpinan pemuda, serta outbound umum dengan fasilitas air bersih dan keamanan terjaga.",
+      "location": "Mintaragen, Tegal Timur, Kota Tegal",
+      "capacity": "1.500 Peserta",
+      "price": "Rp 150.000 / Hari",
+      "facilities": [
+        "Area Tenda Luas",
+        "MCK Bersih",
+        "Pendopo Utama",
+        "Akses Air Bersih",
+        "Pos Keamanan"
+      ],
+      "imageUrl": "https://picsum.photos/seed/bumi_perkemahan/800/600",
+      "locationIcon": "MapPin",
+      "capacityIcon": "Users",
+      "priceIcon": "Ticket",
+      "facilitiesTitle": "Fasilitas Area",
+      "details": [
+        {
+          "value": "Mintaragen, Tegal Timur, Kota Tegal",
+          "icon": "MapPin"
+        },
+        {
+          "value": "1.500 Peserta",
+          "icon": "Users"
+        },
+        {
+          "value": "Rp 150.000 / Hari",
+          "icon": "Ticket"
+        }
+      ]
+    },
+    {
+      "id": "kc-2",
+      "title": "Gedung Serbaguna Kepemudaan (GSG)",
+      "description": "Gedung pertemuan indoor untuk kegiatan organisasi kepemudaan, pentas seni, seminar, rapat pleno, dan pameran kreativitas wirausaha muda Kota Tegal.",
+      "location": "Kejambon, Tegal Timur, Kota Tegal",
+      "capacity": "500 Kursi",
+      "price": "Rp 100.000 / Jam",
+      "facilities": [
+        "Panggung Utama",
+        "Sound System",
+        "Kursi Lipat",
+        "AC/Kipas Angin",
+        "Area Parkir"
+      ],
+      "imageUrl": "https://picsum.photos/seed/gedung_pemuda/800/600",
+      "locationIcon": "MapPin",
+      "capacityIcon": "Users",
+      "priceIcon": "Ticket",
+      "facilitiesTitle": "Fasilitas Area",
+      "details": [
+        {
+          "value": "Kejambon, Tegal Timur, Kota Tegal",
+          "icon": "MapPin"
+        },
+        {
+          "value": "500 Kursi",
+          "icon": "Users"
+        },
+        {
+          "value": "Rp 100.000 / Jam",
+          "icon": "Ticket"
+        }
+      ]
+    },
+    {
+      "id": "kc-3",
+      "title": "Co-working Space & Youth Hub Room",
+      "description": "Ruangan kerja bersama yang tenang dan nyaman dilengkapi koneksi internet cepat untuk mendukung produktivitas freelancer, developer muda, dan kreator konten lokal.",
+      "location": "Slerok, Tegal Timur, Kota Tegal",
+      "capacity": "50 Orang",
+      "price": "Gratis (Bagi Organisasi Binaan)",
+      "facilities": [
+        "Akses WiFi Cepat",
+        "Colokan Listrik",
+        "AC Dingin",
+        "Meja & Kursi Kerja",
+        "Whiteboard"
+      ],
+      "imageUrl": "https://picsum.photos/seed/creative_hub_room/800/600",
+      "locationIcon": "MapPin",
+      "capacityIcon": "Users",
+      "priceIcon": "Ticket",
+      "facilitiesTitle": "Fasilitas Area",
+      "details": [
+        {
+          "value": "Slerok, Tegal Timur, Kota Tegal",
+          "icon": "MapPin"
+        },
+        {
+          "value": "50 Orang",
+          "icon": "Users"
+        },
+        {
+          "value": "Gratis (Bagi Organisasi Binaan)",
+          "icon": "Ticket"
+        }
+      ]
+    }
+  ],
+  "olahragaCards": [
+    {
+      "id": "oc-1",
+      "title": "Stadion Yos Sudarso Tegal",
+      "description": "Stadion utama Kota Tegal dengan lapangan sepak bola rumput alami standar nasional, lintasan atletik, serta kapasitas tribun penonton yang memadai untuk kompetisi olahraga regional.",
+      "location": "Jl. Melati, Kejambon, Tegal Timur",
+      "capacity": "15.000 Penonton",
+      "price": "Rp 250.000 / Jam",
+      "facilities": [
+        "Lap. Rumput Alami",
+        "Lintasan Atletik",
+        "Tribun Penonton",
+        "Lampu Penerangan",
+        "Area Parkir Luas"
+      ],
+      "imageUrl": "https://picsum.photos/seed/stadion_yos_sudarso/800/600",
+      "locationIcon": "MapPin",
+      "capacityIcon": "Users",
+      "priceIcon": "Ticket",
+      "facilitiesTitle": "Fasilitas Area",
+      "details": [
+        {
+          "value": "Jl. Melati, Kejambon, Tegal Timur",
+          "icon": "MapPin"
+        },
+        {
+          "value": "15.000 Penonton",
+          "icon": "Users"
+        },
+        {
+          "value": "Rp 250.000 / Jam",
+          "icon": "Ticket"
+        }
+      ]
+    },
+    {
+      "id": "oc-2",
+      "title": "GOR Wisanggeni (Indoor)",
+      "description": "Gelanggang olahraga indoor serbaguna untuk olahraga bulu tangkis, futsal, dan basket. Dilengkapi tribun penonton dan pencahayaan optimal untuk pertandingan.",
+      "location": "Slerok, Tegal Timur, Kota Tegal",
+      "capacity": "2.500 Penonton",
+      "price": "Rp 75.000 / Jam",
+      "facilities": [
+        "Lapangan Futsal",
+        "Lapangan Badminton",
+        "Ring Basket",
+        "Tribun Indoor",
+        "Toilet & Ruang Ganti"
+      ],
+      "imageUrl": "https://picsum.photos/seed/gor_wisanggeni/800/600",
+      "locationIcon": "MapPin",
+      "capacityIcon": "Users",
+      "priceIcon": "Ticket",
+      "facilitiesTitle": "Fasilitas Area",
+      "details": [
+        {
+          "value": "Slerok, Tegal Timur, Kota Tegal",
+          "icon": "MapPin"
+        },
+        {
+          "value": "2.500 Penonton",
+          "icon": "Users"
+        },
+        {
+          "value": "Rp 75.000 / Jam",
+          "icon": "Ticket"
+        }
+      ]
+    },
+    {
+      "id": "oc-3",
+      "title": "Kolam Renang Samudra Bahari",
+      "description": "Fasilitas kolam renang prestasi dengan ukuran standar Olympic, sistem filter air yang terawat, area bilas modern, serta tribun penonton untuk kejuaraan renang daerah.",
+      "location": "Kawasan Wisata PAI, Mintaragen",
+      "capacity": "1.000 Pengunjung",
+      "price": "Rp 15.000 / Orang",
+      "facilities": [
+        "Kolam Olympic Standard",
+        "Kolam Anak",
+        "Area Bilas Modern",
+        "Tribun Penonton",
+        "Kios Makanan"
+      ],
+      "imageUrl": "https://picsum.photos/seed/kolam_renang_bahari/800/600",
+      "locationIcon": "MapPin",
+      "capacityIcon": "Users",
+      "priceIcon": "Ticket",
+      "facilitiesTitle": "Fasilitas Area",
+      "details": [
+        {
+          "value": "Kawasan Wisata PAI, Mintaragen",
+          "icon": "MapPin"
+        },
+        {
+          "value": "1.000 Pengunjung",
+          "icon": "Users"
+        },
+        {
+          "value": "Rp 15.000 / Orang",
+          "icon": "Ticket"
+        }
+      ]
+    }
+  ],
+  "pariwisataCards": [
+    {
+      "id": "pc-1",
+      "title": "Pantai Alam Indah (PAI)",
+      "description": "Icon pariwisata bahari Kota Tegal dengan pasir putih, hutan mangrove yang asri, dermaga apung yang modern, sunset menawan, serta Monumen Bahari TNI AL yang memajang kendaraan tempur bersejarah asli.",
+      "location": "Mintaragen, Tegal Timur, Kota Tegal",
+      "capacity": "05:00 - 21:00 WIB",
+      "price": "Rp 5.000 (Anak) / Rp 10.000 (Dewasa)",
+      "facilities": [
+        "Area Bermain",
+        "Hutan Mangrove",
+        "Dermaga Apung",
+        "Monumen Alutsista",
+        "Food Court Kuliner Khas",
+        "Mushola & Toilet"
+      ],
+      "imageUrl": "https://picsum.photos/seed/pantai_alam_indah/1200/800",
+      "locationIcon": "MapPin",
+      "capacityIcon": "Clock",
+      "priceIcon": "Ticket",
+      "facilitiesTitle": "Fasilitas Area",
+      "details": [
+        {
+          "value": "Mintaragen, Tegal Timur, Kota Tegal",
+          "icon": "MapPin"
+        },
+        {
+          "value": "05:00 - 21:00 WIB",
+          "icon": "Clock"
+        },
+        {
+          "value": "Rp 5.000 (Anak) / Rp 10.000 (Dewasa)",
+          "icon": "Ticket"
+        }
+      ]
+    },
+    {
+      "id": "pc-2",
+      "title": "Pantai Pulau Kodok",
+      "description": "Pantai yang terkenal dengan suasana sejuk berkat rindangnya cemara laut dan memiliki terapi air laut alami bagi wisatawan. Destinasi favorit keluarga dan komunitas di pesisir Tegal.",
+      "location": "Panggung, Tegal Timur, Kota Tegal",
+      "capacity": "05:00 - 18:00 WIB",
+      "price": "Rp 3.000",
+      "facilities": [
+        "Kios Teh Poci",
+        "Gazebo Pantai",
+        "Area Terapi Air",
+        "Panggung Hiburan",
+        "Spot Foto Instagramable"
+      ],
+      "imageUrl": "https://picsum.photos/seed/pulau_kodok/1200/800",
+      "locationIcon": "MapPin",
+      "capacityIcon": "Clock",
+      "priceIcon": "Ticket",
+      "facilitiesTitle": "Fasilitas Area",
+      "details": [
+        {
+          "value": "Panggung, Tegal Timur, Kota Tegal",
+          "icon": "MapPin"
+        },
+        {
+          "value": "05:00 - 18:00 WIB",
+          "icon": "Clock"
+        },
+        {
+          "value": "Rp 3.000",
+          "icon": "Ticket"
+        }
+      ]
+    },
+    {
+      "id": "pc-3",
+      "title": "Alun-Alun Kota Tegal & Taman Pancasila",
+      "description": "Kawasan pusat kota yang terintegrasi indah dengan Masjid Agung Tegal, Gedung Birao (SCS) peninggalan kolonial bersejarah, dan Menara Air peninggalan Belanda. Dilengkapi dancing fountain dan pedestrian ramah pejalan kaki.",
+      "location": "Mangkukusuman, Tegal Timur, Kota Tegal",
+      "capacity": "Buka 24 Jam",
+      "price": "Gratis",
+      "facilities": [
+        "Pedestrian Edukatif",
+        "Taman Pancasila",
+        "Lokomotif Antik Kereta Api",
+        "Kawasan Kuliner",
+        "Gedung SCS Kolonial"
+      ],
+      "imageUrl": "https://picsum.photos/seed/alun_alun_tegal/1200/800",
+      "locationIcon": "MapPin",
+      "capacityIcon": "Clock",
+      "priceIcon": "Ticket",
+      "facilitiesTitle": "Fasilitas Area",
+      "details": [
+        {
+          "value": "Mangkukusuman, Tegal Timur, Kota Tegal",
+          "icon": "MapPin"
+        },
+        {
+          "value": "Buka 24 Jam",
+          "icon": "Clock"
+        },
+        {
+          "value": "Gratis",
+          "icon": "Ticket"
+        }
+      ]
     }
   ]
 }

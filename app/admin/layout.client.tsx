@@ -29,7 +29,7 @@ import {
   Landmark
 } from 'lucide-react';
 import Link from 'next/link';
-import Logo from '@/components/Logo';
+import Logo from '@/components/ui/Logo';
 
 export default function AdminLayoutClient({
   children,
@@ -103,33 +103,60 @@ export default function AdminLayoutClient({
     };
   }, [notification]);
 
-  // Global session check for 12-hour auto-logout
+  // Global session check for 20-minute idle auto-logout
   useEffect(() => {
     if (!isLoggedIn) {
       localStorage.removeItem('disporapar_admin_login_time');
+      localStorage.removeItem('disporapar_admin_last_activity');
       return;
     }
 
-    let loginTimeStr = localStorage.getItem('disporapar_admin_login_time');
-    if (!loginTimeStr) {
-      loginTimeStr = Date.now().toString();
-      localStorage.setItem('disporapar_admin_login_time', loginTimeStr);
+    let lastActivityStr = localStorage.getItem('disporapar_admin_last_activity');
+    if (!lastActivityStr) {
+      lastActivityStr = Date.now().toString();
+      localStorage.setItem('disporapar_admin_last_activity', lastActivityStr);
     }
 
-    const loginTime = parseInt(loginTimeStr, 10);
-    const TWELVE_HOURS = 12 * 60 * 60 * 1000;
-
     const checkSession = () => {
-      const elapsed = Date.now() - loginTime;
-      if (elapsed >= TWELVE_HOURS) {
+      const lastActivity = parseInt(localStorage.getItem('disporapar_admin_last_activity') || Date.now().toString(), 10);
+      const elapsed = Date.now() - lastActivity;
+      const TWENTY_MINUTES = 20 * 60 * 1000;
+
+      if (elapsed >= TWENTY_MINUTES) {
         handleLogout(true);
-        showNotification('Sesi Anda telah berakhir (lebih dari 12 jam). Silakan masuk kembali.', 'error');
+        showNotification('Sesi Anda telah berakhir karena tidak ada aktivitas selama 20 menit. Silakan masuk kembali.', 'error');
       }
     };
 
+    const handleActivity = () => {
+      localStorage.setItem('disporapar_admin_last_activity', Date.now().toString());
+    };
+
+    const activityEvents = ['mousedown', 'click', 'keypress', 'scroll', 'touchstart', 'mousemove'];
+    
+    // Throttle activity updates to avoid excessive localStorage writes (once per second max)
+    let lastUpdate = 0;
+    const throttledActivity = () => {
+      const now = Date.now();
+      if (now - lastUpdate > 1000) {
+        handleActivity();
+        lastUpdate = now;
+      }
+    };
+
+    activityEvents.forEach((event) => {
+      window.addEventListener(event, throttledActivity);
+    });
+
     checkSession();
-    const intervalId = setInterval(checkSession, 10000);
-    return () => clearInterval(intervalId);
+    const intervalId = setInterval(checkSession, 5000);
+
+    return () => {
+      clearInterval(intervalId);
+      activityEvents.forEach((event) => {
+        window.removeEventListener(event, throttledActivity);
+      });
+    };
   }, [isLoggedIn]);
 
   // Handle Login
@@ -146,6 +173,7 @@ export default function AdminLayoutClient({
         showNotification('Username atau password salah.', 'error');
       } else {
         localStorage.setItem('disporapar_admin_login_time', Date.now().toString());
+        localStorage.setItem('disporapar_admin_last_activity', Date.now().toString());
         showNotification('Berhasil masuk ke panel admin!', 'success');
         router.push('/admin/dashboard');
         router.refresh();
@@ -162,6 +190,7 @@ export default function AdminLayoutClient({
       setIsAccountModalOpen(false);
       setIsProfileDropdownOpen(false);
       localStorage.removeItem('disporapar_admin_login_time');
+      localStorage.removeItem('disporapar_admin_last_activity');
       await signOut({ redirect: false });
       if (!skipNotification) {
         showNotification('Berhasil keluar.', 'success');

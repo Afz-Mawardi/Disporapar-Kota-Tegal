@@ -8,7 +8,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useOfficeInfo } from '@/lib/data-store';
-import { SocialMediaItem } from '@/lib/data';
+import { SocialMediaItem } from '@/lib/types';
 
 export default function InfoKontakAdminPage() {
   const [officeInfo, setOfficeInfo] = useOfficeInfo();
@@ -79,9 +79,8 @@ export default function InfoKontakAdminPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${
-            notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-          }`}
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+            }`}
         >
           {notification.type === 'success' ? (
             <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -288,7 +287,7 @@ export default function InfoKontakAdminPage() {
                               type="text"
                               value={social.label}
                               onChange={(e) => updateField('label', e.target.value)}
-                              placeholder="Keterangan (misal: Resmi)"
+                              placeholder="Nama Akun"
                               className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-accent text-slate-800 placeholder-slate-400"
                             />
                           ) : (

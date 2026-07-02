@@ -42,7 +42,7 @@ export const authOptions: AuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 6 * 60 * 60 // 1 day session > 6 hours session
+    maxAge: 20 * 60 // 20 minutes session (idle timeout)
   },
   pages: {
     signIn: '/admin',

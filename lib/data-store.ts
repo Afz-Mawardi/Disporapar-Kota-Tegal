@@ -2,14 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import {
-  NEWS as initialNews,
-  EVENTS as initialEvents,
-  GALLERY_PHOTOS as initialGallery,
-  PUBLIC_SERVICES as initialServices,
-  OFFICE_INFO as initialOfficeInfo,
-  WELCOME_MESSAGE as initialWelcomeMessage,
-  HERO_SLIDES as initialHeroSlides,
-  PRIORITY_PROGRAMS as initialPriorityPrograms,
   News,
   EventAgenda,
   PublicService,
@@ -18,15 +10,25 @@ import {
   PriorityProgram,
   HomepageSection,
   HomepageSettings,
-  INITIAL_HOMEPAGE_SETTINGS as initialHomepageSettings,
-  DEFAULT_KEPEMUDAAN_CARDS as initialKepemudaanCards,
-  DEFAULT_OLAHRAGA_CARDS as initialOlahragaCards,
-  DEFAULT_PARIWISATA_CARDS as initialPariwisataCards,
   BidangCard,
-  Retribusi,
-  DEFAULT_RETRIBUSI as initialRetribusi
-} from './data';
+  Retribusi
+} from './types';
+import dbData from './db.json';
 
+// Cast JSON mock data as default fallbacks
+const initialNews = dbData.news as News[];
+const initialEvents = dbData.events as EventAgenda[];
+const initialGallery = dbData.gallery as any[];
+const initialServices = dbData.services as PublicService[];
+const initialOfficeInfo = dbData.officeInfo as any;
+const initialWelcomeMessage = dbData.welcomeMessage as WelcomeMessage;
+const initialHeroSlides = dbData.heroSlides as HeroSlide[];
+const initialPriorityPrograms = dbData.priorityPrograms as PriorityProgram[];
+const initialHomepageSettings = dbData.homepageSettings as unknown as HomepageSettings;
+const initialKepemudaanCards = dbData.kepemudaanCards as BidangCard[];
+const initialOlahragaCards = dbData.olahragaCards as BidangCard[];
+const initialPariwisataCards = dbData.pariwisataCards as BidangCard[];
+const initialRetribusi = dbData.retribusi as Retribusi[];
 
 export interface BidangBottomCard {
   id: 'kepemudaan' | 'olahraga' | 'pariwisata';
@@ -40,41 +42,7 @@ export interface BidangBottomCard {
   sectionTitle?: string;
 }
 
-export const initialBidangBottomCards: BidangBottomCard[] = [
-  {
-    id: 'kepemudaan',
-    tag: 'Layanan & Kemitraan Pemuda',
-    title: 'Kemitraan Organisasi & Legalitas Kepemudaan',
-    description: 'DISPORAPAR memandu, membina legalitas organisasi kepemudaan, serta memfasilitasi gerakan KNPI, Karang Taruna, dan Forum Anak Tegal (FAT) dalam upaya mewujudkan sinergi dan pemberdayaan potensi pemuda Kota Tegal secara berkelanjutan.',
-    buttonText: 'Hubungi Kemitraan Pemuda',
-    buttonLink: '/pelayanan',
-    imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800',
-    sectionTag: 'Program Strategis & Layanan Pemuda',
-    sectionTitle: 'Fasilitas Pembinaan Pemuda Kota Tegal'
-  },
-  {
-    id: 'olahraga',
-    tag: 'Pemberdayaan Atlet Daerah',
-    title: 'Pemusatan Latihan & Pembinaan Olahraga Berkelanjutan',
-    description: 'DISPORAPAR bersinergi erat bersama KONI (Komite Olahraga Nasional Indonesia) Kota Tegal secara terpadu mengelola pemusatan latihan atlet usia dini berkala, peningkatan kualifikasi lisensi pelatih nasional, serta penyelenggaraan bonus apresiasi kejuaraan PORPROV & PON.',
-    buttonText: 'Hubungi Layanan Atlet & KONI',
-    buttonLink: '/pelayanan',
-    imageUrl: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=800',
-    sectionTag: 'Sarana & Fasilitas Olahraga',
-    sectionTitle: 'Pusat Kegiatan Keolahragaan Kota Tegal'
-  },
-  {
-    id: 'pariwisata',
-    tag: 'Mitra Pelaku Usaha Wisata',
-    title: 'Kembangkan Usaha Pariwisata & Kuliner Kreatif Anda Bersama Kami',
-    description: 'DISPORAPAR mendukung penuh pelaku industri penginapan, restoran Sate Tegal legendaris, agen perjalanan, serta pemandu wisata bahari untuk mengajukan data usaha resmi agar terdaftar secara luas di bawah rekomendasi katalog pariwisata terpadu.',
-    buttonText: 'Urus Izin Usaha & TDUP',
-    buttonLink: '/pelayanan',
-    imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800',
-    sectionTag: 'Destinasi Wisata',
-    sectionTitle: 'Destinasi Wisata Terpopuler & Unggulan'
-  }
-];
+export const initialBidangBottomCards: BidangBottomCard[] = dbData.bidangBottomCards as BidangBottomCard[];
 
 // Helper to check if running in client-side
 const isClient = typeof window !== 'undefined';

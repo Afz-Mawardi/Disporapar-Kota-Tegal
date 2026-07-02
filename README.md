@@ -1,20 +1,33 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Prototype Portal DISPORAPAR Kota Tegal
 
-# Run and deploy your AI Studio app
+Aplikasi portal informasi dan database modern terpusat Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal. Dibangun menggunakan Next.js, Tailwind CSS, Prisma ORM, dan MySQL.
 
-This contains everything you need to run your app locally.
+## Cara Menjalankan Project Secara Lokal
 
-View your app in AI Studio: https://ai.studio/apps/bf9bb98d-bbd3-4979-81c7-c875ae659413
+### Prasyarat
+- Node.js (v18 ke atas)
+- MySQL Database
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Langkah-langkah
+1. **Install dependensi**:
+   ```bash
+   npm install
+   ```
+2. **Konfigurasi Environment**:
+   Salin file `.env.example` menjadi `.env` lalu sesuaikan konfigurasi koneksi database:
+   ```bash
+   cp .env.example .env
+   ```
+3. **Migrasi Database & Seeding**:
+   Jalankan perintah berikut untuk membuat tabel dan mengisi data awal ke database Anda:
+   ```bash
+   npx prisma db push
+   npm run seed
+   ```
+4. **Jalankan Server Development**:
+   ```bash
+   npm run dev
+   ```
+5. **Buka di Browser**:
+   Buka [http://localhost:3000](http://localhost:3000) untuk melihat web portal.
+   Buka [http://localhost:3000/admin](http://localhost:3000/admin) untuk masuk ke panel admin.

@@ -38,7 +38,7 @@ export default function Logo({ isWhiteNav, variant, className = '', showEmblem =
       {showEmblem && (
         <div className="relative shrink-0">
           <Image
-            src="/aset/tegal-emblem.svg"
+            src="/assets/tegal-emblem.svg"
             alt="Kota Tegal Shield Emblem"
             width={38}
             height={44}

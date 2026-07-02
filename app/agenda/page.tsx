@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import AgendaPageClient from './AgendaPageClient';
+import AgendaPageClient from './page.client';
 
 export const dynamic = 'force-dynamic';
 

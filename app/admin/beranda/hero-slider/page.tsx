@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useHeroSlides } from '@/lib/data-store';
-import { HeroSlide } from '@/lib/data';
+import { HeroSlide } from '@/lib/types';
 
 // Helper to convert image and upload to server
 const convertImageToWebP = (file: File): Promise<string> => {

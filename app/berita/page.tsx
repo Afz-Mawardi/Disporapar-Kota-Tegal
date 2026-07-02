@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import BeritaPageClient from './BeritaPageClient';
+import BeritaPageClient from './page.client';
 
 export const dynamic = 'force-dynamic';
 

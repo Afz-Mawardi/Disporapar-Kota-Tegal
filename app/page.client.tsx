@@ -33,10 +33,7 @@ import {
   Award,
   Zap
 } from 'lucide-react';
-import {
-  YOUTH_PROGRAMS,
-  SPORTS_VENUES
-} from '@/lib/data';
+
 import {
   useNews,
   useEvents,

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import KontakPageClient from './KontakPageClient';
+import KontakPageClient from './page.client';
 
 export const dynamic = 'force-dynamic';
 

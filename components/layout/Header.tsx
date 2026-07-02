@@ -30,7 +30,7 @@ import {
   FileSignature
 } from 'lucide-react';
 
-import Logo from './Logo';
+import Logo from '../ui/Logo';
 
 interface DropdownItem {
   name: string;

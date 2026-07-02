@@ -10,7 +10,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { usePriorityPrograms } from '@/lib/data-store';
-import { PriorityProgram } from '@/lib/data';
+import { PriorityProgram } from '@/lib/types';
 
 export default function PilarProgramPage() {
   const [priorityPrograms, setPriorityPrograms] = usePriorityPrograms();

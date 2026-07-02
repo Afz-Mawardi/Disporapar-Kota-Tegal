@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import KepemudaanPageClient from './KepemudaanPageClient';
+import KepemudaanPageClient from './page.client';
 
 export const dynamic = 'force-dynamic';
 

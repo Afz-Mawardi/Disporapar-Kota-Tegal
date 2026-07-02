@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import GaleriPageClient from './GaleriPageClient';
+import GaleriPageClient from './page.client';
 
 export const dynamic = 'force-dynamic';
 

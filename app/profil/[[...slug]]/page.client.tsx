@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import InteractiveImage from '@/components/InteractiveImage';
+import InteractiveImage from '@/components/ui/InteractiveImage';
 import { usePathname } from 'next/navigation';
 import { Target, Users, BookOpen, User, Award } from 'lucide-react';
 import { useWelcomeMessage } from '@/lib/data-store';
@@ -132,7 +132,7 @@ export default function ProfilPageClient({
             </div>
 
             <InteractiveImage
-              src="/aset/struktur-organisasi.webp"
+              src="/assets/struktur-organisasi.webp"
               alt="Struktur Organisasi DISPORAPAR Kota Tegal"
             />
           </div>

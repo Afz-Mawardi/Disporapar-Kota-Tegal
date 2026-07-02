@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { News } from '@/lib/data';
+import { News } from '@/lib/types';
 import { useNews, useCategories } from '@/lib/data-store';
 import { Search, Calendar, User, ChevronRight, Newspaper, X, Clock, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';

@@ -17,7 +17,7 @@ import {
   Ticket
 } from 'lucide-react';
 import { useKepemudaanCards, useBidangBottomCards } from '@/lib/data-store';
-import { BidangCard } from '@/lib/data';
+import { BidangCard } from '@/lib/types';
 
 // Helper to convert image to WebP format
 const convertImageToWebP = (file: File): Promise<string> => {

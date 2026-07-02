@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useEvents } from '@/lib/data-store';
 import { Search, MapPin, Clock, Calendar } from 'lucide-react';
 import { parseIndonesianDate } from '@/lib/utils';
-import CalendarHeader from '@/components/CalendarHeader';
+import CalendarHeader from '@/components/ui/CalendarHeader';
 
 // Get today's date in WIB (UTC+7) as a plain date (no time)
 function getTodayWIB(): Date {
