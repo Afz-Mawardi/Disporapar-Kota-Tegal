@@ -43,11 +43,11 @@ export const authOptions: AuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 20 * 60 // 20 minutes session (idle timeout)
+    maxAge: 20 * 60 // 20 menit sesi (idle timeout)
   },
   pages: {
-    signIn: '/admin',
-    error: '/admin'
+    signIn: '/login.admin',
+    error: '/login.admin'
   },
   callbacks: {
     async jwt({ token, user }) {

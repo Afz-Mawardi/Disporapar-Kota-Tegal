@@ -256,7 +256,7 @@ export default function Header() {
     setExpandedMobileMenu(prev => (prev === name ? null : name));
   };
 
-  if (pathname && pathname.startsWith('/admin')) {
+  if (pathname && (pathname.startsWith('/admin') || pathname.startsWith('/login.admin'))) {
     return null;
   }
 

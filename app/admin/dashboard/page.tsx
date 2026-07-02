@@ -41,6 +41,8 @@ export default function AdminDashboard() {
   const [externalLinks, setExternalLinks] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredMonthIdx, setHoveredMonthIdx] = useState<number | null>(null);
+  const [barLimitMode, setBarLimitMode] = useState('dynamic');
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
   // Fetch dynamic statistics
   const fetchData = async () => {
@@ -77,10 +79,10 @@ export default function AdminDashboard() {
   // Complaints Breakdown
   // -------------------------------------------------------------
   const totalComplaints = complaints.length;
-  const baruCount = complaints.filter(c => c.status === 'Baru').length;
-  const diprosesCount = complaints.filter(c => c.status === 'Diproses').length;
-  const selesaiCount = complaints.filter(c => c.status === 'Selesai').length;
-  const ditolakCount = complaints.filter(c => c.status === 'Ditolak').length;
+  const baruCount = complaints.filter(c => c.status && c.status.toLowerCase() === 'baru').length;
+  const diprosesCount = complaints.filter(c => c.status && c.status.toLowerCase() === 'diproses').length;
+  const selesaiCount = complaints.filter(c => c.status && c.status.toLowerCase() === 'selesai').length;
+  const ditolakCount = complaints.filter(c => c.status && c.status.toLowerCase() === 'ditolak').length;
 
   const pctBaru = totalComplaints > 0 ? Math.round((baruCount / totalComplaints) * 100) : 0;
   const pctProses = totalComplaints > 0 ? Math.round((diprosesCount / totalComplaints) * 100) : 0;
@@ -118,84 +120,134 @@ export default function AdminDashboard() {
     return -1;
   };
 
-  const currentMonthIdx = new Date().getMonth();
-  const lineChartMonths = Array.from({ length: 6 }).map((_, i) => {
-    const idx = (currentMonthIdx - (5 - i) + 12) % 12;
+  // Helper to extract month index (0-11) and year from items
+  const getItemMonthAndYear = (item: any): { month: number; year: number } => {
+    // 1. Try parsing from item.date (e.g. "24 Mei 2026")
+    if (item.date) {
+      const m = getMonthIndex(item.date);
+      const parts = item.date.trim().split(/\s+/);
+      if (parts.length > 0) {
+        const lastWord = parts[parts.length - 1];
+        const yr = Number(lastWord);
+        if (!isNaN(yr) && yr > 1900 && yr < 2100 && m !== -1) {
+          return { month: m, year: yr };
+        }
+      }
+    }
+
+    // 2. Try parsing from item.createdAt
+    if (item.createdAt) {
+      const d = new Date(item.createdAt);
+      const m = d.getMonth();
+      const y = d.getFullYear();
+      if (!isNaN(m) && !isNaN(y)) {
+        return { month: m, year: y };
+      }
+    }
+
+    // 3. Try parsing from ID timestamp (e.g. n-178129381293)
+    if (item.id) {
+      const parts = item.id.split('-');
+      const lastPart = parts[parts.length - 1];
+      const timestamp = Number(lastPart);
+      if (!isNaN(timestamp) && timestamp > 1000000000000) {
+        const d = new Date(timestamp);
+        return { month: d.getMonth(), year: d.getFullYear() };
+      }
+    }
+
+    // 4. Specific fallback for mock gallery items (g-1 to g-8)
+    if (item.id && item.id.startsWith('g-')) {
+      const num = Number(item.id.replace('g-', ''));
+      if (!isNaN(num)) {
+        let m = 0;
+        if (num <= 2) m = 1;      // Feb
+        else if (num <= 4) m = 2; // Mar
+        else if (num <= 6) m = 3; // Apr
+        else m = 4;               // Mei
+        return { month: m, year: 2026 };
+      }
+    }
+
+    // Fallback default
+    return { month: new Date().getMonth(), year: new Date().getFullYear() };
+  };
+
+  // Get all unique years from publications (news, events, gallery)
+  const availableYears = React.useMemo(() => {
+    const yearsSet = new Set<number>();
+
+    const addYearFromItem = (item: any) => {
+      const { year } = getItemMonthAndYear(item);
+      if (year) {
+        yearsSet.add(year);
+      }
+    };
+
+    news.forEach(addYearFromItem);
+    events.forEach(addYearFromItem);
+    gallery.forEach(addYearFromItem);
+
+    const sortedYears = Array.from(yearsSet).sort((a, b) => b - a);
+    return sortedYears.length > 0 ? sortedYears : [new Date().getFullYear()];
+  }, [news, events, gallery]);
+
+  // Sync selectedYear if the active year gets deleted
+  useEffect(() => {
+    if (!availableYears.includes(selectedYear)) {
+      setSelectedYear(availableYears[0]);
+    }
+  }, [availableYears, selectedYear]);
+
+  // 12 months array (Jan to Dec)
+  const lineChartMonths = Array.from({ length: 12 }).map((_, i) => {
     return {
-      short: shortMonths[idx],
-      full: fullMonths[idx],
-      index: idx
+      short: shortMonths[i],
+      full: fullMonths[i],
+      index: i
     };
   });
 
-  const getNewsCountForMonth = (monthIdx: number): number => {
+  const getNewsCountForMonth = (monthIdx: number, year: number): number => {
     return news.filter((item) => {
-      const part = item.id.split('-')[1];
-      const timestamp = part ? Number(part) : NaN;
-      if (!isNaN(timestamp) && timestamp > 1000000000000) {
-        return new Date(timestamp).getMonth() === monthIdx;
-      }
-      return getMonthIndex(item.date) === monthIdx;
+      const { month, year: itemYear } = getItemMonthAndYear(item);
+      return month === monthIdx && itemYear === year;
     }).length;
   };
 
-  const getEventsCountForMonth = (monthIdx: number): number => {
+  const getEventsCountForMonth = (monthIdx: number, year: number): number => {
     return events.filter((item) => {
-      const part = item.id.split('-')[1];
-      const timestamp = part ? Number(part) : NaN;
-      if (!isNaN(timestamp) && timestamp > 1000000000000) {
-        return new Date(timestamp).getMonth() === monthIdx;
-      }
-      return getMonthIndex(item.date) === monthIdx;
+      const { month, year: itemYear } = getItemMonthAndYear(item);
+      return month === monthIdx && itemYear === year;
     }).length;
   };
 
-  const getGalleryCountForMonth = (monthIdx: number): number => {
+  const getGalleryCountForMonth = (monthIdx: number, year: number): number => {
     return gallery.filter((item) => {
-      const part = item.id.split('-')[1];
-      const timestamp = part ? Number(part) : NaN;
-      if (!isNaN(timestamp) && timestamp > 1000000000000) {
-        return new Date(timestamp).getMonth() === monthIdx;
-      }
-      const num = Number(item.id.replace('g-', ''));
-      if (!isNaN(num)) {
-        if (num <= 2) return monthIdx === 1;
-        if (num <= 4) return monthIdx === 2;
-        if (num <= 6) return monthIdx === 3;
-        return monthIdx === 4;
-      }
-      return false;
+      const { month, year: itemYear } = getItemMonthAndYear(item);
+      return month === monthIdx && itemYear === year;
     }).length;
   };
 
-  const getComplaintsCountForMonth = (monthIdx: number): number => {
-    return complaints.filter((item) => {
-      if (item.createdAt) {
-        return new Date(item.createdAt).getMonth() === monthIdx;
-      }
-      return false;
-    }).length;
-  };
-
-  // Compile monthly values
-  const monthlyNews = lineChartMonths.map(m => getNewsCountForMonth(m.index));
-  const monthlyEvents = lineChartMonths.map(m => getEventsCountForMonth(m.index));
-  const monthlyGallery = lineChartMonths.map(m => getGalleryCountForMonth(m.index));
-  const monthlyComplaints = lineChartMonths.map(m => getComplaintsCountForMonth(m.index));
+  // Compile monthly values for the selected year
+  const monthlyNews = lineChartMonths.map(m => getNewsCountForMonth(m.index, selectedYear));
+  const monthlyEvents = lineChartMonths.map(m => getEventsCountForMonth(m.index, selectedYear));
+  const monthlyGallery = lineChartMonths.map(m => getGalleryCountForMonth(m.index, selectedYear));
 
   const maxCountVal = Math.max(
-    10,
+    1,
     ...monthlyNews,
     ...monthlyEvents,
-    ...monthlyGallery,
-    ...monthlyComplaints
+    ...monthlyGallery
   );
+  // Round up max value to nearest multiple of 4 to have a uniform, integer-based Y-axis scale
+  const yMax = Math.max(4, Math.ceil(maxCountVal / 4) * 4);
 
-  // SVG Coordinates mapping: viewBox = 0 0 500 200
+  // SVG Coordinates mapping: viewBox = 0 0 500 210
   // Y-axis spans from y=20 (max) to y=180 (0 value). Height = 160.
-  // X-axis spans from x=45 (Jan) to x=470 (Jun). Gap = 85.
-  const getX = (idx: number) => 45 + idx * 85;
-  const getY = (val: number) => 180 - (val / maxCountVal) * 160;
+  // X-axis spans from x=35 (Jan) to x=475 (Des). Gap = 40.
+  const getX = (idx: number) => 35 + idx * 40;
+  const getY = (val: number) => 180 - (val / yMax) * 160;
 
   const buildPath = (dataArr: number[]) => {
     return "M " + dataArr.map((val, idx) => `${getX(idx)},${getY(val)}`).join(" L ");
@@ -204,7 +256,6 @@ export default function AdminDashboard() {
   const newsPath = buildPath(monthlyNews);
   const eventsPath = buildPath(monthlyEvents);
   const galleryPath = buildPath(monthlyGallery);
-  const complaintsPath = buildPath(monthlyComplaints);
 
   // -------------------------------------------------------------
   // Horizontal Bar Chart (Konten per Modul)
@@ -218,7 +269,8 @@ export default function AdminDashboard() {
     { label: 'Galeri Foto', val: gallery.length, color: '#3B6C9C' },
     { label: 'Berkas Layanan', val: services.length, color: '#5283B3' }
   ];
-  const maxBarVal = Math.max(10, ...barData.map(b => b.val));
+  const maxValInData = Math.max(...barData.map(b => b.val));
+  const maxBarVal = barLimitMode === 'dynamic' ? Math.max(1, maxValInData) : Math.max(10, maxValInData);
 
   // -------------------------------------------------------------
   // Recent Complaints Log (5 items)
@@ -232,44 +284,46 @@ export default function AdminDashboard() {
     .slice(0, 5);
 
   const getStatusTextBadge = (status: string) => {
-    switch (status) {
-      case 'Baru':
+    const normalized = (status || '').toLowerCase();
+    switch (normalized) {
+      case 'baru':
         return <span className="text-[10px] font-extrabold text-blue-600 tracking-wider uppercase">[BARU]</span>;
-      case 'Diproses':
+      case 'diproses':
         return <span className="text-[10px] font-extrabold text-amber-500 tracking-wider uppercase">[DIPROSES]</span>;
-      case 'Selesai':
+      case 'selesai':
         return <span className="text-[10px] font-extrabold text-emerald-600 tracking-wider uppercase">[SELESAI]</span>;
-      case 'Ditolak':
-        return <span className="text-[10px] font-extrabold text-red-650 tracking-wider uppercase">[DITOLAK]</span>;
+      case 'ditolak':
+        return <span className="text-[10px] font-extrabold text-red-600 tracking-wider uppercase">[DITOLAK]</span>;
       default:
         return <span className="text-[10px] font-extrabold text-slate-500 tracking-wider uppercase">[{status.toUpperCase()}]</span>;
     }
   };
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'Baru':
+    const normalized = (status || '').toLowerCase();
+    switch (normalized) {
+      case 'baru':
         return (
           <span className="inline-flex items-center gap-1 text-[9px] font-extrabold font-mono uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
             <Clock className="w-2.5 h-2.5 shrink-0" />
             <span>BARU</span>
           </span>
         );
-      case 'Diproses':
+      case 'diproses':
         return (
           <span className="inline-flex items-center gap-1 text-[9px] font-extrabold font-mono uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
             <Clock className="w-2.5 h-2.5 shrink-0" />
             <span>DIPROSES</span>
           </span>
         );
-      case 'Selesai':
+      case 'selesai':
         return (
           <span className="inline-flex items-center gap-1 text-[9px] font-extrabold font-mono uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
             <CheckCircle className="w-2.5 h-2.5 shrink-0" />
             <span>SELESAI</span>
           </span>
         );
-      case 'Ditolak':
+      case 'ditolak':
         return (
           <span className="inline-flex items-center gap-1 text-[9px] font-extrabold font-mono uppercase tracking-wider text-red-700 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full">
             <XCircle className="w-2.5 h-2.5 shrink-0" />
@@ -292,9 +346,9 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="pt-4 md:pt-6 space-y-6 animate-fade-in text-left font-inter">
+    <div className="pt-4 md:pt-0 space-y-6 animate-fade-in text-left font-inter">
       {/* Grid Summary Cards (5 Columns) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
         {[
           { title: 'Berita', count: news.length, icon: <Newspaper className="w-5 h-5 text-[#0E3B66]" /> },
           { title: 'Agenda', count: events.length, icon: <Calendar className="w-5 h-5 text-[#FF7A00]" /> },
@@ -304,7 +358,8 @@ export default function AdminDashboard() {
         ].map((stat, i) => (
           <div
             key={i}
-            className="p-5 rounded-[20px] border border-slate-200/60 shadow-sm bg-white flex items-center justify-between transition-all hover:scale-[1.02] hover:shadow-md h-full"
+            className={`p-5 rounded-[20px] border border-slate-200/60 shadow-sm bg-white flex items-center justify-between transition-all hover:scale-[1.02] hover:shadow-md h-full ${i === 4 ? 'sm:col-span-2 lg:col-span-1' : ''
+              }`}
           >
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block leading-none">
@@ -324,16 +379,33 @@ export default function AdminDashboard() {
       {/* Row 1: Line Chart & Pie Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Multi-Line Chart (Aktivitas Bulanan) */}
-        <div className="lg:col-span-8 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between relative">
+        <div className="lg:col-span-8 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between relative h-auto lg:h-[470px]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
               <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-[#FF7A00]" />
                 <span>Aktivitas Bulanan</span>
               </h3>
-              <p className="text-[10px] text-slate-400 mt-1">Perbandingan tren unggahan berita, event, galeri, dan laporan aduan</p>
+              <p className="text-[10px] text-slate-400 mt-1">Perbandingan tren publikasi berita, agenda event, dan galeri foto</p>
             </div>
-            <span className="bg-slate-50 border border-slate-100 text-slate-500 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase self-start sm:self-auto">Multi Line Chart</span>
+
+            {/* Year selector dropdown (drop list) */}
+            <div className="relative shrink-0 self-start sm:self-auto select-none">
+              <select
+                value={selectedYear}
+                onChange={(e) => {
+                  setSelectedYear(Number(e.target.value));
+                  e.target.blur();
+                }}
+                className="px-2.5 py-1.5 border border-slate-200 hover:border-slate-350 hover:bg-slate-50 transition-all rounded-lg text-xs text-[#0E3B66] font-extrabold font-mono focus:outline-none cursor-pointer bg-white"
+              >
+                {availableYears.map((year) => (
+                  <option key={year} value={year} className="font-mono font-extrabold text-[#0E3B66]">
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Legend Horizontal */}
@@ -350,124 +422,115 @@ export default function AdminDashboard() {
               <span className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6]" />
               <span className="text-slate-650 font-medium">Galeri Foto</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#F43F5E]" />
-              <span className="text-slate-650 font-medium">Pengaduan</span>
-            </div>
           </div>
 
           {/* SVG Multi Line Chart Area */}
-          <div className="relative w-full h-72 border border-slate-100/50 bg-slate-50/50 rounded-[20px] p-4 flex items-center justify-center select-none">
-            <svg viewBox="0 0 500 210" className="w-full h-full overflow-visible">
-              {/* Horizontal Grid Lines */}
-              <line x1="35" y1="20" x2="480" y2="20" stroke="#f1f5f9" strokeWidth="1" />
-              <line x1="35" y1="60" x2="480" y2="60" stroke="#f1f5f9" strokeWidth="1" />
-              <line x1="35" y1="100" x2="480" y2="100" stroke="#f1f5f9" strokeWidth="1" />
-              <line x1="35" y1="140" x2="480" y2="140" stroke="#f1f5f9" strokeWidth="1" />
-              <line x1="35" y1="180" x2="480" y2="180" stroke="#cbd5e1" strokeWidth="1.5" />
+          <div className="relative w-full border border-slate-100/50 bg-slate-50/50 rounded-[20px] p-4 flex items-center justify-center select-none">
+            <div className="relative w-full">
+              <svg viewBox="0 0 500 210" className="w-full h-auto overflow-visible">
+                {/* Horizontal Grid Lines */}
+                <line x1="35" y1="20" x2="475" y2="20" stroke="#f1f5f9" strokeWidth="1" />
+                <line x1="35" y1="60" x2="475" y2="60" stroke="#f1f5f9" strokeWidth="1" />
+                <line x1="35" y1="100" x2="475" y2="100" stroke="#f1f5f9" strokeWidth="1" />
+                <line x1="35" y1="140" x2="475" y2="140" stroke="#f1f5f9" strokeWidth="1" />
+                <line x1="35" y1="180" x2="475" y2="180" stroke="#cbd5e1" strokeWidth="1.5" />
 
-              {/* Y Axis Labels */}
-              <text x="25" y="24" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{maxCountVal}</text>
-              <text x="25" y="64" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{Math.round(maxCountVal * 0.75)}</text>
-              <text x="25" y="104" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{Math.round(maxCountVal * 0.5)}</text>
-              <text x="25" y="144" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{Math.round(maxCountVal * 0.25)}</text>
-              <text x="25" y="184" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">0</text>
+                {/* Y Axis Labels */}
+                <text x="25" y="24" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{yMax}</text>
+                <text x="25" y="64" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{yMax * 0.75}</text>
+                <text x="25" y="104" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{yMax * 0.5}</text>
+                <text x="25" y="144" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{yMax * 0.25}</text>
+                <text x="25" y="184" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">0</text>
 
-              {/* X Axis Labels */}
-              {lineChartMonths.map((m, idx) => (
-                <text key={idx} x={getX(idx)} y="198" textAnchor="middle" className="font-extrabold fill-slate-500 font-mono text-[9px]">{m.short}</text>
-              ))}
+                {/* X Axis Labels */}
+                {lineChartMonths.map((m, idx) => (
+                  <text key={idx} x={getX(idx)} y="198" textAnchor="middle" className="font-extrabold fill-slate-500 font-mono text-[9px]">{m.short}</text>
+                ))}
 
-              {/* Dotted Vertical Hover Line */}
+                {/* Dotted Vertical Hover Line */}
+                {hoveredMonthIdx !== null && (
+                  <line
+                    x1={getX(hoveredMonthIdx)}
+                    y1="20"
+                    x2={getX(hoveredMonthIdx)}
+                    y2="180"
+                    stroke="#94A3B8"
+                    strokeWidth="1.5"
+                    strokeDasharray="4 3"
+                  />
+                )}
+
+                {/* SVG paths representing lines */}
+                <path d={newsPath} fill="none" stroke="#0E3B66" strokeWidth="3" strokeLinecap="round" className="transition-all duration-300" />
+                <path d={eventsPath} fill="none" stroke="#FF7A00" strokeWidth="3" strokeLinecap="round" className="transition-all duration-300" />
+                <path d={galleryPath} fill="none" stroke="#8B5CF6" strokeWidth="3" strokeLinecap="round" className="transition-all duration-300" />
+
+                {/* Anchor Node Circles */}
+                {lineChartMonths.map((_, idx) => (
+                  <g key={idx}>
+                    {/* News node */}
+                    <circle cx={getX(idx)} cy={getY(monthlyNews[idx])} r={hoveredMonthIdx === idx ? 6 : 4} className="fill-white stroke-[#0E3B66] stroke-[2.5] transition-all" />
+                    {/* Events node */}
+                    <circle cx={getX(idx)} cy={getY(monthlyEvents[idx])} r={hoveredMonthIdx === idx ? 6 : 4} className="fill-white stroke-[#FF7A00] stroke-[2.5] transition-all" />
+                    {/* Gallery node */}
+                    <circle cx={getX(idx)} cy={getY(monthlyGallery[idx])} r={hoveredMonthIdx === idx ? 6 : 4} className="fill-white stroke-[#8B5CF6] stroke-[2.5] transition-all" />
+                  </g>
+                ))}
+
+                {/* Invisible interactive vertical columns for hover tooltip triggering */}
+                {lineChartMonths.map((_, idx) => (
+                  <rect
+                    key={idx}
+                    x={getX(idx) - 20}
+                    y="15"
+                    width="40"
+                    height="170"
+                    fill="transparent"
+                    className="cursor-pointer"
+                    onMouseEnter={() => setHoveredMonthIdx(idx)}
+                    onMouseLeave={() => setHoveredMonthIdx(null)}
+                  />
+                ))}
+              </svg>
+
+              {/* Hover Tooltip Overlay Card */}
               {hoveredMonthIdx !== null && (
-                <line
-                  x1={getX(hoveredMonthIdx)}
-                  y1="20"
-                  x2={getX(hoveredMonthIdx)}
-                  y2="180"
-                  stroke="#94A3B8"
-                  strokeWidth="1.5"
-                  strokeDasharray="4 3"
-                />
+                <div
+                  className="absolute z-10 bg-[#051424]/95 text-white p-4 rounded-2xl shadow-2xl space-y-3 pointer-events-none transition-all font-inter text-left min-w-[190px] border border-white/10"
+                  style={{
+                    top: '25px',
+                    left: `${(getX(hoveredMonthIdx) / 500) * 100}%`,
+                    transform: hoveredMonthIdx >= 6 ? 'translateX(-100%) translateX(-15px)' : 'translateX(15px)'
+                  }}
+                >
+                  <div className="font-mono text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none border-b border-white/10 pb-2">
+                    {lineChartMonths[hoveredMonthIdx].full}
+                  </div>
+                  <div className="space-y-2 pt-0.5 text-xs">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6] shrink-0" />
+                      <span className="text-slate-200 font-extrabold uppercase tracking-wider text-[10px] font-mono">Berita:</span>
+                      <span className="font-mono font-black text-white text-base ml-auto leading-none">{monthlyNews[hoveredMonthIdx]}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#FF7A00] shrink-0" />
+                      <span className="text-slate-200 font-extrabold uppercase tracking-wider text-[10px] font-mono">Agenda:</span>
+                      <span className="font-mono font-black text-white text-base ml-auto leading-none">{monthlyEvents[hoveredMonthIdx]}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6] shrink-0" />
+                      <span className="text-slate-200 font-extrabold uppercase tracking-wider text-[10px] font-mono">Galeri:</span>
+                      <span className="font-mono font-black text-white text-base ml-auto leading-none">{monthlyGallery[hoveredMonthIdx]}</span>
+                    </div>
+                  </div>
+                </div>
               )}
-
-              {/* SVG paths representing lines */}
-              <path d={newsPath} fill="none" stroke="#0E3B66" strokeWidth="3" strokeLinecap="round" className="transition-all duration-300" />
-              <path d={eventsPath} fill="none" stroke="#FF7A00" strokeWidth="3" strokeLinecap="round" className="transition-all duration-300" />
-              <path d={galleryPath} fill="none" stroke="#8B5CF6" strokeWidth="3" strokeLinecap="round" className="transition-all duration-300" />
-              <path d={complaintsPath} fill="none" stroke="#F43F5E" strokeWidth="3" strokeLinecap="round" className="transition-all duration-300" />
-
-              {/* Anchor Node Circles */}
-              {lineChartMonths.map((_, idx) => (
-                <g key={idx}>
-                  {/* News node */}
-                  <circle cx={getX(idx)} cy={getY(monthlyNews[idx])} r={hoveredMonthIdx === idx ? 6 : 4} className="fill-white stroke-[#0E3B66] stroke-[2.5] transition-all" />
-                  {/* Events node */}
-                  <circle cx={getX(idx)} cy={getY(monthlyEvents[idx])} r={hoveredMonthIdx === idx ? 6 : 4} className="fill-white stroke-[#FF7A00] stroke-[2.5] transition-all" />
-                  {/* Gallery node */}
-                  <circle cx={getX(idx)} cy={getY(monthlyGallery[idx])} r={hoveredMonthIdx === idx ? 6 : 4} className="fill-white stroke-[#8B5CF6] stroke-[2.5] transition-all" />
-                  {/* Complaints node */}
-                  <circle cx={getX(idx)} cy={getY(monthlyComplaints[idx])} r={hoveredMonthIdx === idx ? 6 : 4} className="fill-white stroke-[#F43F5E] stroke-[2.5] transition-all" />
-                </g>
-              ))}
-
-              {/* Invisible interactive vertical columns for hover tooltip triggering */}
-              {lineChartMonths.map((_, idx) => (
-                <rect
-                  key={idx}
-                  x={getX(idx) - 25}
-                  y="15"
-                  width="50"
-                  height="170"
-                  fill="transparent"
-                  className="cursor-pointer"
-                  onMouseEnter={() => setHoveredMonthIdx(idx)}
-                  onMouseLeave={() => setHoveredMonthIdx(null)}
-                />
-              ))}
-            </svg>
-
-            {/* Hover Tooltip Overlay Card */}
-            {hoveredMonthIdx !== null && (
-              <div
-                className="absolute z-10 bg-[#051424]/95 text-white p-3.5 rounded-2xl shadow-xl space-y-2 pointer-events-none transition-all font-inter text-left min-w-[170px] border border-white/10"
-                style={{
-                  top: '25px',
-                  left: `${hoveredMonthIdx >= 3 ? getX(hoveredMonthIdx) * 1.05 - 195 : getX(hoveredMonthIdx) * 1.05 + 15}px`
-                }}
-              >
-                <div className="font-mono text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none border-b border-white/10 pb-1.5">
-                  {lineChartMonths[hoveredMonthIdx].full}
-                </div>
-                <div className="space-y-1.5 pt-1 text-[11px]">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#3B82F6]" />
-                    <span className="text-slate-300 font-medium">Berita:</span>
-                    <span className="font-mono font-bold ml-auto">{monthlyNews[hoveredMonthIdx]}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#FF7A00]" />
-                    <span className="text-slate-300 font-medium">Agenda:</span>
-                    <span className="font-mono font-bold ml-auto">{monthlyEvents[hoveredMonthIdx]}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
-                    <span className="text-slate-300 font-medium">Galeri:</span>
-                    <span className="font-mono font-bold ml-auto">{monthlyGallery[hoveredMonthIdx]}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#F43F5E]" />
-                    <span className="text-slate-300 font-medium">Pengaduan:</span>
-                    <span className="font-mono font-bold ml-auto">{monthlyComplaints[hoveredMonthIdx]}</span>
-                  </div>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
 
         {/* Donut Chart (Status Pengaduan) */}
-        <div className="lg:col-span-4 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-4 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between h-auto lg:h-[470px]">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
@@ -476,12 +539,11 @@ export default function AdminDashboard() {
               </h3>
               <p className="text-[10px] text-slate-400 mt-1">Daftar resolusi aduan masyarakat</p>
             </div>
-            <span className="bg-slate-50 border border-slate-100 text-slate-500 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">Donut Chart</span>
           </div>
 
-          <div className="flex flex-col items-center justify-center p-4 border border-slate-150/40 bg-slate-50/50 rounded-2xl">
+          <div className="flex-grow flex flex-col items-center justify-center gap-6 mt-4">
             {/* Donut Ring visualization */}
-            <div className="relative w-36 h-36 flex items-center justify-center">
+            <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                 {/* Background Ring */}
                 <circle cx="60" cy="60" r="40" stroke="#E2E8F0" strokeWidth="9" fill="none" />
@@ -557,39 +619,47 @@ export default function AdminDashboard() {
               {/* Total label at center */}
               <div className="absolute text-center">
                 <span className="text-2xl font-black text-[#0E3B66] font-mono leading-none block">{totalComplaints}</span>
-                <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-widest block mt-1 font-mono">Total Aduan</span>
+                <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-widest block mt-1.5 font-mono">Total Aduan</span>
               </div>
             </div>
 
-            {/* Labels and Percentages */}
-            <div className="w-full space-y-2 mt-5 text-[10px] font-mono">
-              <div className="flex items-center justify-between p-2 bg-white border border-slate-100 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
-                  <span className="text-slate-500 font-bold uppercase">Selesai:</span>
+            {/* Labels and Percentages - 2x2 Grid */}
+            <div className="grid grid-cols-2 gap-3 w-full max-w-[320px] mx-auto text-[10px] font-mono">
+              <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-between transition-all hover:bg-slate-100/70">
+                <div className="flex items-center gap-1.5 mb-1 shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Selesai</span>
                 </div>
-                <span className="font-extrabold text-slate-800">{selesaiCount} ({pctSelesai}%)</span>
+                <span className="font-extrabold text-[#0E3B66] text-xs">
+                  {selesaiCount} <span className="text-[10px] font-medium text-slate-400">({pctSelesai}%)</span>
+                </span>
               </div>
-              <div className="flex items-center justify-between p-2 bg-white border border-slate-100 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF7A00] shrink-0" />
-                  <span className="text-slate-500 font-bold uppercase">Diproses:</span>
+              <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-between transition-all hover:bg-slate-100/70">
+                <div className="flex items-center gap-1.5 mb-1 shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-[#FF7A00] shrink-0" />
+                  <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Diproses</span>
                 </div>
-                <span className="font-extrabold text-slate-800">{diprosesCount} ({pctProses}%)</span>
+                <span className="font-extrabold text-[#0E3B66] text-xs">
+                  {diprosesCount} <span className="text-[10px] font-medium text-slate-400">({pctProses}%)</span>
+                </span>
               </div>
-              <div className="flex items-center justify-between p-2 bg-white border border-slate-100 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0" />
-                  <span className="text-slate-500 font-bold uppercase">Baru:</span>
+              <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-between transition-all hover:bg-slate-100/70">
+                <div className="flex items-center gap-1.5 mb-1 shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                  <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Baru</span>
                 </div>
-                <span className="font-extrabold text-slate-800">{baruCount} ({pctBaru}%)</span>
+                <span className="font-extrabold text-[#0E3B66] text-xs">
+                  {baruCount} <span className="text-[10px] font-medium text-slate-400">({pctBaru}%)</span>
+                </span>
               </div>
-              <div className="flex items-center justify-between p-2 bg-white border border-slate-100 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0" />
-                  <span className="text-slate-500 font-bold uppercase">Ditolak:</span>
+              <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-between transition-all hover:bg-slate-100/70">
+                <div className="flex items-center gap-1.5 mb-1 shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+                  <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Ditolak</span>
                 </div>
-                <span className="font-extrabold text-slate-800">{ditolakCount} ({pctDitolak}%)</span>
+                <span className="font-extrabold text-[#0E3B66] text-xs">
+                  {ditolakCount} <span className="text-[10px] font-medium text-slate-400">({pctDitolak}%)</span>
+                </span>
               </div>
             </div>
           </div>
@@ -599,13 +669,15 @@ export default function AdminDashboard() {
       {/* Row 2: Horizontal Bar & Activity Stream */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Horizontal Bar Chart (Konten per Modul) */}
-        <div className="lg:col-span-6 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between h-[420px]">
-          <div>
-            <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
-              <SlidersHorizontal className="w-5 h-5 text-[#FF7A00]" />
-              <span>Konten per Modul</span>
-            </h3>
-            <p className="text-[10px] text-slate-400 mt-1">Distribusi jumlah konten aktif per modul sistem</p>
+        <div className="lg:col-span-6 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between h-auto lg:h-[420px]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-2">
+            <div>
+              <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
+                <SlidersHorizontal className="w-5 h-5 text-[#FF7A00]" />
+                <span>Konten per Modul</span>
+              </h3>
+              <p className="text-[10px] text-slate-400 mt-0.5">Distribusi jumlah konten aktif per modul sistem</p>
+            </div>
           </div>
 
           <div className="flex-grow flex flex-col justify-center h-[320px] mt-4">
@@ -614,7 +686,7 @@ export default function AdminDashboard() {
                 const pct = maxBarVal > 0 ? (bar.val / maxBarVal) * 100 : 0;
                 return (
                   <div key={idx} className="flex items-center text-xs">
-                    <span className="w-[160px] text-slate-600 pr-4 text-left font-semibold truncate">
+                    <span className="w-[120px] sm:w-[150px] text-slate-600 pr-3 sm:pr-4 text-left font-semibold truncate font-semibold">
                       {bar.label}
                     </span>
                     <div className="flex-1 flex items-center gap-3 min-w-0">
@@ -627,8 +699,8 @@ export default function AdminDashboard() {
                           }}
                         />
                       </div>
-                      <span className="font-mono font-bold text-slate-700 w-8 text-right shrink-0">
-                        {bar.val}
+                      <span className="font-mono font-bold text-slate-700 w-12 text-right shrink-0">
+                        {barLimitMode === 'dynamic' ? `${bar.val}` : `${bar.val}/${maxBarVal}`}
                       </span>
                     </div>
                   </div>
@@ -639,7 +711,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Real-time recent complaints (Aduan Masuk Terbaru) */}
-        <div className="lg:col-span-6 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between h-[420px]">
+        <div className="lg:col-span-6 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between h-auto lg:h-[420px]">
           <div className="flex flex-col h-full justify-between">
             <div>
               <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">

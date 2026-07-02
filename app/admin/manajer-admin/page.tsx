@@ -53,15 +53,20 @@ export default function ManajerAdminPage() {
   // Forms state
   const [usernameInput, setUsernameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
   const [roleInput, setRoleInput] = useState('ADMIN');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Edit states
   const [editingAdmin, setEditingAdmin] = useState<any | null>(null);
+  const [editUsernameInput, setEditUsernameInput] = useState('');
   const [editPasswordInput, setEditPasswordInput] = useState('');
+  const [editConfirmPasswordInput, setEditConfirmPasswordInput] = useState('');
   const [editRoleInput, setEditRoleInput] = useState('ADMIN');
   const [showEditPassword, setShowEditPassword] = useState(false);
+  const [showEditConfirmPassword, setShowEditConfirmPassword] = useState(false);
 
   // Delete states
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -112,8 +117,10 @@ export default function ManajerAdminPage() {
   const handleOpenAddModal = () => {
     setUsernameInput('');
     setPasswordInput('');
+    setConfirmPasswordInput('');
     setRoleInput('ADMIN');
     setShowPassword(false);
+    setShowConfirmPassword(false);
     setIsAddModalOpen(true);
   };
 
@@ -123,9 +130,12 @@ export default function ManajerAdminPage() {
 
   const handleOpenEditModal = (admin: any) => {
     setEditingAdmin(admin);
+    setEditUsernameInput(admin.username);
     setEditPasswordInput('');
+    setEditConfirmPasswordInput('');
     setEditRoleInput(admin.role);
     setShowEditPassword(false);
+    setShowEditConfirmPassword(false);
     setIsEditModalOpen(true);
   };
 
@@ -145,6 +155,10 @@ export default function ManajerAdminPage() {
       showNotification('Password minimal harus 6 karakter.', 'error');
       return;
     }
+    if (passwordInput !== confirmPasswordInput) {
+      showNotification('Konfirmasi password tidak cocok.', 'error');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -152,7 +166,7 @@ export default function ManajerAdminPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: usernameInput,
+          username: usernameInput.trim(),
           password: passwordInput,
           role: roleInput
         })
@@ -179,9 +193,20 @@ export default function ManajerAdminPage() {
     e.preventDefault();
     if (!editingAdmin) return;
 
-    if (editPasswordInput && editPasswordInput.trim().length < 6) {
-      showNotification('Password baru minimal harus 6 karakter.', 'error');
+    if (!editUsernameInput.trim()) {
+      showNotification('Username tidak boleh kosong.', 'error');
       return;
+    }
+
+    if (editPasswordInput) {
+      if (editPasswordInput.trim().length < 6) {
+        showNotification('Password baru minimal harus 6 karakter.', 'error');
+        return;
+      }
+      if (editPasswordInput !== editConfirmPasswordInput) {
+        showNotification('Konfirmasi password baru tidak cocok.', 'error');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -191,8 +216,9 @@ export default function ManajerAdminPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: editingAdmin.id,
+          username: editUsernameInput.trim(),
           role: editRoleInput,
-          password: editPasswordInput ? editPasswordInput : undefined
+          password: editPasswordInput ? editPasswordInput.trim() : undefined
         })
       });
 
@@ -201,7 +227,7 @@ export default function ManajerAdminPage() {
         showNotification('Data admin berhasil diperbarui!', 'success');
         setAdmins(prev => prev.map(item => {
           if (item.id === editingAdmin.id) {
-            return { ...item, role: editRoleInput };
+            return { ...item, username: editUsernameInput.trim(), role: editRoleInput };
           }
           return item;
         }));
@@ -273,16 +299,6 @@ export default function ManajerAdminPage() {
     );
   }
 
-  // Render Loading Screen
-  if (status === 'loading' || isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 select-none">
-        <Loader2 className="w-8 h-8 animate-spin text-[#0E3B66] mb-3" />
-        <span className="font-mono text-xs font-bold uppercase tracking-wider text-slate-400">Memuat data administrator...</span>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 text-left animate-fade-in relative">
       {/* Toast Notification */}
@@ -338,8 +354,17 @@ export default function ManajerAdminPage() {
               {sortedAdmins.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-12 text-center text-slate-400 select-none">
-                    <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                    <span className="font-mono text-[10px] font-bold uppercase">TIDAK ADA DATA ADMINISTRATOR</span>
+                    {status === 'loading' || isLoading ? (
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <Loader2 className="w-6 h-6 animate-spin text-[#0E3B66]" />
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Memuat data administrator...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                        <span className="font-mono text-[10px] font-bold uppercase">TIDAK ADA DATA ADMINISTRATOR</span>
+                      </>
+                    )}
                   </td>
                 </tr>
               ) : (
@@ -447,9 +472,30 @@ export default function ManajerAdminPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer flex items-center justify-center"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer flex items-center justify-center font-bold"
                   >
                     {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Konfirmasi Password</label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    value={confirmPasswordInput}
+                    onChange={(e) => setConfirmPasswordInput(e.target.value)}
+                    placeholder="Konfirmasi password"
+                    className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer flex items-center justify-center font-bold"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
                   </button>
                 </div>
               </div>
@@ -496,7 +542,7 @@ export default function ManajerAdminPage() {
 
       {/* EDIT ADMIN MODAL */}
       {isEditModalOpen && editingAdmin && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in font-inter">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-955/60 backdrop-blur-sm animate-fade-in font-inter">
           <div className="absolute inset-0" onClick={handleCloseEditModal} />
           <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 overflow-hidden flex flex-col relative z-10 animate-scale-in text-left">
             {/* Modal Header */}
@@ -516,12 +562,14 @@ export default function ManajerAdminPage() {
             {/* Modal Content */}
             <form onSubmit={handleEditAdmin} className="p-6 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Username (Tidak dapat diubah)</label>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Username</label>
                 <input
                   type="text"
-                  disabled
-                  value={editingAdmin.username}
-                  className="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm font-medium text-slate-400 select-none cursor-not-allowed"
+                  required
+                  value={editUsernameInput}
+                  onChange={(e) => setEditUsernameInput(e.target.value)}
+                  placeholder={editingAdmin.username}
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium"
                 />
               </div>
 
@@ -532,15 +580,35 @@ export default function ManajerAdminPage() {
                     type={showEditPassword ? 'text' : 'password'}
                     value={editPasswordInput}
                     onChange={(e) => setEditPasswordInput(e.target.value)}
-                    placeholder="Masukkan password baru"
+                    placeholder="••••••••"
                     className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium"
                   />
                   <button
                     type="button"
                     onClick={() => setShowEditPassword(!showEditPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer flex items-center justify-center"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer flex items-center justify-center font-bold"
                   >
                     {showEditPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Konfirmasi Password Baru</label>
+                <div className="relative">
+                  <input
+                    type={showEditConfirmPassword ? 'text' : 'password'}
+                    value={editConfirmPasswordInput}
+                    onChange={(e) => setEditConfirmPasswordInput(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowEditConfirmPassword(!showEditConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer flex items-center justify-center font-bold"
+                  >
+                    {showEditConfirmPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
                   </button>
                 </div>
               </div>

@@ -30,4 +30,4 @@ Aplikasi portal informasi dan database modern terpusat Dinas Kepemudaan, Olahrag
    ```
 5. **Buka di Browser**:
    Buka [http://localhost:3000](http://localhost:3000) untuk melihat web portal.
-   Buka [http://localhost:3000/admin](http://localhost:3000/admin) untuk masuk ke panel admin.
+   Buka [http://localhost:3000/admin](http://localhost:3000/login.admin) untuk masuk ke panel admin.

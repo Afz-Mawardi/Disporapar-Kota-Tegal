@@ -9,53 +9,35 @@ export default function DynamicTitle() {
   useEffect(() => {
     if (!pathname) return;
 
-    if (pathname === '/') {
-      document.title = 'DISPORAPAR Kota Tegal';
-      return;
-    }
+    const updateTitle = () => {
+      const isAdmin = pathname.startsWith('/admin') || pathname.startsWith('/login.admin');
+      const expectedTitle = isAdmin ? 'Admin - DISPORAPAR Kota Tegal' : 'DISPORAPAR Kota Tegal';
+      if (document.title !== expectedTitle) {
+        document.title = expectedTitle;
+      }
+    };
 
-    if (pathname.startsWith('/admin')) {
-      document.title = 'ADMIN - DISPORAPAR  Kota Tegal';
-      return;
-    }
+    // Run initially to set the correct title
+    updateTitle();
 
-    if (pathname.startsWith('/profil')) {
-      document.title = 'PROFIL - DISPORAPAR  Kota Tegal';
-      return;
-    }
+    // Set up MutationObserver to prevent title overrides (e.g. during Next.js HMR or route changes)
+    const observer = new MutationObserver(() => {
+      updateTitle();
+    });
 
-    if (
-      pathname.startsWith('/kepemudaan') ||
-      pathname.startsWith('/olahraga') ||
-      pathname.startsWith('/pariwisata') ||
-      pathname.startsWith('/bidang')
-    ) {
-      document.title = 'BIDANG - DISPORAPAR  Kota Tegal';
-      return;
-    }
+    observer.observe(document.head, {
+      subtree: true,
+      childList: true,
+      characterData: true
+    });
 
-    if (pathname.startsWith('/pelayanan')) {
-      document.title = 'LAYANAN - DISPORAPAR  Kota Tegal';
-      return;
-    }
+    // Set up an interval as a fallback for HMR/fast-refresh edge cases
+    const interval = setInterval(updateTitle, 200);
 
-    if (
-      pathname.startsWith('/berita') ||
-      pathname.startsWith('/agenda') ||
-      pathname.startsWith('/galeri') ||
-      pathname.startsWith('/publikasi')
-    ) {
-      document.title = 'PUBLIKASI - DISPORAPAR  Kota Tegal';
-      return;
-    }
-
-    if (pathname.startsWith('/kontak')) {
-      document.title = 'KONTAK - DISPORAPAR  Kota Tegal';
-      return;
-    }
-
-    // Fallback if none of the above matches
-    document.title = 'DISPORAPAR Kota Tegal';
+    return () => {
+      observer.disconnect();
+      clearInterval(interval);
+    };
   }, [pathname]);
 
   return null;

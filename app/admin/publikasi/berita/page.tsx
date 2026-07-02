@@ -413,8 +413,11 @@ export default function BeritaAdminPage() {
           {/* Category Filter */}
           <select
             value={selectedCategoryFilter}
-            onChange={(e) => setSelectedCategoryFilter(e.target.value)}
-            className="w-full sm:w-40 px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs text-slate-700 font-bold focus:outline-none focus:ring-2 focus:ring-[#0E3B66] cursor-pointer bg-white"
+            onChange={(e) => {
+              setSelectedCategoryFilter(e.target.value);
+              e.target.blur();
+            }}
+            className="w-full sm:w-40 px-3.5 py-2.5 border border-slate-200 hover:border-slate-350 hover:bg-slate-50 transition-all rounded-xl text-xs text-slate-700 font-bold focus:outline-none cursor-pointer bg-white"
           >
             <option value="Semua">Semua Kategori</option>
             {categoriesStore.news?.map((c) => (

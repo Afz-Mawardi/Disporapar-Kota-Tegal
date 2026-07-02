@@ -87,16 +87,23 @@ export async function GET() {
     }
 
     if (socialMediaList.length === 0) {
-      socialMediaList = [
-        { platform: 'instagram', label: 'Resmi', url: (officeInfoDb && officeInfoDb.instagramResmi && !officeInfoDb.instagramResmi.startsWith('[')) ? officeInfoDb.instagramResmi : (OFFICE_INFO.socialMedia?.instagramResmi || '') },
-        { platform: 'instagram', label: 'Wisata', url: officeInfoDb?.instagramTourism || (OFFICE_INFO.socialMedia?.instagramTourism || '') },
-        { platform: 'instagram', label: 'Pemuda', url: officeInfoDb?.instagramPemuda || (OFFICE_INFO.socialMedia?.instagramPemuda || '') },
-        { platform: 'youtube', label: 'YouTube', url: officeInfoDb?.youtube || (OFFICE_INFO.socialMedia?.youtube || '') }
-      ].filter(item => item.url !== '');
-
-      if (socialMediaList.length === 0 && OFFICE_INFO.socialMediaList) {
-        socialMediaList = OFFICE_INFO.socialMediaList;
-      }
+      const defaultList = OFFICE_INFO.socialMediaList || [];
+      socialMediaList = defaultList.map(item => {
+        let url = item.url;
+        if (officeInfoDb) {
+          if ((item.label === 'Dinas' || item.label === 'Resmi') && officeInfoDb.instagramResmi && !officeInfoDb.instagramResmi.startsWith('[')) {
+            url = officeInfoDb.instagramResmi;
+          } else if (item.label === 'Pemuda' && officeInfoDb.instagramPemuda) {
+            url = officeInfoDb.instagramPemuda;
+          } else if (item.label === 'Wisata' && officeInfoDb.instagramTourism) {
+            url = officeInfoDb.instagramTourism;
+          } else if (item.label === 'YouTube' && officeInfoDb.youtube) {
+            url = officeInfoDb.youtube;
+          }
+        }
+        return { ...item, url };
+      });
+      socialMediaList = socialMediaList.filter(item => item.url !== '');
     }
 
     const officeInfo = officeInfoDb ? {
@@ -105,7 +112,7 @@ export async function GET() {
       email: officeInfoDb.email,
       operationalHours: officeInfoDb.operationalHours,
       socialMedia: {
-        instagramResmi: (officeInfoDb.instagramResmi && !officeInfoDb.instagramResmi.startsWith('[')) ? officeInfoDb.instagramResmi : (socialMediaList.find(s => s.platform === 'instagram' && s.label === 'Resmi')?.url || ''),
+        instagramResmi: (officeInfoDb.instagramResmi && !officeInfoDb.instagramResmi.startsWith('[')) ? officeInfoDb.instagramResmi : (socialMediaList.find(s => s.platform === 'instagram' && (s.label === 'Dinas' || s.label === 'Resmi'))?.url || ''),
         instagramTourism: officeInfoDb.instagramTourism,
         instagramPemuda: officeInfoDb.instagramPemuda,
         youtube: officeInfoDb.youtube
@@ -153,8 +160,8 @@ export async function GET() {
       select: { id: true, username: true }
     });
     const users = usersDb.length > 0 ? usersDb : [
-      { id: 'slide-admin-1', username: 'admin123' },
-      { id: 'slide-admin-2', username: 'admin' }
+      { id: 'env-super-admin', username: process.env.DEFAULT_SUPER_ADMIN_USERNAME || 'superadmin' },
+      { id: 'env-regular-admin', username: process.env.DEFAULT_REGULAR_ADMIN_USERNAME || 'admin' }
     ];
 
     // 12. Fetch Bidang Cards (Kepemudaan, Olahraga, Pariwisata)
@@ -205,10 +212,49 @@ export async function GET() {
       retribusi
     });
   } catch (error) {
-    console.error('Failed to read database', error);
-    return NextResponse.json({ error: 'Failed to read database' }, { status: 500 });
+    console.error('Failed to read database, returning db.json instead:', error);
+
+    // Format db.json contents as expected by GET response
+    return NextResponse.json({
+      news: dbData.news || [],
+      events: dbData.events || [],
+      gallery: dbData.gallery || [],
+      services: dbData.services || [],
+      officeInfo: dbData.officeInfo || OFFICE_INFO,
+      welcomeMessage: dbData.welcomeMessage || WELCOME_MESSAGE,
+      heroSlides: dbData.heroSlides || [],
+      categories: dbData.categories || {
+        news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
+        gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
+        services: ['SOP', 'Formulir', 'Berkas Layanan'],
+        retribusi: ['Olahraga', 'Pariwisata', 'Kepemudaan']
+      },
+      homepageSettings: dbData.homepageSettings || INITIAL_HOMEPAGE_SETTINGS,
+      priorityPrograms: dbData.priorityPrograms || [],
+      users: [
+        { id: 'env-super-admin', username: process.env.DEFAULT_SUPER_ADMIN_USERNAME || 'superadmin' },
+        { id: 'env-regular-admin', username: process.env.DEFAULT_REGULAR_ADMIN_USERNAME || 'admin' }
+      ],
+      kepemudaanCards: (dbData.kepemudaanCards || []).map((c: any) => ({
+        ...c,
+        facilities: Array.isArray(c.facilities) ? c.facilities : (c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : [])
+      })),
+      olahragaCards: (dbData.olahragaCards || []).map((c: any) => ({
+        ...c,
+        facilities: Array.isArray(c.facilities) ? c.facilities : (c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : [])
+      })),
+      pariwisataCards: (dbData.pariwisataCards || []).map((c: any) => ({
+        ...c,
+        capacity: c.operationalHours || c.capacity || '',
+        facilities: Array.isArray(c.facilities) ? c.facilities : (c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : [])
+      })),
+      bidangBottomCards: dbData.bidangBottomCards || [],
+      retribusi: dbData.retribusi || [],
+      isFallback: true
+    });
   }
 }
+
 
 
 // POST: Sync frontend changes to MySQL and delete unused files
@@ -216,7 +262,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { type, data } = body;
-    
+
     if (type === 'news') {
       const newsArray = data.map((item: any) => ({
         id: item.id,
@@ -540,7 +586,7 @@ export async function POST(request: Request) {
       ]);
       saveToLocalDbJson('retribusi', retribusiArray);
     }
- else if (type === 'adminAccount') {
+    else if (type === 'adminAccount') {
       const { username: oldUsername, newUsername, newPassword } = data;
       const user = await prisma.user.findUnique({
         where: { username: oldUsername }
@@ -586,7 +632,7 @@ export async function POST(request: Request) {
     } else {
       return NextResponse.json({ error: 'Invalid data type' }, { status: 400 });
     }
-    
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to update database', error);

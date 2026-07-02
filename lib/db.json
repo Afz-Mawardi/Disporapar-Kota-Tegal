@@ -45,6 +45,7 @@
       "date": "10 Mei 2026",
       "imageUrl": "https://picsum.photos/seed/layanan_publik_news/800/600",
       "author": "Seksi Data & Informasi",
+      "featured": false,
       "showOnHomepage": false
     }
   ],

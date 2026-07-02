@@ -23,23 +23,30 @@ async function main() {
   await prisma.pariwisataCard.deleteMany();
   await prisma.bidangBottomCard.deleteMany();
   await prisma.retribusi.deleteMany();
-  // 2. Hash admin password with MD5 and insert Users
-  const md5Password = crypto.createHash('md5').update('admin123').digest('hex');
+  // 2. Hash admin password with MD5 and insert Users (read from process.env to avoid hardcoding in the codebase)
+  const superUsername = process.env.DEFAULT_SUPER_ADMIN_USERNAME || 'superadmin';
+  const superPassword = process.env.DEFAULT_SUPER_ADMIN_PASSWORD || 'superpassword123';
+  const regularUsername = process.env.DEFAULT_REGULAR_ADMIN_USERNAME || 'admin';
+  const regularPassword = process.env.DEFAULT_REGULAR_ADMIN_PASSWORD || 'adminpassword123';
+
+  const md5SuperPassword = crypto.createHash('md5').update(superPassword).digest('hex');
+  const md5RegularPassword = crypto.createHash('md5').update(regularPassword).digest('hex');
+
   await prisma.user.create({
     data: {
-      username: 'admin123',
-      password: md5Password,
+      username: superUsername,
+      password: md5SuperPassword,
       role: 'SUPER_ADMIN'
     }
   });
   await prisma.user.create({
     data: {
-      username: 'admin',
-      password: md5Password,
-      role: 'SUPER_ADMIN'
+      username: regularUsername,
+      password: md5RegularPassword,
+      role: 'ADMIN'
     }
   });
-  console.log('Admin users seeded with MD5 (admin and admin123) as SUPER_ADMIN.');
+  console.log('Admin users seeded from environment variables.');
 
   // 3. Read db.json
   const dbPath = path.join(process.cwd(), 'lib', 'db.json');
@@ -128,6 +135,7 @@ async function main() {
   // 8. Seed Office Info
   if (dbData.officeInfo) {
     const info = dbData.officeInfo;
+    const listStr = JSON.stringify(info.socialMediaList || []);
     await prisma.officeInfo.create({
       data: {
         id: 'default',
@@ -135,7 +143,7 @@ async function main() {
         phone: info.phone || '',
         email: info.email || '',
         operationalHours: info.operationalHours || '',
-        instagramResmi: info.socialMedia?.instagramResmi || '',
+        instagramResmi: listStr,
         instagramTourism: info.socialMedia?.instagramTourism || '',
         instagramPemuda: info.socialMedia?.instagramPemuda || '',
         youtube: info.socialMedia?.youtube || '',

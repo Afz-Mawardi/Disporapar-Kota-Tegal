@@ -34,7 +34,7 @@ export default function ScrollToTop() {
   };
 
   // Hide scroll-to-top button on admin pages
-  if (pathname && pathname.startsWith('/admin')) {
+  if (pathname && (pathname.startsWith('/admin') || pathname.startsWith('/login.admin'))) {
     return null;
   }
 

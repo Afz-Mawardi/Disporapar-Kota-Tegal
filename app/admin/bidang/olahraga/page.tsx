@@ -682,7 +682,7 @@ export default function OlahragaAdminPage() {
                 </div>
               ) : (
                 <>
-                  <div className="p-6 overflow-y-auto flex-1 space-y-5 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+                  <div className="p-6 overflow-y-auto flex-1 space-y-5">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Nama / Judul Sarana</label>
                       <input

@@ -203,16 +203,6 @@ export default function RiwayatAdminPage() {
     );
   }
 
-  // Render Loading Screen
-  if (status === 'loading' || isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 select-none">
-        <Loader2 className="w-8 h-8 animate-spin text-[#0E3B66] mb-3" />
-        <span className="font-mono text-xs font-bold uppercase tracking-wider text-slate-400">Memuat riwayat aktivitas...</span>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 text-left animate-fade-in relative font-inter">
       {/* Toast Notification */}
@@ -303,8 +293,17 @@ export default function RiwayatAdminPage() {
               {logs.length === 0 ? (
                 <tr>
                   <td colSpan={isSelectMode ? 4 : 3} className="py-12 text-center text-slate-400 select-none">
-                    <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                    <span className="font-mono text-[10px] font-bold uppercase">BELUM ADA RIWAYAT AKTIVITAS</span>
+                    {status === 'loading' || isLoading ? (
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <Loader2 className="w-6 h-6 animate-spin text-[#0E3B66]" />
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Memuat riwayat aktivitas...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                        <span className="font-mono text-[10px] font-bold uppercase">BELUM ADA RIWAYAT AKTIVITAS</span>
+                      </>
+                    )}
                   </td>
                 </tr>
               ) : (

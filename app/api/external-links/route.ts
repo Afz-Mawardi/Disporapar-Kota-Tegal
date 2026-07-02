@@ -30,8 +30,8 @@ export async function GET() {
     
     return NextResponse.json(links);
   } catch (error: any) {
-    console.error('Failed to get external links:', error);
-    return NextResponse.json({ error: 'Failed to retrieve external links.' }, { status: 500 });
+    console.error('Failed to get external links, returning defaults:', error);
+    return NextResponse.json(DEFAULT_LINKS);
   }
 }
 

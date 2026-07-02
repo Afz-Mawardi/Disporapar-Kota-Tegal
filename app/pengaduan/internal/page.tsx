@@ -69,14 +69,18 @@ export default function PengaduanInternalPage() {
     notificationTimerRef.current = setTimeout(() => setNotification(null), 4000);
   };
 
-  // Auto-close success modal after 3 seconds
+  // Listen for keyboard events to close success modal
   useEffect(() => {
-    if (showSuccessModal) {
-      const timer = setTimeout(() => {
-        setShowSuccessModal(false);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
+    if (!showSuccessModal) return;
+
+    const handleKeyDown = () => {
+      setShowSuccessModal(false);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [showSuccessModal]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -245,7 +249,8 @@ export default function PengaduanInternalPage() {
             className="fixed inset-0 z-[100] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 cursor-pointer"
           >
             <div
-              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-100 flex flex-col items-center text-center"
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-100 flex flex-col items-center text-center cursor-default"
             >
               <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 mb-5">
                 <CheckCircle className="w-10 h-10" />

@@ -13,7 +13,7 @@ export default function Footer() {
   const pathname = usePathname();
   const [officeInfo] = useOfficeInfo();
 
-  if (pathname && pathname.startsWith('/admin')) {
+  if (pathname && (pathname.startsWith('/admin') || pathname.startsWith('/login.admin'))) {
     return null;
   }
 
@@ -100,7 +100,7 @@ export default function Footer() {
   };
 
   return (
-    <footer id="footer" className="bg-gradient-to-b from-[#051424] to-[#030c16] text-slate-400 pt-16 border-t border-white/5 relative overflow-hidden">
+    <footer id="footer" className="bg-gradient-to-b from-[#051424] to-[#030c16] text-slate-400 pt-10 border-t border-white/5 relative overflow-hidden">
       {/* Decorative subtle background accents */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
@@ -188,7 +188,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom copyright segment */}
-      <div className="font-mono w-full bg-black border-t border-white/10 py-6 mt-12 relative z-10">
+      <div className="font-mono w-full bg-black border-t border-white/10 py-5 mt-10 relative z-10">
         <div className="text-center leading-relaxed max-w-[1200px] mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-center text-[10px] uppercase font-bold  text-slate-300 tracking-wider">
           copyright © 2026 Dinas Kepemudaan dan Olahraga dan Pariwisata Kota Tegal | Seluruh Hak Cipta Dilindungi
         </div>

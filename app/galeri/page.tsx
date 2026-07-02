@@ -1,18 +1,34 @@
-import { prisma } from '@/lib/prisma';
+import { prisma, checkDatabaseConnection } from '@/lib/prisma';
 import GaleriPageClient from './page.client';
 import dbData from '@/lib/db.json';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-  const galleryDb = await prisma.galleryPhoto.findMany({
-    orderBy: { createdAt: 'desc' }
-  });
+  let gallery: any[] = [];
+  if (await checkDatabaseConnection()) {
+    try {
+      const galleryDb = await prisma.galleryPhoto.findMany({
+        orderBy: { createdAt: 'desc' }
+      });
 
-  const gallery = galleryDb.map(item => ({
-    ...item,
-    createdAt: item.createdAt.toISOString()
-  }));
+      gallery = galleryDb.map(item => ({
+        ...item,
+        createdAt: item.createdAt.toISOString()
+      }));
+    } catch (error) {
+      console.warn("Database connection failed, falling back to local json storage:", error);
+      gallery = (dbData.gallery || []).map((item: any) => ({
+        ...item,
+        createdAt: item.createdAt || new Date().toISOString()
+      }));
+    }
+  } else {
+    gallery = (dbData.gallery || []).map((item: any) => ({
+      ...item,
+      createdAt: item.createdAt || new Date().toISOString()
+    }));
+  }
 
   // Load categories directly from db.json since it has no admin CRUD
   const initialCategories = dbData.categories || {
