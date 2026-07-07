@@ -151,9 +151,8 @@ export default function SambutanPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${
-            notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-          }`}
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+            }`}
         >
           {notification.type === 'success' ? (
             <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -200,7 +199,7 @@ export default function SambutanPage() {
                 <img src={welcomeMessage.imageUrl} alt={welcomeMessage.name} className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="w-44 h-56 rounded-2xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center text-slate-350 shrink-0 mx-auto md:mx-0 select-none">
+              <div className="w-44 h-56 rounded-2xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center text-slate-350 shrink-0 mx-auto md:mx-0">
                 <User className="w-12 h-12 opacity-30" />
                 <span className="text-[10px] font-mono font-bold mt-2">TANPA FOTO</span>
               </div>
@@ -263,9 +262,8 @@ export default function SambutanPage() {
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
                 {/* Local Upload */}
                 <div className="sm:col-span-4">
-                  <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 relative ${
-                    isDragOverWelcome ? 'border-accent bg-accent/5 scale-[1.02] shadow-md' : 'border-slate-300 bg-slate-50/50 hover:bg-slate-50'
-                  }`}>
+                  <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-all duration-200 relative ${isDragOverWelcome ? 'border-accent bg-accent/5 scale-[1.02] shadow-md' : 'border-slate-300 bg-slate-50/50 hover:bg-slate-50'
+                    }`}>
                     <Upload className="w-5 h-5 text-slate-400" />
                     <span className="text-[9px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Pilih Foto</span>
                     <input

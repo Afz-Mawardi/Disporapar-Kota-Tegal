@@ -8,11 +8,21 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  username String @unique
-  password String
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
 
   @@map("user")
+}
+
+model AdminLog {
+  id        String   @id @default(uuid())
+  action    String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@map("riwayat_admin")
 }
 
 model News {
@@ -50,6 +60,7 @@ model GalleryPhoto {
   title          String   @db.Text
   category       String
   imageUrl       String   @db.Text
+  date           String   @default("")
   showOnHomepage Boolean  @default(true)
   createdAt      DateTime @default(now())
 
@@ -104,22 +115,6 @@ model HeroSlide {
   createdAt DateTime @default(now())
 
   @@map("beranda")
-}
-
-model Category {
-  id     String @id @default(uuid())
-  module String
-  name   String
-
-  @@unique([module, name])
-  @@map("kategori")
-}
-
-model HomepageSetting {
-  id   String @id @default("default")
-  data Json
-
-  @@map("pengaturan_beranda")
 }
 
 model PriorityProgram {
@@ -180,6 +175,7 @@ model BidangBottomCard {
   title        String   @db.Text
   description  String   @db.Text
   buttonText   String   @db.Text
+  buttonLink   String?  @db.Text
   imageUrl     String   @db.Text
   sectionTag   String?  @db.Text
   sectionTitle String?  @db.Text
@@ -196,4 +192,25 @@ model Retribusi {
   createdAt DateTime @default(now())
 
   @@map("retribusi")
+}
+
+model Complaint {
+  id        String   @id @default(uuid())
+  title     String   @db.Text
+  content   String   @db.Text
+  imageUrl  String   @db.Text
+  contact   String   @db.Text
+  status    String   @default("Baru") // Baru, Diproses, Selesai, Ditolak
+  notes     String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@map("pengaduan_internal")
+}
+
+model ExternalLink {
+  id    String @id // 'laporgub', 'lapor', 'ppid'
+  title String
+  url   String @db.Text
+
+  @@map("link_eksternal")
 }

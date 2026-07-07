@@ -1,15 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { signOut } from 'next-auth/react';
 import {
-  NEWS as initialNews,
-  EVENTS as initialEvents,
-  GALLERY_PHOTOS as initialGallery,
-  PUBLIC_SERVICES as initialServices,
-  OFFICE_INFO as initialOfficeInfo,
-  WELCOME_MESSAGE as initialWelcomeMessage,
-  HERO_SLIDES as initialHeroSlides,
-  PRIORITY_PROGRAMS as initialPriorityPrograms,
   News,
   EventAgenda,
   PublicService,
@@ -18,15 +11,25 @@ import {
   PriorityProgram,
   HomepageSection,
   HomepageSettings,
-  INITIAL_HOMEPAGE_SETTINGS as initialHomepageSettings,
-  DEFAULT_KEPEMUDAAN_CARDS as initialKepemudaanCards,
-  DEFAULT_OLAHRAGA_CARDS as initialOlahragaCards,
-  DEFAULT_PARIWISATA_CARDS as initialPariwisataCards,
   BidangCard,
-  Retribusi,
-  DEFAULT_RETRIBUSI as initialRetribusi
-} from './data';
+  Retribusi
+} from './types';
+import dbData from './db.json';
 
+// Cast JSON mock data as default fallbacks
+const initialNews = dbData.news as News[];
+const initialEvents = dbData.events as EventAgenda[];
+const initialGallery = dbData.gallery as any[];
+const initialServices = dbData.services as PublicService[];
+const initialOfficeInfo = dbData.officeInfo as any;
+const initialWelcomeMessage = dbData.welcomeMessage as WelcomeMessage;
+const initialHeroSlides = dbData.heroSlides as HeroSlide[];
+const initialPriorityPrograms = dbData.priorityPrograms as PriorityProgram[];
+const initialHomepageSettings = dbData.homepageSettings as unknown as HomepageSettings;
+const initialKepemudaanCards = dbData.kepemudaanCards as BidangCard[];
+const initialOlahragaCards = dbData.olahragaCards as BidangCard[];
+const initialPariwisataCards = dbData.pariwisataCards as BidangCard[];
+const initialRetribusi = dbData.retribusi as Retribusi[];
 
 export interface BidangBottomCard {
   id: 'kepemudaan' | 'olahraga' | 'pariwisata';
@@ -40,41 +43,7 @@ export interface BidangBottomCard {
   sectionTitle?: string;
 }
 
-export const initialBidangBottomCards: BidangBottomCard[] = [
-  {
-    id: 'kepemudaan',
-    tag: 'Layanan & Kemitraan Pemuda',
-    title: 'Kemitraan Organisasi & Legalitas Kepemudaan',
-    description: 'DISPORAPAR memandu, membina legalitas organisasi kepemudaan, serta memfasilitasi gerakan KNPI, Karang Taruna, dan Forum Anak Tegal (FAT) dalam upaya mewujudkan sinergi dan pemberdayaan potensi pemuda Kota Tegal secara berkelanjutan.',
-    buttonText: 'Hubungi Kemitraan Pemuda',
-    buttonLink: '/pelayanan',
-    imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800',
-    sectionTag: 'Program Strategis & Layanan Pemuda',
-    sectionTitle: 'Fasilitas Pembinaan Pemuda Kota Tegal'
-  },
-  {
-    id: 'olahraga',
-    tag: 'Pemberdayaan Atlet Daerah',
-    title: 'Pemusatan Latihan & Pembinaan Olahraga Berkelanjutan',
-    description: 'DISPORAPAR bersinergi erat bersama KONI (Komite Olahraga Nasional Indonesia) Kota Tegal secara terpadu mengelola pemusatan latihan atlet usia dini berkala, peningkatan kualifikasi lisensi pelatih nasional, serta penyelenggaraan bonus apresiasi kejuaraan PORPROV & PON.',
-    buttonText: 'Hubungi Layanan Atlet & KONI',
-    buttonLink: '/pelayanan',
-    imageUrl: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=800',
-    sectionTag: 'Sarana & Fasilitas Olahraga',
-    sectionTitle: 'Pusat Kegiatan Keolahragaan Kota Tegal'
-  },
-  {
-    id: 'pariwisata',
-    tag: 'Mitra Pelaku Usaha Wisata',
-    title: 'Kembangkan Usaha Pariwisata & Kuliner Kreatif Anda Bersama Kami',
-    description: 'DISPORAPAR mendukung penuh pelaku industri penginapan, restoran Sate Tegal legendaris, agen perjalanan, serta pemandu wisata bahari untuk mengajukan data usaha resmi agar terdaftar secara luas di bawah rekomendasi katalog pariwisata terpadu.',
-    buttonText: 'Urus Izin Usaha & TDUP',
-    buttonLink: '/pelayanan',
-    imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800',
-    sectionTag: 'Destinasi Wisata',
-    sectionTitle: 'Destinasi Wisata Terpopuler & Unggulan'
-  }
-];
+export const initialBidangBottomCards: BidangBottomCard[] = dbData.bidangBottomCards as BidangBottomCard[];
 
 // Helper to check if running in client-side
 const isClient = typeof window !== 'undefined';
@@ -196,147 +165,163 @@ export const getStoredPriorityPrograms = (): PriorityProgram[] => {
 };
 
 // Set values in LocalStorage and trigger update event to sync other pages
-export const saveStoredNews = (data: News[]) => {
-  if (isClient) {
-    try {
+export const saveStoredNews = async (data: News[]): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'news', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_news', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-      
-      // Persist to server db.json via API route
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'news', data })
-      }).catch(err => console.error('Failed to save news to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save news to server database', e);
+    return false;
   }
 };
 
-export const saveStoredEvents = (data: EventAgenda[]) => {
-  if (isClient) {
-    try {
+export const saveStoredEvents = async (data: EventAgenda[]): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'events', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_events', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-
-      // Persist to server db.json via API route
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'events', data })
-      }).catch(err => console.error('Failed to save events to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save events to server database', e);
+    return false;
   }
 };
 
-export const saveStoredGallery = (data: typeof initialGallery) => {
-  if (isClient) {
-    try {
+export const saveStoredGallery = async (data: typeof initialGallery): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'gallery', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_gallery', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-
-      // Persist to server db.json via API route
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'gallery', data })
-      }).catch(err => console.error('Failed to save gallery to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save gallery to server database', e);
+    return false;
   }
 };
 
-export const saveStoredServices = (data: PublicService[]) => {
-  if (isClient) {
-    try {
+export const saveStoredServices = async (data: PublicService[]): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'services', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_services', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-
-      // Persist to server db.json via API route
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'services', data })
-      }).catch(err => console.error('Failed to save services to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save services to server database', e);
+    return false;
   }
 };
 
-export const saveStoredOfficeInfo = (data: typeof initialOfficeInfo) => {
-  if (isClient) {
-    try {
+export const saveStoredOfficeInfo = async (data: typeof initialOfficeInfo): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'officeInfo', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_office_info', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-
-      // Persist to server db.json via API route
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'officeInfo', data })
-      }).catch(err => console.error('Failed to save office info to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save office info to server database', e);
+    return false;
   }
 };
 
-export const saveStoredWelcomeMessage = (data: WelcomeMessage) => {
-  if (isClient) {
-    try {
+export const saveStoredWelcomeMessage = async (data: WelcomeMessage): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'welcomeMessage', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_welcome_message', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-
-      // Persist to server db.json via API route
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'welcomeMessage', data })
-      }).catch(err => console.error('Failed to save welcome message to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save welcome message to server database', e);
+    return false;
   }
 };
 
-export const saveStoredHeroSlides = (data: HeroSlide[]) => {
-  if (isClient) {
-    try {
+export const saveStoredHeroSlides = async (data: HeroSlide[]): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'heroSlides', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_hero_slides', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-
-      // Persist to server db.json via API route
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'heroSlides', data })
-      }).catch(err => console.error('Failed to save hero slides to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save hero slides to server database', e);
+    return false;
   }
 };
 
-export const saveStoredPriorityPrograms = (data: PriorityProgram[]) => {
-  if (isClient) {
-    try {
+export const saveStoredPriorityPrograms = async (data: PriorityProgram[]): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'priorityPrograms', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_priority_programs', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-
-      // Persist to server db.json via API route
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'priorityPrograms', data })
-      }).catch(err => console.error('Failed to save priority programs to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save priority programs to server database', e);
+    return false;
   }
 };
 
@@ -367,28 +352,33 @@ export const getStoredCategories = (): CategoryStore => {
   }
 };
 
-export const saveStoredCategories = (data: CategoryStore) => {
-  if (isClient) {
-    try {
+export const saveStoredCategories = async (data: CategoryStore): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'categories', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_categories', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-
-      // Persist to server db.json via API route
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'categories', data })
-      }).catch(err => console.error('Failed to save categories to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save categories to server database', e);
+    return false;
   }
 };
 
 // Shared Promise reference to deduplicate parallel API calls on mount
 let activeSyncPromise: Promise<void> | null = null;
+let isSyncedGlobal = false;
+let adminSyncedGlobal = false;
 
-const syncWithServer = async () => {
+const syncWithServer = async (force = false) => {
+  if (isSyncedGlobal && !force) return;
   if (activeSyncPromise) return activeSyncPromise;
 
   activeSyncPromise = (async () => {
@@ -396,6 +386,18 @@ const syncWithServer = async () => {
       const res = await fetch('/api/data', { cache: 'no-store' });
       if (res.ok) {
         const db = await res.json();
+        
+        // Check if database connection failed and fell back to db.json
+        if (db.isFallback) {
+          const isAdmin = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+          if (isAdmin) {
+            localStorage.removeItem('disporapar_admin_login_time');
+            localStorage.removeItem('disporapar_admin_last_activity');
+            signOut({ callbackUrl: '/login.admin?reason=db_error' });
+            return;
+          }
+        }
+
         if (db.news) localStorage.setItem('disporapar_news', JSON.stringify(db.news));
         if (db.events) localStorage.setItem('disporapar_events', JSON.stringify(db.events));
         if (db.gallery) localStorage.setItem('disporapar_gallery', JSON.stringify(db.gallery));
@@ -412,6 +414,7 @@ const syncWithServer = async () => {
         if (db.bidangBottomCards) localStorage.setItem('disporapar_bidang_bottom_cards', JSON.stringify(db.bidangBottomCards));
         if (db.retribusi) localStorage.setItem('disporapar_retribusi', JSON.stringify(db.retribusi));
 
+        isSyncedGlobal = true;
         
         // Dispatch update to sync all states
         window.dispatchEvent(new Event('disporapar_data_update'));
@@ -429,231 +432,85 @@ const syncWithServer = async () => {
 
 // Reactive custom hooks that listen to changes
 // Initialize with static default data to guarantee SSR matches initial client render
-export function useNews() {
-  const [data, setData] = useState<News[]>(initialNews);
+function useDataStore<T>(
+  initialData: T | undefined,
+  fallbackData: T,
+  getStored: () => T,
+  saveStored: (data: T) => any
+) {
+  const [data, setData] = useState<T>(initialData !== undefined ? initialData : fallbackData);
 
   useEffect(() => {
-    setData(getStoredNews());
+    setData(getStored());
     
     if (isClient) {
-      syncWithServer();
+      const isAdmin = window.location.pathname.startsWith('/admin');
+      if (isAdmin && !adminSyncedGlobal) {
+        adminSyncedGlobal = true;
+        syncWithServer(true);
+      } else {
+        syncWithServer();
+      }
     }
     
     const handleUpdate = () => {
-      setData(getStoredNews());
+      setData(getStored());
     };
 
     window.addEventListener('disporapar_data_update', handleUpdate);
     return () => {
       window.removeEventListener('disporapar_data_update', handleUpdate);
     };
-  }, []);
+  }, [getStored]);
 
-  const updateData = (newData: News[]) => {
-    saveStoredNews(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
-}
-
-export function useEvents() {
-  const [data, setData] = useState<EventAgenda[]>(initialEvents);
-
-  useEffect(() => {
-    setData(getStoredEvents());
-    
-    if (isClient) {
-      syncWithServer();
+  const updateData = async (newData: T): Promise<boolean> => {
+    const result = saveStored(newData);
+    if (result instanceof Promise) {
+      const success = await result;
+      if (success) {
+        setData(newData);
+      }
+      return success;
+    } else {
+      setData(newData);
+      return true;
     }
-    
-    const handleUpdate = () => {
-      setData(getStoredEvents());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: EventAgenda[]) => {
-    saveStoredEvents(newData);
-    setData(newData);
   };
 
   return [data, updateData] as const;
 }
 
-export function useGallery() {
-  const [data, setData] = useState<typeof initialGallery>(initialGallery);
-
-  useEffect(() => {
-    setData(getStoredGallery());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredGallery());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: typeof initialGallery) => {
-    saveStoredGallery(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function useNews(initialData?: News[]) {
+  return useDataStore(initialData, initialNews, getStoredNews, saveStoredNews);
 }
 
-export function usePublicServices() {
-  const [data, setData] = useState<PublicService[]>(initialServices);
-
-  useEffect(() => {
-    setData(getStoredServices());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredServices());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: PublicService[]) => {
-    saveStoredServices(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function useEvents(initialData?: EventAgenda[]) {
+  return useDataStore(initialData, initialEvents, getStoredEvents, saveStoredEvents);
 }
 
-export function useOfficeInfo() {
-  const [data, setData] = useState<typeof initialOfficeInfo>(initialOfficeInfo);
-
-  useEffect(() => {
-    setData(getStoredOfficeInfo());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredOfficeInfo());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: typeof initialOfficeInfo) => {
-    saveStoredOfficeInfo(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function useGallery(initialData?: typeof initialGallery) {
+  return useDataStore(initialData, initialGallery, getStoredGallery, saveStoredGallery);
 }
 
-export function useCategories() {
-  const [data, setData] = useState<CategoryStore>(initialCategories);
-
-  useEffect(() => {
-    setData(getStoredCategories());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredCategories());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: CategoryStore) => {
-    saveStoredCategories(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function usePublicServices(initialData?: PublicService[]) {
+  return useDataStore(initialData, initialServices, getStoredServices, saveStoredServices);
 }
 
-export function useWelcomeMessage() {
-  const [data, setData] = useState<WelcomeMessage>(initialWelcomeMessage);
-
-  useEffect(() => {
-    setData(getStoredWelcomeMessage());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredWelcomeMessage());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: WelcomeMessage) => {
-    saveStoredWelcomeMessage(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function useOfficeInfo(initialData?: typeof initialOfficeInfo) {
+  return useDataStore(initialData, initialOfficeInfo, getStoredOfficeInfo, saveStoredOfficeInfo);
 }
 
-export function useHeroSlides() {
-  const [data, setData] = useState<HeroSlide[]>(initialHeroSlides);
-
-  useEffect(() => {
-    setData(getStoredHeroSlides());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredHeroSlides());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: HeroSlide[]) => {
-    saveStoredHeroSlides(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function useCategories(initialData?: CategoryStore) {
+  return useDataStore(initialData, initialCategories, getStoredCategories, saveStoredCategories);
 }
 
-// Homepage Section types and initial settings are imported from './data'
+export function useWelcomeMessage(initialData?: WelcomeMessage) {
+  return useDataStore(initialData, initialWelcomeMessage, getStoredWelcomeMessage, saveStoredWelcomeMessage);
+}
+
+export function useHeroSlides(initialData?: HeroSlide[]) {
+  return useDataStore(initialData, initialHeroSlides, getStoredHeroSlides, saveStoredHeroSlides);
+}
 
 export const getStoredHomepageSettings = (): HomepageSettings => {
   if (!isClient) return initialHomepageSettings;
@@ -668,76 +525,32 @@ export const getStoredHomepageSettings = (): HomepageSettings => {
   }
 };
 
-export const saveStoredHomepageSettings = (data: HomepageSettings) => {
-  if (isClient) {
-    try {
+export const saveStoredHomepageSettings = async (data: HomepageSettings): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'homepageSettings', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_homepage_settings', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'homepageSettings', data })
-      }).catch(err => console.error('Failed to save homepage settings to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save homepage settings to server database', e);
+    return false;
   }
 };
 
-export function useHomepageSettings() {
-  const [data, setData] = useState<HomepageSettings>(initialHomepageSettings);
-
-  useEffect(() => {
-    setData(getStoredHomepageSettings());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredHomepageSettings());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: HomepageSettings) => {
-    saveStoredHomepageSettings(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function useHomepageSettings(initialData?: HomepageSettings) {
+  return useDataStore(initialData, initialHomepageSettings, getStoredHomepageSettings, saveStoredHomepageSettings);
 }
 
-export function usePriorityPrograms() {
-  const [data, setData] = useState<PriorityProgram[]>(initialPriorityPrograms);
-
-  useEffect(() => {
-    setData(getStoredPriorityPrograms());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredPriorityPrograms());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: PriorityProgram[]) => {
-    saveStoredPriorityPrograms(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function usePriorityPrograms(initialData?: PriorityProgram[]) {
+  return useDataStore(initialData, initialPriorityPrograms, getStoredPriorityPrograms, saveStoredPriorityPrograms);
 }
 
 // ==========================================
@@ -756,48 +569,28 @@ export const getStoredKepemudaanCards = (): BidangCard[] => {
   }
 };
 
-export const saveStoredKepemudaanCards = (data: BidangCard[]) => {
-  if (isClient) {
-    try {
+export const saveStoredKepemudaanCards = async (data: BidangCard[]): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'kepemudaanCards', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_kepemudaan_cards', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'kepemudaanCards', data })
-      }).catch(err => console.error('Failed to save kepemudaan cards to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save kepemudaan cards to server database', e);
+    return false;
   }
 };
 
-export function useKepemudaanCards() {
-  const [data, setData] = useState<BidangCard[]>(initialKepemudaanCards);
-
-  useEffect(() => {
-    setData(getStoredKepemudaanCards());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredKepemudaanCards());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: BidangCard[]) => {
-    saveStoredKepemudaanCards(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function useKepemudaanCards(initialData?: BidangCard[]) {
+  return useDataStore(initialData, initialKepemudaanCards, getStoredKepemudaanCards, saveStoredKepemudaanCards);
 }
 
 // ==========================================
@@ -816,48 +609,28 @@ export const getStoredOlahragaCards = (): BidangCard[] => {
   }
 };
 
-export const saveStoredOlahragaCards = (data: BidangCard[]) => {
-  if (isClient) {
-    try {
+export const saveStoredOlahragaCards = async (data: BidangCard[]): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'olahragaCards', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_olahraga_cards', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'olahragaCards', data })
-      }).catch(err => console.error('Failed to save olahraga cards to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save olahraga cards to server database', e);
+    return false;
   }
 };
 
-export function useOlahragaCards() {
-  const [data, setData] = useState<BidangCard[]>(initialOlahragaCards);
-
-  useEffect(() => {
-    setData(getStoredOlahragaCards());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredOlahragaCards());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: BidangCard[]) => {
-    saveStoredOlahragaCards(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function useOlahragaCards(initialData?: BidangCard[]) {
+  return useDataStore(initialData, initialOlahragaCards, getStoredOlahragaCards, saveStoredOlahragaCards);
 }
 
 // ==========================================
@@ -876,48 +649,28 @@ export const getStoredPariwisataCards = (): BidangCard[] => {
   }
 };
 
-export const saveStoredPariwisataCards = (data: BidangCard[]) => {
-  if (isClient) {
-    try {
+export const saveStoredPariwisataCards = async (data: BidangCard[]): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'pariwisataCards', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_pariwisata_cards', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'pariwisataCards', data })
-      }).catch(err => console.error('Failed to save pariwisata cards to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save pariwisata cards to server database', e);
+    return false;
   }
 };
 
-export function usePariwisataCards() {
-  const [data, setData] = useState<BidangCard[]>(initialPariwisataCards);
-
-  useEffect(() => {
-    setData(getStoredPariwisataCards());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredPariwisataCards());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: BidangCard[]) => {
-    saveStoredPariwisataCards(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function usePariwisataCards(initialData?: BidangCard[]) {
+  return useDataStore(initialData, initialPariwisataCards, getStoredPariwisataCards, saveStoredPariwisataCards);
 }
 
 // ==========================================
@@ -936,50 +689,33 @@ export const getStoredBidangBottomCards = (): BidangBottomCard[] => {
   }
 };
 
-export const saveStoredBidangBottomCards = (data: BidangBottomCard[]) => {
-  if (isClient) {
-    try {
+export const saveStoredBidangBottomCards = async (data: BidangBottomCard[]): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'bidangBottomCards', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_bidang_bottom_cards', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'bidangBottomCards', data })
-      }).catch(err => console.error('Failed to save bidang bottom cards to server database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save bidang bottom cards to server database', e);
+    return false;
   }
 };
 
-export function useBidangBottomCards() {
-  const [data, setData] = useState<BidangBottomCard[]>(initialBidangBottomCards);
-
-  useEffect(() => {
-    setData(getStoredBidangBottomCards());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredBidangBottomCards());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: BidangBottomCard[]) => {
-    saveStoredBidangBottomCards(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function useBidangBottomCards(initialData?: BidangBottomCard[]) {
+  return useDataStore(initialData, initialBidangBottomCards, getStoredBidangBottomCards, saveStoredBidangBottomCards);
 }
 
+// ==========================================
+// Retribusi Store
+// ==========================================
 export const getStoredRetribusi = (): Retribusi[] => {
   if (!isClient) return initialRetribusi;
   try {
@@ -993,48 +729,28 @@ export const getStoredRetribusi = (): Retribusi[] => {
   }
 };
 
-export const saveStoredRetribusi = (data: Retribusi[]) => {
-  if (isClient) {
-    try {
+export const saveStoredRetribusi = async (data: Retribusi[]): Promise<boolean> => {
+  if (!isClient) return false;
+  try {
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'retribusi', data })
+    });
+    if (res.ok) {
       localStorage.setItem('disporapar_retribusi', JSON.stringify(data));
       window.dispatchEvent(new Event('disporapar_data_update'));
-      fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'retribusi', data })
-      }).catch(err => console.error('Failed to save retribusi to database', err));
-    } catch (e) {
-      console.error(e);
+      return true;
     }
+    return false;
+  } catch (e) {
+    console.error('Failed to save retribusi to database', e);
+    return false;
   }
 };
 
-export function useRetribusi() {
-  const [data, setData] = useState<Retribusi[]>(initialRetribusi);
-
-  useEffect(() => {
-    setData(getStoredRetribusi());
-    
-    if (isClient) {
-      syncWithServer();
-    }
-    
-    const handleUpdate = () => {
-      setData(getStoredRetribusi());
-    };
-
-    window.addEventListener('disporapar_data_update', handleUpdate);
-    return () => {
-      window.removeEventListener('disporapar_data_update', handleUpdate);
-    };
-  }, []);
-
-  const updateData = (newData: Retribusi[]) => {
-    saveStoredRetribusi(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
+export function useRetribusi(initialData?: Retribusi[]) {
+  return useDataStore(initialData, initialRetribusi, getStoredRetribusi, saveStoredRetribusi);
 }
 
 

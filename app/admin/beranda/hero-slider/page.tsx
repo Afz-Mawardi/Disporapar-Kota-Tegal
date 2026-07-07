@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useHeroSlides } from '@/lib/data-store';
-import { HeroSlide } from '@/lib/data';
+import { HeroSlide } from '@/lib/types';
 
 // Helper to convert image and upload to server
 const convertImageToWebP = (file: File): Promise<string> => {
@@ -196,9 +196,8 @@ export default function HeroSliderPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${
-            notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-          }`}
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+            }`}
         >
           {notification.type === 'success' ? (
             <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -258,17 +257,17 @@ export default function HeroSliderPage() {
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => openForm('edit', slide)}
-                          className="p-2 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
+                          className="p-1.5 text-[#0E3B66] bg-transparent border border-transparent hover:!bg-[#0E3B66] hover:!text-white hover:!border-[#0E3B66] rounded-xl transition-all cursor-pointer"
                           title="Ubah slide"
                         >
-                          <Edit2 className="w-3.5 h-3.5" />
+                          <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => openDeleteConfirm(slide)}
-                          className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
+                          className="p-1.5 text-red-600 bg-transparent border border-transparent hover:!bg-red-600 hover:!text-white hover:!border-red-600 rounded-xl transition-all cursor-pointer"
                           title="Hapus slide"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -308,7 +307,7 @@ export default function HeroSliderPage() {
               {modalType === 'delete' ? (
                 <div className="space-y-4">
                   <p className="text-xs text-slate-500 leading-relaxed font-inter">
-                    Apakah Anda yakin ingin menghapus slide hero dengan judul <span className="font-bold text-slate-850">"{editingItem?.title}"</span>? Tindakan ini tidak dapat dibatalkan.
+                    Apakah Anda yakin ingin menghapus slide hero dengan judul <span className="font-bold text-slate-850">&quot;{editingItem?.title}&quot;</span>? Tindakan ini tidak dapat dibatalkan.
                   </p>
                   <div className="flex justify-end gap-3 pt-2">
                     <button
@@ -321,6 +320,7 @@ export default function HeroSliderPage() {
                     <button
                       type="submit"
                       className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                      style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
                     >
                       Ya, Hapus
                     </button>
@@ -370,9 +370,8 @@ export default function HeroSliderPage() {
                     <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Gambar Background Hero</label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Local Upload */}
-                      <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${
-                        isDragOverModal ? 'border-accent bg-accent/5 scale-[1.02] shadow-md' : 'border-slate-300 bg-slate-50/50 hover:bg-slate-50'
-                      }`}>
+                      <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${isDragOverModal ? 'border-accent bg-accent/5 scale-[1.02] shadow-md' : 'border-slate-300 bg-slate-50/50 hover:bg-slate-50'
+                        }`}>
                         <Upload className="w-5 h-5 text-slate-400" />
                         <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Gambar</span>
                         <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 2MB (WEBP/PNG/JPG/JPEG)</span>

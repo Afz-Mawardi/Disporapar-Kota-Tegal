@@ -10,7 +10,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { usePriorityPrograms } from '@/lib/data-store';
-import { PriorityProgram } from '@/lib/data';
+import { PriorityProgram } from '@/lib/types';
 
 export default function PilarProgramPage() {
   const [priorityPrograms, setPriorityPrograms] = usePriorityPrograms();
@@ -140,9 +140,8 @@ export default function PilarProgramPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${
-            notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-          }`}
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+            }`}
         >
           {notification.type === 'success' ? (
             <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -167,13 +166,12 @@ export default function PilarProgramPage() {
             openForm('add');
           }}
           disabled={priorityPrograms.length >= 3}
-          className={`w-full sm:w-auto px-5 py-2.5 font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer ${
-            priorityPrograms.length >= 3 ? 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300' : 'bg-accent hover:bg-orange-500 text-white'
-          }`}
-          title={priorityPrograms.length >= 3 ? 'Maksimal 3 item program' : 'Tambah pilar program'}
+          className={`w-full sm:w-auto px-5 py-2.5 font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer ${priorityPrograms.length >= 3 ? 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300' : 'bg-accent hover:bg-orange-500 text-white'
+            }`}
+          title={priorityPrograms.length >= 3 ? 'Maksimal 3 item program' : 'Tambah (max: 3)'}
         >
           <Plus className="w-4 h-4" />
-          <span>Tambah Pilar Program</span>
+          <span>Tambah (max: 3)</span>
         </button>
       </div>
 
@@ -236,17 +234,17 @@ export default function PilarProgramPage() {
                           </button>
                           <button
                             onClick={() => openForm('edit', program)}
-                            className="p-2 bg-slate-50 hover:bg-[#0E3B66] hover:text-white border border-slate-200 rounded-lg text-[#0E3B66] transition-colors cursor-pointer"
+                            className="p-1.5 text-[#0E3B66] bg-transparent border border-transparent hover:!bg-[#0E3B66] hover:!text-white hover:!border-[#0E3B66] rounded-xl transition-all cursor-pointer"
                             title="Ubah program"
                           >
-                            <Edit2 className="w-3.5 h-3.5" />
+                            <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => openDeleteConfirm(program)}
-                            className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 transition-colors cursor-pointer"
+                            className="p-1.5 text-red-600 bg-transparent border border-transparent hover:!bg-red-600 hover:!text-white hover:!border-red-600 rounded-xl transition-all cursor-pointer"
                             title="Hapus program"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -273,7 +271,7 @@ export default function PilarProgramPage() {
           <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-150 overflow-hidden">
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <h3 className="text-sm font-black text-[#0E3B66] uppercase tracking-wider font-mono">
-                {modalType === 'add' ? 'Tambah Pilar Program' : modalType === 'edit' ? 'Ubah Pilar Program' : 'Konfirmasi Hapus'}
+                {modalType === 'add' ? 'Tambah (max: 3)' : modalType === 'edit' ? 'Ubah Pilar Program' : 'Konfirmasi Hapus'}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -287,7 +285,7 @@ export default function PilarProgramPage() {
               {modalType === 'delete' ? (
                 <div className="space-y-4">
                   <p className="text-xs text-slate-500 leading-relaxed font-inter">
-                    Apakah Anda yakin ingin menghapus pilar program prioritas <span className="font-bold text-slate-850">"{editingItem?.title}"</span>? Tindakan ini tidak dapat dibatalkan.
+                    Apakah Anda yakin ingin menghapus pilar program prioritas <span className="font-bold text-slate-850">&quot;{editingItem?.title}&quot;</span>? Tindakan ini tidak dapat dibatalkan.
                   </p>
                   <div className="flex justify-end gap-3 pt-2">
                     <button
@@ -300,6 +298,7 @@ export default function PilarProgramPage() {
                     <button
                       type="submit"
                       className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                      style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
                     >
                       Ya, Hapus
                     </button>

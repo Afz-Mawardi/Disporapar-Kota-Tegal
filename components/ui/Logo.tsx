@@ -38,7 +38,7 @@ export default function Logo({ isWhiteNav, variant, className = '', showEmblem =
       {showEmblem && (
         <div className="relative shrink-0">
           <Image
-            src="/aset/tegal-emblem.svg"
+            src="/assets/tegal-emblem.svg"
             alt="Kota Tegal Shield Emblem"
             width={38}
             height={44}
@@ -47,7 +47,7 @@ export default function Logo({ isWhiteNav, variant, className = '', showEmblem =
           />
         </div>
       )}
-      <div className="flex flex-col select-none leading-none">
+      <div className="flex flex-col leading-none">
         {/* "disporapar" in rounded custom font */}
         <div
           className="font-logo-disporapar font-bold text-lg sm:text-xl md:text-2xl tracking-normal flex items-baseline leading-none"

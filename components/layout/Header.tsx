@@ -4,9 +4,33 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, ExternalLink, ChevronDown, ChevronRight, Compass, FileText, Phone, Radio, HelpCircle, ShieldAlert, CheckCircle } from 'lucide-react';
+import {
+  Menu,
+  X,
+  ExternalLink,
+  ChevronDown,
+  ChevronRight,
+  Compass,
+  FileText,
+  Phone,
+  Radio,
+  HelpCircle,
+  ShieldAlert,
+  CheckCircle,
+  Home,
+  User,
+  Users,
+  Trophy,
+  Landmark,
+  Newspaper,
+  Calendar,
+  Image as ImageIcon,
+  ShieldCheck,
+  Target,
+  FileSignature
+} from 'lucide-react';
 
-import Logo from './Logo';
+import Logo from '../ui/Logo';
 
 interface DropdownItem {
   name: string;
@@ -21,46 +45,112 @@ interface MenuGroup {
   isExternal?: boolean;
 }
 
+const getGroupIcon = (name: string) => {
+  const normalized = name.toLowerCase().trim();
+  switch (normalized) {
+    case 'beranda':
+      return <Home className="w-4 h-4 shrink-0" />;
+    case 'profil':
+      return <User className="w-4 h-4 shrink-0" />;
+    case 'bidang':
+      return <Trophy className="w-4 h-4 shrink-0" />;
+    case 'layanan':
+      return <Landmark className="w-4 h-4 shrink-0" />;
+    case 'publikasi':
+      return <Newspaper className="w-4 h-4 shrink-0" />;
+    case 'pengaduan':
+      return <ShieldAlert className="w-4 h-4 shrink-0" />;
+    case 'ppid':
+      return <ShieldCheck className="w-4 h-4 shrink-0" />;
+    case 'kontak':
+    case 'info kontak':
+      return <Phone className="w-4 h-4 shrink-0" />;
+    default:
+      return <HelpCircle className="w-4 h-4 shrink-0" />;
+  }
+};
+
+const getItemIcon = (name: string) => {
+  const normalized = name.toLowerCase().trim();
+  if (normalized.includes('sambutan')) {
+    return <User className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('struktur')) {
+    return <Users className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('tupoksi')) {
+    return <FileSignature className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('kepemudaan')) {
+    return <Users className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('olahraga')) {
+    return <Trophy className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('pariwisata')) {
+    return <Compass className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('visi')) {
+    return <Target className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('maklumat')) {
+    return <ShieldCheck className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('motto') || normalized.includes('moto')) {
+    return <CheckCircle className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('retribusi')) {
+    return <Landmark className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('berkas') || normalized.includes('sop') || normalized.includes('formulir') || normalized.includes('dokumen')) {
+    return <FileText className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('agenda') || normalized.includes('event')) {
+    return <Calendar className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('berita') || normalized.includes('artikel')) {
+    return <Newspaper className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('galeri') || normalized.includes('foto') || normalized.includes('dokumentasi')) {
+    return <ImageIcon className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('laporgub')) {
+    return <Radio className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('lapor!')) {
+    return <ShieldAlert className="w-3.5 h-3.5 shrink-0" />;
+  }
+  if (normalized.includes('internal') || normalized.includes('pengaduan internal')) {
+    return <ShieldAlert className="w-3.5 h-3.5 shrink-0" />;
+  }
+  return <HelpCircle className="w-3.5 h-3.5 shrink-0" />;
+};
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
   const pathname = usePathname();
-  const isHome = pathname === '/';
-  const isHubungiActive = pathname === '/kontak';
+  
+  // Dynamic external links state
+  const [externalLinks, setExternalLinks] = useState<any[]>([]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 40) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    handleScroll();
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    fetch('/api/external-links')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setExternalLinks(data);
+        }
+      })
+      .catch(err => console.error('Failed to load external links:', err));
   }, []);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
+  const ppidLink = externalLinks.find(l => l.id === 'ppid') || { title: 'PPID', url: 'https://ppid.tegalkota.go.id/' };
+  const laporGubLink = externalLinks.find(l => l.id === 'laporgub') || { title: 'LaporGub!', url: 'https://laporgub.jatengprov.go.id/' };
+  const laporLink = externalLinks.find(l => l.id === 'lapor') || { title: 'SP4N-LAPOR!', url: 'https://lapor.go.id/' };
 
-  useEffect(() => {
-    setOpenDropdown(null);
-    setIsOpen(false);
-  }, [pathname]);
-
-  // Structural groupings requested to make navbar compact
   const navigationMenu: MenuGroup[] = [
     {
       name: 'BERANDA',
@@ -103,16 +193,52 @@ export default function Header() {
     {
       name: 'PENGADUAN',
       items: [
-        { name: 'LaporGub!', href: 'https://laporgub.jatengprov.go.id/', isExternal: true },
-        { name: 'SP4N-LAPOR!', href: 'https://lapor.go.id/', isExternal: true },
+        { name: laporGubLink.title, href: laporGubLink.url, isExternal: true },
+        { name: laporLink.title, href: laporLink.url, isExternal: true },
+        { name: 'Pengaduan Internal', href: '/pengaduan/internal' }
       ],
     },
     {
-      name: 'PPID',
-      href: 'https://ppid.tegalkota.go.id/',
+      name: ppidLink.title.toUpperCase(),
+      href: ppidLink.url,
       isExternal: true,
     },
   ];
+
+  const isHome = pathname === '/';
+  const isHubungiActive = pathname === '/kontak';
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 40) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    setOpenDropdown(null);
+    setIsOpen(false);
+  }, [pathname]);
+
+
 
   const isWhiteNav = scrolled || !isHome;
 
@@ -130,7 +256,7 @@ export default function Header() {
     setExpandedMobileMenu(prev => (prev === name ? null : name));
   };
 
-  if (pathname && pathname.startsWith('/admin')) {
+  if (pathname && (pathname.startsWith('/admin') || pathname.startsWith('/login.admin'))) {
     return null;
   }
 
@@ -341,7 +467,10 @@ export default function Header() {
                             : 'text-slate-200 hover:bg-white/5'
                             }`}
                         >
-                          <span>{group.name}</span>
+                          <div className="flex items-center gap-2.5">
+                            {getGroupIcon(group.name)}
+                            <span>{group.name}</span>
+                          </div>
                           <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isMobileExpanded ? 'rotate-180 text-accent' : ''}`} />
                         </button>
 
@@ -389,7 +518,8 @@ export default function Header() {
                                       : 'text-slate-300 hover:text-white hover:bg-white/5'
                                       }`}
                                   >
-                                    <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase font-mono">
+                                    <div className="flex items-center gap-2.5 text-[11px] font-bold uppercase font-mono">
+                                      {getItemIcon(item.name)}
                                       <span>{item.name}</span>
                                       {item.isExternal && <ExternalLink className="w-3 h-3 text-slate-500" />}
                                     </div>
@@ -426,7 +556,10 @@ export default function Header() {
                         : 'text-slate-200 hover:bg-white/5'
                         }`}
                     >
-                      <span>{group.name}</span>
+                      <div className="flex items-center gap-2.5">
+                        {getGroupIcon(group.name)}
+                        <span>{group.name}</span>
+                      </div>
                       {group.isExternal && <ExternalLink className="w-3.5 h-3.5 text-slate-500" />}
                     </MobLinkComponent>
                   );
@@ -446,7 +579,10 @@ export default function Header() {
                     : 'text-slate-200 hover:text-white hover:bg-white/5 border-white/10'
                     }`}
                 >
-                  <span>Kontak</span>
+                  <div className="flex items-center gap-2.5">
+                    {getGroupIcon('kontak')}
+                    <span>Kontak</span>
+                  </div>
                   <ChevronRight className={`w-3.5 h-3.5 ${isHubungiActive ? 'text-white' : 'text-slate-400'}`} />
                 </Link>
               </div>

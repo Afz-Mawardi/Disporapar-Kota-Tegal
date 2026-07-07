@@ -71,14 +71,14 @@ export default function InteractiveImage({ src, alt, className = '' }: Interacti
   // Run on mount and container resizing
   useEffect(() => {
     resetView();
-    
+
     // Setup resize observer for container changes
     if (!containerRef.current) return;
     const observer = new ResizeObserver(() => {
       resetView();
     });
     observer.observe(containerRef.current);
-    
+
     return () => {
       observer.disconnect();
     };
@@ -198,9 +198,9 @@ export default function InteractiveImage({ src, alt, className = '' }: Interacti
     const handleWheelRaw = (e: WheelEvent) => {
       // Prevent default page scroll when using mouse wheel over the container
       e.preventDefault();
-      
+
       const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
-      
+
       const rect = container.getBoundingClientRect();
       const targetX = e.clientX - rect.left;
       const targetY = e.clientY - rect.top;
@@ -237,7 +237,7 @@ export default function InteractiveImage({ src, alt, className = '' }: Interacti
       {/* Interactive Container */}
       <div
         ref={containerRef}
-        className="w-full h-[320px] sm:h-[450px] lg:h-[550px] bg-[#F8F8FA] border border-slate-150 rounded-3xl overflow-hidden relative cursor-grab select-none active:cursor-grabbing"
+        className="w-full h-[320px] sm:h-[450px] lg:h-[550px] bg-[#F8F8FA] border border-slate-150 rounded-3xl overflow-hidden relative cursor-grab active:cursor-grabbing"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUpOrLeave}
@@ -246,31 +246,31 @@ export default function InteractiveImage({ src, alt, className = '' }: Interacti
         {/* Sleek Custom Light Toolbar in Bottom-Right */}
         <div className="absolute bottom-4 right-4 z-20 flex flex-row items-center gap-1 bg-white/90 backdrop-blur-md border border-slate-200/80 px-2 py-1.5 rounded-2xl shadow-md">
           {/* Zoom Percentage */}
-          <span className="text-xs font-bold text-slate-700 select-none min-w-[2.75rem] text-center font-mono mr-1">
+          <span className="text-xs font-bold text-slate-700 min-w-[2.75rem] text-center font-mono mr-1">
             {Math.round(scale * 100)}%
           </span>
-          
+
           {/* Divider */}
           <div className="w-[1px] h-4 bg-slate-200 mx-1" />
-          
+
           {/* Zoom Out Button */}
           <button
             onClick={() => handleZoom(0.8)}
             className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-primary hover:bg-slate-100 rounded-lg transition-all duration-200 active:scale-95 cursor-pointer"
             title="Perkecil"
           >
-            <span className="text-lg font-semibold select-none leading-none">&#8722;</span>
+            <span className="text-lg font-semibold leading-none">&#8722;</span>
           </button>
-          
+
           {/* Zoom In Button */}
           <button
             onClick={() => handleZoom(1.25)}
             className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-primary hover:bg-slate-100 rounded-lg transition-all duration-200 active:scale-95 cursor-pointer"
             title="Perbesar"
           >
-            <span className="text-lg font-semibold select-none leading-none">+</span>
+            <span className="text-lg font-semibold leading-none">+</span>
           </button>
-          
+
           {/* Divider */}
           <div className="w-[1px] h-4 bg-slate-200 mx-1" />
 
@@ -301,7 +301,7 @@ export default function InteractiveImage({ src, alt, className = '' }: Interacti
             alt={alt}
             width={imgWidth}
             height={imgHeight}
-            className="object-contain w-full h-full pointer-events-none select-none"
+            className="object-contain w-full h-full pointer-events-none"
             priority
           />
         </div>

@@ -8,7 +8,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useOfficeInfo } from '@/lib/data-store';
-import { SocialMediaItem } from '@/lib/data';
+import { SocialMediaItem } from '@/lib/types';
 
 export default function InfoKontakAdminPage() {
   const [officeInfo, setOfficeInfo] = useOfficeInfo();
@@ -30,24 +30,14 @@ export default function InfoKontakAdminPage() {
   // Sync editingSocials when officeInfo loads
   useEffect(() => {
     if (officeInfo) {
-      setEditingSocials(officeInfo.socialMediaList || [
-        { platform: 'instagram', label: 'Resmi', url: officeInfo.socialMedia?.instagramResmi || '' },
-        { platform: 'instagram', label: 'Wisata', url: officeInfo.socialMedia?.instagramTourism || '' },
-        { platform: 'instagram', label: 'Pemuda', url: officeInfo.socialMedia?.instagramPemuda || '' },
-        { platform: 'youtube', label: 'YouTube', url: officeInfo.socialMedia?.youtube || '' }
-      ]);
+      setEditingSocials(officeInfo.socialMediaList || []);
     }
   }, [officeInfo]);
 
   const handleCancelContact = () => {
     setIsEditingContact(false);
     if (officeInfo) {
-      setEditingSocials(officeInfo.socialMediaList || [
-        { platform: 'instagram', label: 'Resmi', url: officeInfo.socialMedia?.instagramResmi || '' },
-        { platform: 'instagram', label: 'Wisata', url: officeInfo.socialMedia?.instagramTourism || '' },
-        { platform: 'instagram', label: 'Pemuda', url: officeInfo.socialMedia?.instagramPemuda || '' },
-        { platform: 'youtube', label: 'YouTube', url: officeInfo.socialMedia?.youtube || '' }
-      ]);
+      setEditingSocials(officeInfo.socialMediaList || []);
     }
   };
 
@@ -89,9 +79,8 @@ export default function InfoKontakAdminPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${
-            notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-          }`}
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+            }`}
         >
           {notification.type === 'success' ? (
             <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -115,20 +104,20 @@ export default function InfoKontakAdminPage() {
                 onClick={() => {
                   setEditingSocials([...editingSocials, { platform: 'instagram', label: '', url: '' }]);
                 }}
-                className="h-10 px-4 flex items-center justify-center font-extrabold bg-accent hover:bg-orange-500 text-white rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0"
+                className="h-10 px-4 flex items-center justify-center font-extrabold bg-accent hover:bg-orange-500 text-white rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer border border-transparent shrink-0"
               >
                 + Tambah Medsos
               </button>
               <button
                 type="button"
                 onClick={handleCancelContact}
-                className="h-10 px-5 flex items-center justify-center font-extrabold border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer select-none shrink-0"
+                className="h-10 px-5 flex items-center justify-center font-extrabold border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer shrink-0"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="h-10 px-5 flex items-center justify-center font-extrabold bg-[#0E3B66] hover:bg-[#0c3359] text-white rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0"
+                className="h-10 px-5 flex items-center justify-center font-extrabold bg-[#0E3B66] hover:bg-[#0c3359] text-white rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer border border-transparent shrink-0"
               >
                 Simpan
               </button>
@@ -137,7 +126,7 @@ export default function InfoKontakAdminPage() {
             <button
               type="button"
               onClick={() => setIsEditingContact(true)}
-              className="h-10 px-6 flex items-center justify-center font-extrabold bg-[#0E3B66] hover:bg-[#0c3359] text-white rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer select-none border border-transparent shrink-0"
+              className="h-10 px-6 flex items-center justify-center font-extrabold bg-[#0E3B66] hover:bg-[#0c3359] text-white rounded-xl transition-all shadow-md font-mono text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer border border-transparent shrink-0"
             >
               Edit Kontak
             </button>
@@ -298,7 +287,7 @@ export default function InfoKontakAdminPage() {
                               type="text"
                               value={social.label}
                               onChange={(e) => updateField('label', e.target.value)}
-                              placeholder="Keterangan (misal: Resmi)"
+                              placeholder="Nama Akun"
                               className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-accent text-slate-800 placeholder-slate-400"
                             />
                           ) : (
@@ -346,10 +335,10 @@ export default function InfoKontakAdminPage() {
                               <button
                                 type="button"
                                 onClick={removeRow}
-                                className="p-2 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 rounded-lg text-red-650 shrink-0 cursor-pointer transition-colors flex items-center justify-center"
+                                className="p-1.5 text-red-600 bg-transparent border border-transparent hover:!bg-red-600 hover:!text-white hover:!border-red-600 rounded-xl transition-all cursor-pointer flex items-center justify-center"
                                 title="Hapus"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
+                                <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
                           ) : (
@@ -376,7 +365,7 @@ export default function InfoKontakAdminPage() {
             </div>
             {editingSocials.length === 0 && (
               <div className="bg-slate-50 py-8 text-center border border-dashed border-slate-200 rounded-2xl">
-                <p className="text-xs text-slate-450 italic select-none font-inter">Belum ada media sosial terhubung.</p>
+                <p className="text-xs text-slate-450 italic font-inter">Belum ada media sosial terhubung.</p>
               </div>
             )}
           </div>

@@ -35,29 +35,32 @@ export const authOptions: AuthOptions = {
         return {
           id: user.id,
           name: user.username,
-          email: user.username
+          email: user.username,
+          role: (user as any).role
         };
       }
     })
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 24 * 60 * 60 // 1 day session
+    maxAge: 20 * 60 // 20 menit sesi (idle timeout)
   },
   pages: {
-    signIn: '/admin',
-    error: '/admin'
+    signIn: '/login.admin',
+    error: '/login.admin'
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.username = user.name;
+        token.role = (user as any).role;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).username = token.username;
+        (session.user as any).role = token.role;
       }
       return session;
     }

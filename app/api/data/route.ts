@@ -3,13 +3,16 @@ import { prisma } from '@/lib/prisma';
 import fs from 'fs';
 import path from 'path';
 
-import {
-  OFFICE_INFO,
-  WELCOME_MESSAGE,
-  INITIAL_HOMEPAGE_SETTINGS
-} from '@/lib/data';
+import dbData from '@/lib/db.json';
+import { OfficeInfo, WelcomeMessage, HomepageSettings } from '@/lib/types';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
-export const dynamic = 'force-dynamic';
+const OFFICE_INFO = dbData.officeInfo as unknown as OfficeInfo;
+const WELCOME_MESSAGE = dbData.welcomeMessage as unknown as WelcomeMessage;
+const INITIAL_HOMEPAGE_SETTINGS = dbData.homepageSettings as unknown as HomepageSettings;
+
+export const revalidate = 20;
 
 // Helper function to delete local files in public/uploads/
 function deleteLocalFile(fileUrl: string) {
@@ -86,16 +89,23 @@ export async function GET() {
     }
 
     if (socialMediaList.length === 0) {
-      socialMediaList = [
-        { platform: 'instagram', label: 'Resmi', url: (officeInfoDb && officeInfoDb.instagramResmi && !officeInfoDb.instagramResmi.startsWith('[')) ? officeInfoDb.instagramResmi : (OFFICE_INFO.socialMedia?.instagramResmi || '') },
-        { platform: 'instagram', label: 'Wisata', url: officeInfoDb?.instagramTourism || (OFFICE_INFO.socialMedia?.instagramTourism || '') },
-        { platform: 'instagram', label: 'Pemuda', url: officeInfoDb?.instagramPemuda || (OFFICE_INFO.socialMedia?.instagramPemuda || '') },
-        { platform: 'youtube', label: 'YouTube', url: officeInfoDb?.youtube || (OFFICE_INFO.socialMedia?.youtube || '') }
-      ].filter(item => item.url !== '');
-
-      if (socialMediaList.length === 0 && OFFICE_INFO.socialMediaList) {
-        socialMediaList = OFFICE_INFO.socialMediaList;
-      }
+      const defaultList = OFFICE_INFO.socialMediaList || [];
+      socialMediaList = defaultList.map(item => {
+        let url = item.url;
+        if (officeInfoDb) {
+          if ((item.label === 'Dinas' || item.label === 'Resmi') && officeInfoDb.instagramResmi && !officeInfoDb.instagramResmi.startsWith('[')) {
+            url = officeInfoDb.instagramResmi;
+          } else if (item.label === 'Pemuda' && officeInfoDb.instagramPemuda) {
+            url = officeInfoDb.instagramPemuda;
+          } else if (item.label === 'Wisata' && officeInfoDb.instagramTourism) {
+            url = officeInfoDb.instagramTourism;
+          } else if (item.label === 'YouTube' && officeInfoDb.youtube) {
+            url = officeInfoDb.youtube;
+          }
+        }
+        return { ...item, url };
+      });
+      socialMediaList = socialMediaList.filter(item => item.url !== '');
     }
 
     const officeInfo = officeInfoDb ? {
@@ -104,7 +114,7 @@ export async function GET() {
       email: officeInfoDb.email,
       operationalHours: officeInfoDb.operationalHours,
       socialMedia: {
-        instagramResmi: (officeInfoDb.instagramResmi && !officeInfoDb.instagramResmi.startsWith('[')) ? officeInfoDb.instagramResmi : (socialMediaList.find(s => s.platform === 'instagram' && s.label === 'Resmi')?.url || ''),
+        instagramResmi: (officeInfoDb.instagramResmi && !officeInfoDb.instagramResmi.startsWith('[')) ? officeInfoDb.instagramResmi : (socialMediaList.find(s => s.platform === 'instagram' && (s.label === 'Dinas' || s.label === 'Resmi'))?.url || ''),
         instagramTourism: officeInfoDb.instagramTourism,
         instagramPemuda: officeInfoDb.instagramPemuda,
         youtube: officeInfoDb.youtube
@@ -130,25 +140,16 @@ export async function GET() {
     });
     const heroSlides = heroSlidesDb;
 
-    // 8. Fetch Categories
-    const categoriesDb = await prisma.category.findMany();
-    const categories = categoriesDb.length > 0 ? {
-      news: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'news').map((c: { module: string; name: string }) => c.name),
-      gallery: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'gallery').map((c: { module: string; name: string }) => c.name),
-      services: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'services').map((c: { module: string; name: string }) => c.name),
-      retribusi: categoriesDb.filter((c: { module: string; name: string }) => c.module === 'retribusi').map((c: { module: string; name: string }) => c.name)
-    } : {
+    // 8. Fetch Categories (Load directly from db.json since they have no admin CRUD)
+    const categories = dbData.categories || {
       news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
       gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
       services: ['SOP', 'Formulir', 'Berkas Layanan'],
       retribusi: ['Olahraga', 'Pariwisata', 'Kepemudaan']
     };
 
-    // 9. Fetch Homepage Settings
-    const homepageSettingsDb = await prisma.homepageSetting.findUnique({
-      where: { id: 'default' }
-    });
-    const homepageSettings = homepageSettingsDb ? homepageSettingsDb.data : INITIAL_HOMEPAGE_SETTINGS;
+    // 9. Fetch Homepage Settings (Load directly from db.json since they have no admin CRUD)
+    const homepageSettings = dbData.homepageSettings || INITIAL_HOMEPAGE_SETTINGS;
 
     // 10. Fetch Priority Programs (No fallback to mock data)
     const priorityProgramsDb = await prisma.priorityProgram.findMany({
@@ -161,8 +162,8 @@ export async function GET() {
       select: { id: true, username: true }
     });
     const users = usersDb.length > 0 ? usersDb : [
-      { id: 'slide-admin-1', username: 'admin123' },
-      { id: 'slide-admin-2', username: 'admin' }
+      { id: 'env-super-admin', username: process.env.DEFAULT_SUPER_ADMIN_USERNAME || 'superadmin' },
+      { id: 'env-regular-admin', username: process.env.DEFAULT_REGULAR_ADMIN_USERNAME || 'admin' }
     ];
 
     // 12. Fetch Bidang Cards (Kepemudaan, Olahraga, Pariwisata)
@@ -213,18 +214,70 @@ export async function GET() {
       retribusi
     });
   } catch (error) {
-    console.error('Failed to read database', error);
-    return NextResponse.json({ error: 'Failed to read database' }, { status: 500 });
+    console.error('Failed to read database, returning db.json instead:', error);
+
+    // Read directly from file to bypass Next.js/Node static import caching
+    const dbPath = path.join(process.cwd(), 'lib', 'db.json');
+    let currentDbData = dbData;
+    if (fs.existsSync(dbPath)) {
+      try {
+        const fileContent = fs.readFileSync(dbPath, 'utf-8');
+        currentDbData = JSON.parse(fileContent);
+      } catch (e) {
+        console.error('Failed to parse db.json from filesystem', e);
+      }
+    }
+
+    // Format db.json contents as expected by GET response
+    return NextResponse.json({
+      news: currentDbData.news || [],
+      events: currentDbData.events || [],
+      gallery: currentDbData.gallery || [],
+      services: currentDbData.services || [],
+      officeInfo: currentDbData.officeInfo || OFFICE_INFO,
+      welcomeMessage: currentDbData.welcomeMessage || WELCOME_MESSAGE,
+      heroSlides: currentDbData.heroSlides || [],
+      categories: currentDbData.categories || {
+        news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
+        gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
+        services: ['SOP', 'Formulir', 'Berkas Layanan'],
+        retribusi: ['Olahraga', 'Pariwisata', 'Kepemudaan']
+      },
+      homepageSettings: currentDbData.homepageSettings || INITIAL_HOMEPAGE_SETTINGS,
+      priorityPrograms: currentDbData.priorityPrograms || [],
+      users: ((currentDbData as any).users || []).length > 0 ? (currentDbData as any).users.map((u: any) => ({ id: u.id, username: u.username })) : [
+        { id: 'env-super-admin', username: process.env.DEFAULT_SUPER_ADMIN_USERNAME || 'superadmin' },
+        { id: 'env-regular-admin', username: process.env.DEFAULT_REGULAR_ADMIN_USERNAME || 'admin' }
+      ],
+      kepemudaanCards: (currentDbData.kepemudaanCards || []).map((c: any) => ({
+        ...c,
+        facilities: Array.isArray(c.facilities) ? c.facilities : (c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : [])
+      })),
+      olahragaCards: (currentDbData.olahragaCards || []).map((c: any) => ({
+        ...c,
+        facilities: Array.isArray(c.facilities) ? c.facilities : (c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : [])
+      })),
+      pariwisataCards: (currentDbData.pariwisataCards || []).map((c: any) => ({
+        ...c,
+        capacity: c.operationalHours || c.capacity || '',
+        facilities: Array.isArray(c.facilities) ? c.facilities : (c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : [])
+      })),
+      bidangBottomCards: currentDbData.bidangBottomCards || [],
+      retribusi: currentDbData.retribusi || [],
+      isFallback: true
+    });
   }
 }
+
 
 
 // POST: Sync frontend changes to MySQL and delete unused files
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
     const body = await request.json();
     const { type, data } = body;
-    
+
     if (type === 'news') {
       const newsArray = data.map((item: any) => ({
         id: item.id,
@@ -285,6 +338,7 @@ export async function POST(request: Request) {
         title: item.title || '',
         category: item.category || '',
         imageUrl: item.imageUrl || '',
+        date: item.date || '',
         showOnHomepage: item.showOnHomepage ?? true
       }));
 
@@ -322,11 +376,80 @@ export async function POST(request: Request) {
         }
       }
 
+      // Log admin actions
+      const currentUsername = session?.user?.name || 'Administrator';
+      const currentRole = (session?.user as any)?.role || 'ADMIN';
+      const roleStr = currentRole === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin';
+
+      const deletedItems = existingServices.filter((item: any) => !servicesArray.some((s: any) => s.id === item.id));
+      const addedItems = servicesArray.filter((item: any) => !existingServices.some((s: any) => s.id === item.id));
+      const modifiedItems = servicesArray.filter((item: any) => {
+        const orig = existingServices.find((s: any) => s.id === item.id);
+        if (!orig) return false;
+        return (
+          orig.title !== item.title ||
+          orig.category !== item.category ||
+          orig.downloadUrl !== item.downloadUrl ||
+          orig.fileSize !== item.fileSize ||
+          orig.showOnHomepage !== item.showOnHomepage
+        );
+      });
+
+      const logActions: string[] = [];
+      if (deletedItems.length > 0) {
+        if (deletedItems.length === 1) {
+          logActions.push(`menghapus berkas dokumen "${deletedItems[0].title}"`);
+        } else {
+          logActions.push(`menghapus ${deletedItems.length} berkas dokumen (${deletedItems.map((i: any) => `"${i.title}"`).join(', ')})`);
+        }
+      }
+      if (addedItems.length > 0) {
+        if (addedItems.length === 1) {
+          logActions.push(`menambahkan berkas dokumen baru "${addedItems[0].title}"`);
+        } else {
+          logActions.push(`menambahkan ${addedItems.length} berkas dokumen baru (${addedItems.map((i: any) => `"${i.title}"`).join(', ')})`);
+        }
+      }
+      if (modifiedItems.length > 0) {
+        for (const item of modifiedItems) {
+          const orig = existingServices.find((s: any) => s.id === item.id)!;
+          const changes: string[] = [];
+          if (orig.title !== item.title) changes.push(`nama diubah menjadi "${item.title}"`);
+          if (orig.category !== item.category) changes.push(`kategori diubah menjadi "${item.category}"`);
+          if (orig.downloadUrl !== item.downloadUrl) changes.push(`berkas diperbarui`);
+          if (orig.fileSize !== item.fileSize) changes.push(`ukuran berkas diubah menjadi "${item.fileSize}"`);
+          if (orig.showOnHomepage !== item.showOnHomepage) {
+            changes.push(item.showOnHomepage ? `ditampilkan di beranda` : `disembunyikan dari beranda`);
+          }
+          logActions.push(`mengubah berkas dokumen "${orig.title}" (${changes.join(', ')})`);
+        }
+      }
+
+      if (logActions.length > 0) {
+        for (const actionText of logActions) {
+          await prisma.adminLog.create({
+            data: {
+              action: `${roleStr} "${currentUsername}" ${actionText}.`
+            }
+          });
+        }
+      }
+
       await prisma.$transaction([
         prisma.publicService.deleteMany(),
         prisma.publicService.createMany({ data: servicesArray })
       ]);
       saveToLocalDbJson('services', servicesArray);
+
+      // Sync admin logs to db.json
+      if (logActions.length > 0) {
+        try {
+          const logs = await prisma.adminLog.findMany({ orderBy: { createdAt: 'desc' } });
+          saveToLocalDbJson('adminLogs', logs);
+        } catch (e) {
+          console.error('Failed to sync adminLogs after services update:', e);
+        }
+      }
     } else if (type === 'officeInfo') {
       const listStr = JSON.stringify(data.socialMediaList || []);
       await prisma.officeInfo.upsert({
@@ -357,24 +480,6 @@ export async function POST(request: Request) {
       });
       saveToLocalDbJson('officeInfo', data);
     } else if (type === 'categories') {
-      const categoriesToInsert: { module: string; name: string }[] = [];
-      if (data.news && Array.isArray(data.news)) {
-        for (const cat of data.news) categoriesToInsert.push({ module: 'news', name: cat });
-      }
-      if (data.gallery && Array.isArray(data.gallery)) {
-        for (const cat of data.gallery) categoriesToInsert.push({ module: 'gallery', name: cat });
-      }
-      if (data.services && Array.isArray(data.services)) {
-        for (const cat of data.services) categoriesToInsert.push({ module: 'services', name: cat });
-      }
-      if (data.retribusi && Array.isArray(data.retribusi)) {
-        for (const cat of data.retribusi) categoriesToInsert.push({ module: 'retribusi', name: cat });
-      }
-
-      await prisma.$transaction([
-        prisma.category.deleteMany(),
-        prisma.category.createMany({ data: categoriesToInsert })
-      ]);
       saveToLocalDbJson('categories', data);
     } else if (type === 'welcomeMessage') {
       const existingWelcome = await prisma.welcomeMessage.findUnique({
@@ -530,6 +635,7 @@ export async function POST(request: Request) {
         title: item.title || '',
         description: item.description || '',
         buttonText: item.buttonText || '',
+        buttonLink: item.buttonLink || '',
         imageUrl: item.imageUrl || '',
         sectionTag: item.sectionTag || '',
         sectionTitle: item.sectionTitle || ''
@@ -550,12 +656,6 @@ export async function POST(request: Request) {
       ]);
       saveToLocalDbJson('bidangBottomCards', bottomCardsArray);
     } else if (type === 'homepageSettings') {
-
-      await prisma.homepageSetting.upsert({
-        where: { id: 'default' },
-        update: { data: data },
-        create: { id: 'default', data: data }
-      });
       saveToLocalDbJson('homepageSettings', data);
     } else if (type === 'retribusi') {
       const retribusiArray = data.map((item: any) => ({
@@ -571,7 +671,7 @@ export async function POST(request: Request) {
       ]);
       saveToLocalDbJson('retribusi', retribusiArray);
     }
- else if (type === 'adminAccount') {
+    else if (type === 'adminAccount') {
       const { username: oldUsername, newUsername, newPassword } = data;
       const user = await prisma.user.findUnique({
         where: { username: oldUsername }
@@ -581,6 +681,7 @@ export async function POST(request: Request) {
       }
 
       const updateData: any = {};
+      const changes: string[] = [];
       if (newUsername) {
         if (newUsername !== oldUsername) {
           const existing = await prisma.user.findUnique({
@@ -589,6 +690,7 @@ export async function POST(request: Request) {
           if (existing) {
             return NextResponse.json({ error: 'Username sudah digunakan' }, { status: 400 });
           }
+          changes.push(`username diubah menjadi "${newUsername}"`);
         }
         updateData.username = newUsername;
       }
@@ -596,44 +698,36 @@ export async function POST(request: Request) {
         const crypto = require('crypto');
         const md5Password = crypto.createHash('md5').update(newPassword).digest('hex');
         updateData.password = md5Password;
+        changes.push('password diperbarui');
       }
 
       await prisma.user.update({
         where: { id: user.id },
         data: updateData
       });
-    } else if (type === 'createAdmin') {
-      const { username, password } = data;
-      if (!username || !password) {
-        return NextResponse.json({ error: 'Username dan password wajib diisi' }, { status: 400 });
+
+      // Log the action
+      if (changes.length > 0) {
+        await prisma.adminLog.create({
+          data: {
+            action: `Admin "${oldUsername}" memperbarui akunnya sendiri (${changes.join(', ')})`
+          }
+        });
       }
-      const existing = await prisma.user.findUnique({
-        where: { username }
-      });
-      if (existing) {
-        return NextResponse.json({ error: 'Username sudah digunakan' }, { status: 400 });
+
+      // Sync users and logs to db.json
+      try {
+        const allUsers = await prisma.user.findMany();
+        saveToLocalDbJson('users', allUsers);
+        const logs = await prisma.adminLog.findMany({ orderBy: { createdAt: 'desc' } });
+        saveToLocalDbJson('adminLogs', logs);
+      } catch (e) {
+        console.error('Failed to sync users and logs after admin self-update:', e);
       }
-      const crypto = require('crypto');
-      const md5Password = crypto.createHash('md5').update(password).digest('hex');
-      await prisma.user.create({
-        data: {
-          username,
-          password: md5Password
-        }
-      });
-    } else if (type === 'deleteAdmin') {
-      const { id } = data;
-      const count = await prisma.user.count();
-      if (count <= 1) {
-        return NextResponse.json({ error: 'Tidak dapat menghapus admin terakhir' }, { status: 400 });
-      }
-      await prisma.user.delete({
-        where: { id }
-      });
     } else {
       return NextResponse.json({ error: 'Invalid data type' }, { status: 400 });
     }
-    
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to update database', error);

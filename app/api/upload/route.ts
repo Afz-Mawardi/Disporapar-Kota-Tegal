@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 20;
 
 export async function POST(request: Request) {
   try {
@@ -35,6 +35,8 @@ export async function POST(request: Request) {
       subFolder = 'uploads/agenda';
     } else if (menuClean === 'berkas') {
       subFolder = 'uploads/dokumen';
+    } else if (menuClean === 'pengaduan') {
+      subFolder = 'uploads/pengaduan';
     } else if (menuClean === 'sambutan' || menuClean === 'beranda') {
       subFolder = 'uploads/galeri'; // Fallback to galeri for static welcome & banner images
     }

@@ -66,5 +66,28 @@
   animation-play-state: paused;
 }
 
+/* Custom scrollbar for admin sidebar to look minimalist and dark-themed */
+.admin-sidebar-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.admin-sidebar-scrollbar::-webkit-scrollbar-track {
+  background: #051424;
+}
+
+.admin-sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+.admin-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.admin-sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) #051424;
+}
+
 
 

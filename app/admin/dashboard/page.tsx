@@ -1,20 +1,31 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Newspaper,
   Image as ImageIcon,
   Calendar,
   FileText,
   TrendingUp,
-  Sliders
+  Sliders,
+  ShieldAlert,
+  ExternalLink,
+  Activity,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  XCircle,
+  SlidersHorizontal,
+  ChevronRight,
+  RefreshCw
 } from 'lucide-react';
 import {
   useNews,
   useEvents,
   useGallery,
   usePublicServices,
-  useHeroSlides
+  useHeroSlides,
+  usePriorityPrograms
 } from '@/lib/data-store';
 
 export default function AdminDashboard() {
@@ -23,9 +34,67 @@ export default function AdminDashboard() {
   const [gallery] = useGallery();
   const [services] = usePublicServices();
   const [heroSlides] = useHeroSlides();
+  const [priorityPrograms] = usePriorityPrograms();
+
+  // Dynamic state for complaints and external links
+  const [complaints, setComplaints] = useState<any[]>([]);
+  const [externalLinks, setExternalLinks] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hoveredMonthIdx, setHoveredMonthIdx] = useState<number | null>(null);
+  const [barLimitMode, setBarLimitMode] = useState('dynamic');
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+
+  // Fetch dynamic statistics
+  const fetchData = async () => {
+    try {
+      const [complaintsRes, externalLinksRes] = await Promise.all([
+        fetch('/api/complaints'),
+        fetch('/api/external-links')
+      ]);
+      if (complaintsRes.ok) {
+        const data = await complaintsRes.json();
+        if (data.success && Array.isArray(data.complaints)) {
+          setComplaints(data.complaints);
+        }
+      }
+      if (externalLinksRes.ok) {
+        const data = await externalLinksRes.json();
+        if (Array.isArray(data)) {
+          setExternalLinks(data);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch dashboard statistics:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // -------------------------------------------------------------
-  // Chart Calculations
+  // Complaints Breakdown
+  // -------------------------------------------------------------
+  const totalComplaints = complaints.length;
+  const baruCount = complaints.filter(c => c.status && c.status.toLowerCase() === 'baru').length;
+  const diprosesCount = complaints.filter(c => c.status && c.status.toLowerCase() === 'diproses').length;
+  const selesaiCount = complaints.filter(c => c.status && c.status.toLowerCase() === 'selesai').length;
+  const ditolakCount = complaints.filter(c => c.status && c.status.toLowerCase() === 'ditolak').length;
+
+  const pctBaru = totalComplaints > 0 ? Math.round((baruCount / totalComplaints) * 100) : 0;
+  const pctProses = totalComplaints > 0 ? Math.round((diprosesCount / totalComplaints) * 100) : 0;
+  const pctSelesai = totalComplaints > 0 ? Math.round((selesaiCount / totalComplaints) * 100) : 0;
+  const pctDitolak = totalComplaints > 0 ? Math.round((ditolakCount / totalComplaints) * 100) : 0;
+
+  // Donut Ring calculations (Radius = 40, Circumference = 251.3)
+  const c1 = 251.3;
+  const lenBaru = (pctBaru / 100) * c1;
+  const lenProses = (pctProses / 100) * c1;
+  const lenSelesai = (pctSelesai / 100) * c1;
+  const lenDitolak = (pctDitolak / 100) * c1;
+
+  // -------------------------------------------------------------
+  // Month Calculations & Multi Line Chart Data
   // -------------------------------------------------------------
   const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -48,237 +117,650 @@ export default function AdminDashboard() {
     return -1;
   };
 
-  const currentMonthIdx = new Date().getMonth();
-  const lineChartMonths = Array.from({ length: 6 }).map((_, i) => {
-    const idx = (currentMonthIdx - (5 - i) + 12) % 12;
+  // Helper to extract month index (0-11) and year from items
+  const getItemMonthAndYear = (item: any): { month: number; year: number } => {
+    // 1. Try parsing from item.date (e.g. "24 Mei 2026")
+    if (item.date) {
+      const m = getMonthIndex(item.date);
+      const parts = item.date.trim().split(/\s+/);
+      if (parts.length > 0) {
+        const lastWord = parts[parts.length - 1];
+        const yr = Number(lastWord);
+        if (!isNaN(yr) && yr > 1900 && yr < 2100 && m !== -1) {
+          return { month: m, year: yr };
+        }
+      }
+    }
+
+    // 2. Try parsing from item.createdAt
+    if (item.createdAt) {
+      const d = new Date(item.createdAt);
+      const m = d.getMonth();
+      const y = d.getFullYear();
+      if (!isNaN(m) && !isNaN(y)) {
+        return { month: m, year: y };
+      }
+    }
+
+    // 3. Try parsing from ID timestamp (e.g. n-178129381293)
+    if (item.id) {
+      const parts = item.id.split('-');
+      const lastPart = parts[parts.length - 1];
+      const timestamp = Number(lastPart);
+      if (!isNaN(timestamp) && timestamp > 1000000000000) {
+        const d = new Date(timestamp);
+        return { month: d.getMonth(), year: d.getFullYear() };
+      }
+    }
+
+    // 4. Specific fallback for mock gallery items (g-1 to g-8)
+    if (item.id && item.id.startsWith('g-')) {
+      const num = Number(item.id.replace('g-', ''));
+      if (!isNaN(num)) {
+        let m = 0;
+        if (num <= 2) m = 1;      // Feb
+        else if (num <= 4) m = 2; // Mar
+        else if (num <= 6) m = 3; // Apr
+        else m = 4;               // Mei
+        return { month: m, year: 2026 };
+      }
+    }
+
+    // Fallback default
+    return { month: new Date().getMonth(), year: new Date().getFullYear() };
+  };
+
+  // Get all unique years from publications (news, events, gallery)
+  const availableYears = React.useMemo(() => {
+    const yearsSet = new Set<number>();
+
+    const addYearFromItem = (item: any) => {
+      const { year } = getItemMonthAndYear(item);
+      if (year) {
+        yearsSet.add(year);
+      }
+    };
+
+    news.forEach(addYearFromItem);
+    events.forEach(addYearFromItem);
+    gallery.forEach(addYearFromItem);
+
+    const sortedYears = Array.from(yearsSet).sort((a, b) => b - a);
+    return sortedYears.length > 0 ? sortedYears : [new Date().getFullYear()];
+  }, [news, events, gallery]);
+
+  // Sync selectedYear if the active year gets deleted
+  useEffect(() => {
+    if (!availableYears.includes(selectedYear)) {
+      setSelectedYear(availableYears[0]);
+    }
+  }, [availableYears, selectedYear]);
+
+  // 12 months array (Jan to Dec)
+  const lineChartMonths = Array.from({ length: 12 }).map((_, i) => {
     return {
-      short: shortMonths[idx],
-      full: fullMonths[idx],
-      index: idx
+      short: shortMonths[i],
+      full: fullMonths[i],
+      index: i
     };
   });
 
-  const getMonthlyActivityCount = (monthIdx: number): number => {
-    const newsCount = news.filter((item) => {
-      const part = item.id.split('-')[1];
-      const timestamp = part ? Number(part) : NaN;
-      if (!isNaN(timestamp) && timestamp > 1000000000000) {
-        return new Date(timestamp).getMonth() === monthIdx;
-      }
-      return getMonthIndex(item.date) === monthIdx;
+  const getNewsCountForMonth = (monthIdx: number, year: number): number => {
+    return news.filter((item) => {
+      const { month, year: itemYear } = getItemMonthAndYear(item);
+      return month === monthIdx && itemYear === year;
     }).length;
-
-    const eventsCount = events.filter((item) => {
-      const part = item.id.split('-')[1];
-      const timestamp = part ? Number(part) : NaN;
-      if (!isNaN(timestamp) && timestamp > 1000000000000) {
-        return new Date(timestamp).getMonth() === monthIdx;
-      }
-      return getMonthIndex(item.date) === monthIdx;
-    }).length;
-
-    const galleryCount = gallery.filter((item) => {
-      const part = item.id.split('-')[1];
-      const timestamp = part ? Number(part) : NaN;
-      if (!isNaN(timestamp) && timestamp > 1000000000000) {
-        return new Date(timestamp).getMonth() === monthIdx;
-      }
-      const num = Number(item.id.replace('g-', ''));
-      if (!isNaN(num)) {
-        if (num <= 2) return monthIdx === 1;
-        if (num <= 4) return monthIdx === 2;
-        if (num <= 6) return monthIdx === 3;
-        return monthIdx === 4;
-      }
-      return false;
-    }).length;
-
-    const servicesCount = services.filter((item) => {
-      const part = item.id.split('-')[1];
-      const timestamp = part ? Number(part) : NaN;
-      if (!isNaN(timestamp) && timestamp > 1000000000000) {
-        return new Date(timestamp).getMonth() === monthIdx;
-      }
-      const num = Number(item.id.replace('s-', ''));
-      if (!isNaN(num)) {
-        if (num <= 2) return monthIdx === 0;
-        if (num <= 4) return monthIdx === 1;
-        if (num <= 6) return monthIdx === 2;
-        if (num <= 8) return monthIdx === 3;
-        return monthIdx === 4;
-      }
-      return false;
-    }).length;
-
-    const slidesCount = heroSlides.filter((item) => {
-      const part = item.id.split('-')[1];
-      const timestamp = part ? Number(part) : NaN;
-      if (!isNaN(timestamp) && timestamp > 1000000000000) {
-        return new Date(timestamp).getMonth() === monthIdx;
-      }
-      return monthIdx === 0;
-    }).length;
-
-    return newsCount + eventsCount + galleryCount + servicesCount + slidesCount;
   };
 
-  const activityCounts = lineChartMonths.map(m => getMonthlyActivityCount(m.index));
-  const maxActivityVal = Math.max(10, ...activityCounts);
+  const getEventsCountForMonth = (monthIdx: number, year: number): number => {
+    return events.filter((item) => {
+      const { month, year: itemYear } = getItemMonthAndYear(item);
+      return month === monthIdx && itemYear === year;
+    }).length;
+  };
 
-  const lineChartPoints = lineChartMonths.map((m, idx) => {
-    const x = 45 + idx * 87;
-    const count = activityCounts[idx];
-    const y = 180 - (count / maxActivityVal) * 150;
-    return { x, y, count, label: m.short };
-  });
+  const getGalleryCountForMonth = (monthIdx: number, year: number): number => {
+    return gallery.filter((item) => {
+      const { month, year: itemYear } = getItemMonthAndYear(item);
+      return month === monthIdx && itemYear === year;
+    }).length;
+  };
 
-  const linePathD = "M " + lineChartPoints.map(p => `${p.x},${p.y}`).join(" L ");
-  const areaPathD = `M ${lineChartPoints[0].x},180 L ` + lineChartPoints.map(p => `${p.x},${p.y}`).join(" L ") + ` L ${lineChartPoints[lineChartPoints.length - 1].x},180 Z`;
+  // Compile monthly values for the selected year
+  const monthlyNews = lineChartMonths.map(m => getNewsCountForMonth(m.index, selectedYear));
+  const monthlyEvents = lineChartMonths.map(m => getEventsCountForMonth(m.index, selectedYear));
+  const monthlyGallery = lineChartMonths.map(m => getGalleryCountForMonth(m.index, selectedYear));
 
-  const barChartData = [
-    { name: 'Berita', x: 55, val: news.length, color: '#2D9CDB' },
-    { name: 'Galeri', x: 135, val: gallery.length, color: '#9B51E0' },
-    { name: 'Agenda', x: 215, val: events.length, color: '#F2994A' },
-    { name: 'Berkas', x: 295, val: services.length, color: '#27AE60' }
+  const maxCountVal = Math.max(
+    1,
+    ...monthlyNews,
+    ...monthlyEvents,
+    ...monthlyGallery
+  );
+  // Round up max value to nearest multiple of 4 to have a uniform, integer-based Y-axis scale
+  const yMax = Math.max(4, Math.ceil(maxCountVal / 4) * 4);
+
+  // SVG Coordinates mapping: viewBox = 0 0 500 210
+  // Y-axis spans from y=20 (max) to y=180 (0 value). Height = 160.
+  // X-axis spans from x=35 (Jan) to x=475 (Des). Gap = 40.
+  const getX = (idx: number) => 35 + idx * 40;
+  const getY = (val: number) => 180 - (val / yMax) * 160;
+
+  const buildPath = (dataArr: number[]) => {
+    return "M " + dataArr.map((val, idx) => `${getX(idx)},${getY(val)}`).join(" L ");
+  };
+
+  const newsPath = buildPath(monthlyNews);
+  const eventsPath = buildPath(monthlyEvents);
+  const galleryPath = buildPath(monthlyGallery);
+
+  // -------------------------------------------------------------
+  // Horizontal Bar Chart (Konten per Modul)
+  // -------------------------------------------------------------
+  const barData = [
+    { label: 'Hero Slider', val: heroSlides.length, color: '#25517a' },
+    { label: 'Publikasi Beranda', val: news.filter(n => n.showOnHomepage).length, color: '#0D3357' },
+    { label: 'Pilar Program', val: priorityPrograms.length, color: '#FF7A00' },
+    { label: 'Berita', val: news.length, color: '#0E3B66' },
+    { label: 'Agenda Event', val: events.length, color: '#FF9433' },
+    { label: 'Galeri Foto', val: gallery.length, color: '#3B6C9C' },
+    { label: 'Berkas Layanan', val: services.length, color: '#5283B3' }
   ];
+  const maxValInData = Math.max(...barData.map(b => b.val));
+  const maxBarVal = barLimitMode === 'dynamic' ? Math.max(1, maxValInData) : Math.max(10, maxValInData);
 
-  const maxBarVal = Math.max(10, ...barChartData.map(b => b.val));
+  // -------------------------------------------------------------
+  // Recent Complaints Log (5 items)
+  // -------------------------------------------------------------
+  const recentComplaints = [...complaints]
+    .sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    })
+    .slice(0, 5);
+
+  const getStatusTextBadge = (status: string) => {
+    const normalized = (status || '').toLowerCase();
+    switch (normalized) {
+      case 'baru':
+        return <span className="text-[10px] font-extrabold text-blue-600 tracking-wider uppercase">[BARU]</span>;
+      case 'diproses':
+        return <span className="text-[10px] font-extrabold text-amber-500 tracking-wider uppercase">[DIPROSES]</span>;
+      case 'selesai':
+        return <span className="text-[10px] font-extrabold text-emerald-600 tracking-wider uppercase">[SELESAI]</span>;
+      case 'ditolak':
+        return <span className="text-[10px] font-extrabold text-red-600 tracking-wider uppercase">[DITOLAK]</span>;
+      default:
+        return <span className="text-[10px] font-extrabold text-slate-500 tracking-wider uppercase">[{status.toUpperCase()}]</span>;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const normalized = (status || '').toLowerCase();
+    switch (normalized) {
+      case 'baru':
+        return (
+          <span className="inline-flex items-center gap-1 text-[9px] font-extrabold font-mono uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
+            <Clock className="w-2.5 h-2.5 shrink-0" />
+            <span>BARU</span>
+          </span>
+        );
+      case 'diproses':
+        return (
+          <span className="inline-flex items-center gap-1 text-[9px] font-extrabold font-mono uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
+            <Clock className="w-2.5 h-2.5 shrink-0" />
+            <span>DIPROSES</span>
+          </span>
+        );
+      case 'selesai':
+        return (
+          <span className="inline-flex items-center gap-1 text-[9px] font-extrabold font-mono uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+            <CheckCircle className="w-2.5 h-2.5 shrink-0" />
+            <span>SELESAI</span>
+          </span>
+        );
+      case 'ditolak':
+        return (
+          <span className="inline-flex items-center gap-1 text-[9px] font-extrabold font-mono uppercase tracking-wider text-red-700 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full">
+            <XCircle className="w-2.5 h-2.5 shrink-0" />
+            <span>DITOLAK</span>
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '-';
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch {
+      return dateStr;
+    }
+  };
 
   return (
-    <div className="space-y-8 animate-fade-in text-left">
-
-      {/* Stat summary cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="pt-4 md:pt-0 space-y-6 animate-fade-in text-left font-inter">
+      {/* Grid Summary Cards (5 Columns) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
         {[
-          { title: 'Total Berita', count: news.length, icon: <Newspaper className="w-5 h-5 text-blue-600" />, bg: 'bg-blue-50/50 border-blue-100' },
-          { title: 'Dokumentasi Galeri', count: gallery.length, icon: <ImageIcon className="w-5 h-5 text-purple-600" />, bg: 'bg-purple-50/50 border-purple-100' },
-          { title: 'Agenda Terdaftar', count: events.length, icon: <Calendar className="w-5 h-5 text-amber-600" />, bg: 'bg-amber-50/50 border-amber-100' },
-          { title: 'Berkas Unduhan', count: services.length, icon: <FileText className="w-5 h-5 text-emerald-600" />, bg: 'bg-emerald-50/50 border-emerald-100' }
+          { title: 'Berita', count: news.length, icon: <Newspaper className="w-5 h-5 text-[#0E3B66]" /> },
+          { title: 'Agenda', count: events.length, icon: <Calendar className="w-5 h-5 text-[#FF7A00]" /> },
+          { title: 'Galeri', count: gallery.length, icon: <ImageIcon className="w-5 h-5 text-[#0E3B66]" /> },
+          { title: 'Berkas', count: services.length, icon: <FileText className="w-5 h-5 text-emerald-600" /> },
+          { title: 'Aduan', count: totalComplaints, icon: <ShieldAlert className="w-5 h-5 text-rose-600" /> }
         ].map((stat, i) => (
-          <div key={i} className={`p-4 rounded-2xl bg-white border shadow-xs flex items-center justify-between ${stat.bg}`}>
-            <div className="min-w-0 text-left">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block leading-none truncate">{stat.title}</span>
-              <span className="text-2xl sm:text-3xl font-black text-[#0E3B66] font-mono block mt-1.5 leading-none">{stat.count}</span>
+          <div
+            key={i}
+            className={`p-5 rounded-[20px] border border-slate-200/60 shadow-sm bg-white flex items-center justify-between transition-all hover:scale-[1.02] hover:shadow-md h-full ${i === 4 ? 'sm:col-span-2 lg:col-span-1' : ''
+              }`}
+          >
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono block leading-none">
+                {stat.title}
+              </span>
+              <span className="text-2xl font-black text-[#0E3B66] font-mono block leading-none">
+                {stat.count}
+              </span>
             </div>
-            <div className="p-2 bg-white border border-slate-100 rounded-xl shadow-xs shrink-0 ml-3">
+            <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl shrink-0">
               {stat.icon}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Visual Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* line chart */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-6">
+      {/* Row 1: Line Chart & Pie Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Multi-Line Chart (Aktivitas Bulanan) */}
+        <div className="lg:col-span-8 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between relative h-auto lg:h-[470px]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
               <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-accent" />
-                <span>Tren Aktivitas Bulanan</span>
+                <TrendingUp className="w-5 h-5 text-[#FF7A00]" />
+                <span>Aktivitas Bulanan</span>
               </h3>
-              <p className="text-[10px] text-slate-400 font-inter mt-1">Total unggahan berita & agenda bulanan</p>
+              <p className="text-[10px] text-slate-400 mt-1">Perbandingan tren publikasi berita, agenda event, dan galeri foto</p>
             </div>
-            <span className="bg-slate-50 border border-slate-100 text-slate-500 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">LINE CHART</span>
+
+            {/* Year selector dropdown (drop list) */}
+            <div className="relative shrink-0 self-start sm:self-auto">
+              <select
+                value={selectedYear}
+                onChange={(e) => {
+                  setSelectedYear(Number(e.target.value));
+                  e.target.blur();
+                }}
+                className="px-2.5 py-1.5 border border-slate-200 hover:border-slate-350 hover:bg-slate-50 transition-all rounded-lg text-xs text-[#0E3B66] font-extrabold font-mono focus:outline-none cursor-pointer bg-white"
+              >
+                {availableYears.map((year) => (
+                  <option key={year} value={year} className="font-mono font-extrabold text-[#0E3B66]">
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div className="relative w-full h-64 border border-slate-100/50 bg-slate-50/50 rounded-2xl p-4 flex items-center justify-center select-none font-inter text-[9px] font-medium text-slate-400">
-            <svg viewBox="0 0 500 230" className="w-full h-full overflow-visible">
-              <line x1="45" y1="20" x2="480" y2="20" stroke="#f1f5f9" strokeWidth="1" />
-              <line x1="45" y1="65" x2="480" y2="65" stroke="#f1f5f9" strokeWidth="1" />
-              <line x1="45" y1="110" x2="480" y2="110" stroke="#f1f5f9" strokeWidth="1" />
-              <line x1="45" y1="155" x2="480" y2="155" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="45" y1="180" x2="480" y2="180" stroke="#cbd5e1" strokeWidth="1.5" />
+          {/* Legend Horizontal */}
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-4 text-[10px] font-bold font-mono uppercase tracking-wider border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#0E3B66]" />
+              <span className="text-slate-600">Berita</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#FF7A00]" />
+              <span className="text-slate-600">Agenda Event</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6]" />
+              <span className="text-slate-650 font-medium">Galeri Foto</span>
+            </div>
+          </div>
 
-              <text x="35" y="24" textAnchor="end" className="font-semibold fill-slate-400 text-[10px]">{maxActivityVal}</text>
-              <text x="35" y="69" textAnchor="end" className="font-semibold fill-slate-400 text-[10px]">{Math.round(maxActivityVal * 0.75)}</text>
-              <text x="35" y="114" textAnchor="end" className="font-semibold fill-slate-400 text-[10px]">{Math.round(maxActivityVal * 0.5)}</text>
-              <text x="35" y="159" textAnchor="end" className="font-semibold fill-slate-400 text-[10px]">{Math.round(maxActivityVal * 0.25)}</text>
-              <text x="35" y="184" textAnchor="end" className="font-semibold fill-slate-400 text-[10px]">0</text>
+          {/* SVG Multi Line Chart Area */}
+          <div className="relative w-full border border-slate-100/50 bg-slate-50/50 rounded-[20px] p-4 flex items-center justify-center">
+            <div className="relative w-full">
+              <svg viewBox="0 0 500 210" className="w-full h-auto overflow-visible">
+                {/* Horizontal Grid Lines */}
+                <line x1="35" y1="20" x2="475" y2="20" stroke="#f1f5f9" strokeWidth="1" />
+                <line x1="35" y1="60" x2="475" y2="60" stroke="#f1f5f9" strokeWidth="1" />
+                <line x1="35" y1="100" x2="475" y2="100" stroke="#f1f5f9" strokeWidth="1" />
+                <line x1="35" y1="140" x2="475" y2="140" stroke="#f1f5f9" strokeWidth="1" />
+                <line x1="35" y1="180" x2="475" y2="180" stroke="#cbd5e1" strokeWidth="1.5" />
 
-              {lineChartPoints.map((pt, idx) => (
-                <text key={idx} x={pt.x} y="208" textAnchor="middle" className="font-bold fill-slate-500 text-[10px]">{pt.label}</text>
-              ))}
+                {/* Y Axis Labels */}
+                <text x="25" y="24" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{yMax}</text>
+                <text x="25" y="64" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{yMax * 0.75}</text>
+                <text x="25" y="104" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{yMax * 0.5}</text>
+                <text x="25" y="144" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">{yMax * 0.25}</text>
+                <text x="25" y="184" textAnchor="end" className="font-semibold fill-slate-400 font-mono text-[9px]">0</text>
 
-              <defs>
-                <linearGradient id="line-gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#F2994A" stopOpacity="0.45" />
-                  <stop offset="100%" stopColor="#F2994A" stopOpacity="0" />
-                </linearGradient>
-              </defs>
+                {/* X Axis Labels */}
+                {lineChartMonths.map((m, idx) => (
+                  <text key={idx} x={getX(idx)} y="198" textAnchor="middle" className="font-extrabold fill-slate-500 font-mono text-[9px]">{m.short}</text>
+                ))}
 
-              <path d={areaPathD} fill="url(#line-gradient)" className="transition-all duration-500 ease-out" />
-              <path
-                d={linePathD}
-                fill="none"
-                stroke="#F2994A"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                className="transition-all duration-500 ease-out"
-                style={{ filter: 'drop-shadow(0px 3px 6px rgba(242,153,74,0.3))' }}
-              />
+                {/* Dotted Vertical Hover Line */}
+                {hoveredMonthIdx !== null && (
+                  <line
+                    x1={getX(hoveredMonthIdx)}
+                    y1="20"
+                    x2={getX(hoveredMonthIdx)}
+                    y2="180"
+                    stroke="#94A3B8"
+                    strokeWidth="1.5"
+                    strokeDasharray="4 3"
+                  />
+                )}
 
-              {lineChartPoints.map((pt, idx) => (
-                <g key={idx} className="group cursor-pointer">
-                  <circle cx={pt.x} cy={pt.y} r="7" className="fill-white stroke-accent stroke-[3] group-hover:r-[9] transition-all" />
-                  <circle cx={pt.x} cy={pt.y} r="14" className="fill-accent/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <text x={pt.x} y={pt.y - 14} textAnchor="middle" className="opacity-0 group-hover:opacity-100 fill-[#0E3B66] font-bold text-[10px] transition-opacity">
-                    {pt.count} Aktivitas
-                  </text>
-                </g>
-              ))}
-            </svg>
+                {/* SVG paths representing lines */}
+                <path d={newsPath} fill="none" stroke="#0E3B66" strokeWidth="3" strokeLinecap="round" className="transition-all duration-300" />
+                <path d={eventsPath} fill="none" stroke="#FF7A00" strokeWidth="3" strokeLinecap="round" className="transition-all duration-300" />
+                <path d={galleryPath} fill="none" stroke="#8B5CF6" strokeWidth="3" strokeLinecap="round" className="transition-all duration-300" />
+
+                {/* Anchor Node Circles */}
+                {lineChartMonths.map((_, idx) => (
+                  <g key={idx}>
+                    {/* News node */}
+                    <circle cx={getX(idx)} cy={getY(monthlyNews[idx])} r={hoveredMonthIdx === idx ? 6 : 4} className="fill-white stroke-[#0E3B66] stroke-[2.5] transition-all" />
+                    {/* Events node */}
+                    <circle cx={getX(idx)} cy={getY(monthlyEvents[idx])} r={hoveredMonthIdx === idx ? 6 : 4} className="fill-white stroke-[#FF7A00] stroke-[2.5] transition-all" />
+                    {/* Gallery node */}
+                    <circle cx={getX(idx)} cy={getY(monthlyGallery[idx])} r={hoveredMonthIdx === idx ? 6 : 4} className="fill-white stroke-[#8B5CF6] stroke-[2.5] transition-all" />
+                  </g>
+                ))}
+
+                {/* Invisible interactive vertical columns for hover tooltip triggering */}
+                {lineChartMonths.map((_, idx) => (
+                  <rect
+                    key={idx}
+                    x={getX(idx) - 20}
+                    y="15"
+                    width="40"
+                    height="170"
+                    fill="transparent"
+                    className="cursor-pointer"
+                    onMouseEnter={() => setHoveredMonthIdx(idx)}
+                    onMouseLeave={() => setHoveredMonthIdx(null)}
+                  />
+                ))}
+              </svg>
+
+              {/* Hover Tooltip Overlay Card */}
+              {hoveredMonthIdx !== null && (
+                <div
+                  className="absolute z-10 bg-[#051424]/95 text-white p-4 rounded-2xl shadow-2xl space-y-3 pointer-events-none transition-all font-inter text-left min-w-[190px] border border-white/10"
+                  style={{
+                    top: '25px',
+                    left: `${(getX(hoveredMonthIdx) / 500) * 100}%`,
+                    transform: hoveredMonthIdx >= 6 ? 'translateX(-100%) translateX(-15px)' : 'translateX(15px)'
+                  }}
+                >
+                  <div className="font-mono text-[11px] text-slate-300 font-semibold uppercase tracking-widest leading-none border-b border-white/10 pb-2">
+                    {lineChartMonths[hoveredMonthIdx].full}
+                  </div>
+                  <div className="space-y-2 pt-0.5 text-xs font-mono">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6] shrink-0" />
+                      <span className="text-slate-200 font-semibold uppercase tracking-wider text-[10px] font-mono">Berita:</span>
+                      <span className="font-medium text-white text-base ml-auto leading-none">{monthlyNews[hoveredMonthIdx]}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#FF7A00] shrink-0" />
+                      <span className="text-slate-200 font-semibold uppercase tracking-wider text-[10px] font-mono">Agenda:</span>
+                      <span className="font-medium text-white text-base ml-auto leading-none">{monthlyEvents[hoveredMonthIdx]}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6] shrink-0" />
+                      <span className="text-slate-200 font-semibold uppercase tracking-wider text-[10px] font-mono">Galeri:</span>
+                      <span className="font-medium text-white text-base ml-auto leading-none">{monthlyGallery[hoveredMonthIdx]}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* bar chart */}
-        <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-6">
+        {/* Donut Chart (Status Pengaduan) */}
+        <div className="lg:col-span-4 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between h-auto lg:h-[470px]">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-purple-650" />
-                <span>Distribusi Data Modul</span>
+                <ShieldAlert className="w-5 h-5 text-rose-600" />
+                <span>Status Pengaduan</span>
               </h3>
-              <p className="text-[10px] text-slate-400 font-inter mt-1">Jumlah data aktif per kategori konten</p>
+              <p className="text-[10px] text-slate-400 mt-1">Daftar resolusi aduan masyarakat</p>
             </div>
-            <span className="bg-slate-50 border border-slate-100 text-slate-500 text-[9px] font-bold font-mono px-2.5 py-1 rounded-md uppercase">BAR CHART</span>
           </div>
 
-          <div className="relative w-full h-64 border border-slate-100/50 bg-slate-50/50 rounded-2xl p-5 flex items-center justify-center select-none font-inter text-[9px] font-medium text-slate-400">
-            <svg viewBox="0 0 350 210" className="w-full h-full overflow-visible">
-              <line x1="30" y1="20" x2="330" y2="20" stroke="#f1f5f9" strokeWidth="1" />
-              <line x1="30" y1="70" x2="330" y2="70" stroke="#f1f5f9" strokeWidth="1" />
-              <line x1="30" y1="120" x2="330" y2="120" stroke="#f1f5f9" strokeWidth="1" />
-              <line x1="30" y1="160" x2="330" y2="160" stroke="#cbd5e1" strokeWidth="1" />
+          <div className="flex-grow flex flex-col items-center justify-center gap-6 mt-4">
+            {/* Donut Ring visualization */}
+            <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                {/* Background Ring */}
+                <circle cx="60" cy="60" r="40" stroke="#E2E8F0" strokeWidth="9" fill="none" />
 
-              {barChartData.map((bar, idx) => {
-                const barHeight = Math.max(15, (bar.val / maxBarVal) * 125);
-                const y = 160 - barHeight;
+                {totalComplaints > 0 ? (
+                  <>
+                    {/* Selesai Arc */}
+                    {pctSelesai > 0 && (
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="40"
+                        stroke="#10B981"
+                        strokeWidth="10"
+                        fill="none"
+                        strokeDasharray={`${lenSelesai} ${c1}`}
+                        strokeDashoffset={0}
+                        transform="rotate(-90 60 60)"
+                        className="transition-all duration-500"
+                      />
+                    )}
+                    {/* Diproses Arc */}
+                    {pctProses > 0 && (
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="40"
+                        stroke="#FF7A00"
+                        strokeWidth="10"
+                        fill="none"
+                        strokeDasharray={`${lenProses} ${c1}`}
+                        strokeDashoffset={-lenSelesai}
+                        transform="rotate(-90 60 60)"
+                        className="transition-all duration-500"
+                      />
+                    )}
+                    {/* Baru Arc */}
+                    {pctBaru > 0 && (
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="40"
+                        stroke="#3B82F6"
+                        strokeWidth="10"
+                        fill="none"
+                        strokeDasharray={`${lenBaru} ${c1}`}
+                        strokeDashoffset={-(lenSelesai + lenProses)}
+                        transform="rotate(-90 60 60)"
+                        className="transition-all duration-500"
+                      />
+                    )}
+                    {/* Ditolak Arc */}
+                    {pctDitolak > 0 && (
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="40"
+                        stroke="#EF4444"
+                        strokeWidth="10"
+                        fill="none"
+                        strokeDasharray={`${lenDitolak} ${c1}`}
+                        strokeDashoffset={-(lenSelesai + lenProses + lenBaru)}
+                        transform="rotate(-90 60 60)"
+                        className="transition-all duration-500"
+                      />
+                    )}
+                  </>
+                ) : (
+                  <circle cx="60" cy="60" r="40" stroke="#CBD5E1" strokeWidth="10" fill="none" />
+                )}
+              </svg>
 
+              {/* Total label at center */}
+              <div className="absolute text-center">
+                <span className="text-2xl font-black text-[#0E3B66] font-mono leading-none block">{totalComplaints}</span>
+                <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-widest block mt-1.5 font-mono">Total Aduan</span>
+              </div>
+            </div>
+
+            {/* Labels and Percentages - 2x2 Grid */}
+            <div className="grid grid-cols-2 gap-3 w-full max-w-[320px] mx-auto text-[10px] font-mono">
+              <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-between transition-all hover:bg-slate-100/70">
+                <div className="flex items-center gap-1.5 mb-1 shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Selesai</span>
+                </div>
+                <span className="font-extrabold text-[#0E3B66] text-xs">
+                  {selesaiCount} <span className="text-[10px] font-medium text-slate-400">({pctSelesai}%)</span>
+                </span>
+              </div>
+              <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-between transition-all hover:bg-slate-100/70">
+                <div className="flex items-center gap-1.5 mb-1 shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-[#FF7A00] shrink-0" />
+                  <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Diproses</span>
+                </div>
+                <span className="font-extrabold text-[#0E3B66] text-xs">
+                  {diprosesCount} <span className="text-[10px] font-medium text-slate-400">({pctProses}%)</span>
+                </span>
+              </div>
+              <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-between transition-all hover:bg-slate-100/70">
+                <div className="flex items-center gap-1.5 mb-1 shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                  <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Baru</span>
+                </div>
+                <span className="font-extrabold text-[#0E3B66] text-xs">
+                  {baruCount} <span className="text-[10px] font-medium text-slate-400">({pctBaru}%)</span>
+                </span>
+              </div>
+              <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-between transition-all hover:bg-slate-100/70">
+                <div className="flex items-center gap-1.5 mb-1 shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+                  <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Ditolak</span>
+                </div>
+                <span className="font-extrabold text-[#0E3B66] text-xs">
+                  {ditolakCount} <span className="text-[10px] font-medium text-slate-400">({pctDitolak}%)</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 2: Horizontal Bar & Activity Stream */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Horizontal Bar Chart (Konten per Modul) */}
+        <div className="lg:col-span-6 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between h-auto lg:h-[420px]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-2">
+            <div>
+              <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
+                <SlidersHorizontal className="w-5 h-5 text-[#FF7A00]" />
+                <span>Konten per Modul</span>
+              </h3>
+              <p className="text-[10px] text-slate-400 mt-0.5">Distribusi jumlah konten aktif per modul sistem</p>
+            </div>
+          </div>
+
+          <div className="flex-grow flex flex-col justify-center h-[320px] mt-4">
+            <div className="flex flex-col gap-[18px]">
+              {barData.map((bar, idx) => {
+                const pct = maxBarVal > 0 ? (bar.val / maxBarVal) * 100 : 0;
                 return (
-                  <g key={idx} className="group cursor-pointer">
-                    <defs>
-                      <linearGradient id={`bar-gradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={bar.color} />
-                        <stop offset="100%" stopColor={bar.color} stopOpacity="0.3" />
-                      </linearGradient>
-                    </defs>
-
-                    <rect
-                      x={bar.x - 18}
-                      y={y}
-                      width="36"
-                      height={barHeight}
-                      rx="6"
-                      fill={`url(#bar-gradient-${idx})`}
-                      className="transition-all duration-550 group-hover:fill-opacity-90"
-                    />
-                    <text x={bar.x} y={y - 8} textAnchor="middle" className="font-bold fill-slate-800 font-mono text-[10px]">{bar.val}</text>
-                    <text x={bar.x} y="185" textAnchor="middle" className="font-bold fill-slate-550 text-[10px]">{bar.name}</text>
-                  </g>
+                  <div key={idx} className="flex items-center text-xs">
+                    <span className="w-[120px] sm:w-[150px] text-slate-600 pr-3 sm:pr-4 text-left font-semibold truncate font-semibold">
+                      {bar.label}
+                    </span>
+                    <div className="flex-1 flex items-center gap-3 min-w-0">
+                      <div className="flex-1 bg-slate-100 rounded-full h-[18px] overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500 ease-out"
+                          style={{
+                            width: `${pct}%`,
+                            backgroundColor: bar.color || '#0E3B66'
+                          }}
+                        />
+                      </div>
+                      <span className="font-mono font-bold text-slate-700 w-12 text-right shrink-0">
+                        {barLimitMode === 'dynamic' ? `${bar.val}` : `${bar.val}/${maxBarVal}`}
+                      </span>
+                    </div>
+                  </div>
                 );
               })}
-            </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Real-time recent complaints (Aduan Masuk Terbaru) */}
+        <div className="lg:col-span-6 bg-white rounded-[20px] border border-slate-200/60 p-6 shadow-sm flex flex-col justify-between h-auto lg:h-[420px]">
+          <div className="flex flex-col h-full justify-between">
+            <div>
+              <h3 className="font-extrabold text-sm sm:text-base text-[#0E3B66] tracking-tight flex items-center gap-2">
+                <Activity className="w-5 h-5 text-[#FF7A00]" />
+                <span>Aduan Masuk Terbaru</span>
+              </h3>
+              <p className="text-[10px] text-slate-400 mt-1">Daftar laporan pengaduan internal terakhir dari warga</p>
+            </div>
+
+            <div className="flex-grow flex flex-col my-4 overflow-hidden">
+              <div className="divide-y divide-slate-100 h-full">
+                {recentComplaints.length > 0 ? (
+                  recentComplaints.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-4"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <h4
+                          className="text-xs font-bold text-slate-800 truncate"
+                          title={item.title}
+                        >
+                          {item.title}
+                        </h4>
+
+                        <p className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1.5 font-medium">
+                          {getStatusTextBadge(item.status)}
+                          <span>•</span>
+                          <span>{formatDate(item.createdAt)}</span>
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-slate-400">
+                    <ShieldAlert className="w-8 h-8 opacity-20 mb-2" />
+                    <span className="font-mono text-[9px] font-black uppercase tracking-wider">
+                      Belum ada aduan masuk
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <a
+                href="/admin/pengaduan/internal"
+                className="text-[11px] font-bold tracking-[0.2em] text-[#0E3B66] hover:text-[#FF7A00] flex items-center gap-1.5 active:translate-x-0.5 transition-all uppercase"
+              >
+                <span>Semua Pengaduan →</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
