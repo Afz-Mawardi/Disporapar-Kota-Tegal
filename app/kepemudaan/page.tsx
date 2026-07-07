@@ -2,11 +2,7 @@ import { prisma, checkDatabaseConnection } from '@/lib/prisma';
 import KepemudaanPageClient from './page.client';
 import dbData from '@/lib/db.json';
 
-<<<<<<< HEAD
 export const revalidate = 20;
-=======
-export const dynamic = 'force-dynamic';
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 
 export default async function Page() {
   let kepemudaanCards: any[] = [];

@@ -1,20 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-<<<<<<< HEAD
 import fs from 'fs';
 import path from 'path';
 
 export const revalidate = 20;
 
-=======
-
-export const dynamic = 'force-dynamic';
-
-// Helper to delete local file if the complaint is deleted
-import fs from 'fs';
-import path from 'path';
-
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 function deleteLocalFile(fileUrl: string) {
   if (!fileUrl || typeof fileUrl !== 'string') return;
   if (fileUrl.startsWith('/uploads/')) {
@@ -30,7 +20,6 @@ function deleteLocalFile(fileUrl: string) {
   }
 }
 
-<<<<<<< HEAD
 function saveToLocalDbJson(key: string, data: any) {
   const dbPath = path.join(process.cwd(), 'lib', 'db.json');
   try {
@@ -47,15 +36,12 @@ function saveToLocalDbJson(key: string, data: any) {
   }
 }
 
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 // GET: Retrieve all complaints for Admin Panel
 export async function GET() {
   try {
     const complaints = await prisma.complaint.findMany({
       orderBy: { createdAt: 'desc' }
     });
-<<<<<<< HEAD
     // Sync backup
     saveToLocalDbJson('complaints', complaints);
     return NextResponse.json({ success: true, complaints });
@@ -73,11 +59,6 @@ export async function GET() {
     } catch (e) {
       console.error('Failed to load complaints from backup:', e);
     }
-=======
-    return NextResponse.json({ success: true, complaints });
-  } catch (error: any) {
-    console.error('Failed to get complaints:', error);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ error: 'Failed to retrieve complaints data.' }, { status: 500 });
   }
 }
@@ -106,7 +87,6 @@ export async function POST(request: Request) {
       }
     });
 
-<<<<<<< HEAD
     // Backup to db.json
     try {
       const complaints = await prisma.complaint.findMany({ orderBy: { createdAt: 'desc' } });
@@ -115,8 +95,6 @@ export async function POST(request: Request) {
       console.error(e);
     }
 
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ success: true, complaint: newComplaint });
   } catch (error: any) {
     console.error('Failed to create complaint:', error);
@@ -150,7 +128,6 @@ export async function PATCH(request: Request) {
       }
     });
 
-<<<<<<< HEAD
     // Backup to db.json
     try {
       const complaints = await prisma.complaint.findMany({ orderBy: { createdAt: 'desc' } });
@@ -159,8 +136,6 @@ export async function PATCH(request: Request) {
       console.error(e);
     }
 
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Failed to update complaint:', error);
@@ -209,7 +184,6 @@ export async function DELETE(request: Request) {
       where: { id: { in: ids } }
     });
 
-<<<<<<< HEAD
     // Backup to db.json
     try {
       const remainingComplaints = await prisma.complaint.findMany({ orderBy: { createdAt: 'desc' } });
@@ -218,8 +192,6 @@ export async function DELETE(request: Request) {
       console.error(e);
     }
 
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Failed to delete complaints:', error);

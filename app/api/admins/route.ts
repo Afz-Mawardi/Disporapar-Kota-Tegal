@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import crypto from 'crypto';
-<<<<<<< HEAD
+import argon2 from 'argon2';
 import fs from 'fs';
 import path from 'path';
+import { logAudit } from '@/lib/audit';
 
 export const revalidate = 20;
 
@@ -24,24 +24,21 @@ function saveToLocalDbJson(key: string, data: any) {
     console.error(`Failed to sync key "${key}" to local db.json`, error);
   }
 }
-=======
-
-export const dynamic = 'force-dynamic';
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 
 // Helper to check if the session is SUPER_ADMIN
-async function checkSuperAdmin() {
+async function checkSuperAdmin(request: Request) {
   const session = await getServerSession(authOptions);
+  const ip = (request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')) || 'Unknown IP';
   if (!session || (session.user as any)?.role !== 'SUPER_ADMIN') {
-    return { authorized: false, session: null };
+    return { authorized: false, session: null, ip };
   }
-  return { authorized: true, session };
+  return { authorized: true, session, ip };
 }
 
 // GET: Get all admins (restricted to SUPER_ADMIN)
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const { authorized } = await checkSuperAdmin();
+    const { authorized } = await checkSuperAdmin(request);
     if (!authorized) {
       return NextResponse.json({ error: 'Akses ditolak. Anda bukan Super Admin.' }, { status: 403 });
     }
@@ -55,7 +52,6 @@ export async function GET() {
       }
     });
 
-<<<<<<< HEAD
     // Auto-update JSON file on successful database read
     try {
       const allUsers = await prisma.user.findMany();
@@ -85,11 +81,6 @@ export async function GET() {
     } catch (e) {
       console.error('Failed to read fallback users:', e);
     }
-=======
-    return NextResponse.json({ success: true, admins });
-  } catch (error: any) {
-    console.error('Failed to get admins:', error);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ error: 'Gagal memuat data administrator.' }, { status: 500 });
   }
 }
@@ -97,7 +88,7 @@ export async function GET() {
 // POST: Add new admin (restricted to SUPER_ADMIN)
 export async function POST(request: Request) {
   try {
-    const { authorized, session } = await checkSuperAdmin();
+    const { authorized, session, ip } = await checkSuperAdmin(request);
     if (!authorized || !session) {
       return NextResponse.json({ error: 'Akses ditolak. Anda bukan Super Admin.' }, { status: 403 });
     }
@@ -123,25 +114,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Username sudah terdaftar.' }, { status: 400 });
     }
 
-    const md5Password = crypto.createHash('md5').update(password.trim()).digest('hex');
+    const argon2Password = await argon2.hash(password.trim(), {
+      type: argon2.argon2id,
+      memoryCost: 2 ** 16,
+      timeCost: 3,
+      parallelism: 1
+    });
 
     const newAdmin = await prisma.user.create({
       data: {
         username: username.trim(),
-        password: md5Password,
+        password: argon2Password,
         role
       }
     });
 
     // Log this action
     const currentUsername = session.user?.name || 'Super Admin';
-    await prisma.adminLog.create({
-      data: {
-        action: `Super Admin "${currentUsername}" menambahkan admin baru "${username.trim()}" dengan peran ${role}.`
-      }
+    await logAudit({
+      user: currentUsername,
+      ip: ip,
+      endpoint: '/api/admins',
+      action: `Tambah Admin Baru: ${username.trim()} (${role})`,
+      status: 'Berhasil'
     });
 
-<<<<<<< HEAD
     // Sync users and logs to db.json
     try {
       const allUsers = await prisma.user.findMany();
@@ -152,8 +149,6 @@ export async function POST(request: Request) {
       console.error('Failed to sync users/logs to db.json after POST:', e);
     }
 
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ success: true, admin: { id: newAdmin.id, username: newAdmin.username, role: newAdmin.role, createdAt: (newAdmin as any).createdAt } });
   } catch (error: any) {
     console.error('Failed to create admin:', error);
@@ -164,7 +159,7 @@ export async function POST(request: Request) {
 // PATCH: Edit existing admin (restricted to SUPER_ADMIN)
 export async function PATCH(request: Request) {
   try {
-    const { authorized, session } = await checkSuperAdmin();
+    const { authorized, session, ip } = await checkSuperAdmin(request);
     if (!authorized || !session) {
       return NextResponse.json({ error: 'Akses ditolak. Anda bukan Super Admin.' }, { status: 403 });
     }
@@ -202,9 +197,14 @@ export async function PATCH(request: Request) {
       if (password.trim().length < 6) {
         return NextResponse.json({ error: 'Password baru minimal 6 karakter.' }, { status: 400 });
       }
-      const md5Password = crypto.createHash('md5').update(password.trim()).digest('hex');
-      updateData.password = md5Password;
-      logChanges.push('password diperbarui');
+      const argon2Password = await argon2.hash(password.trim(), {
+        type: argon2.argon2id,
+        memoryCost: 2 ** 16,
+        timeCost: 3,
+        parallelism: 1
+      });
+      updateData.password = argon2Password;
+      logChanges.push('password diperbarui (Argon2)');
     }
 
     if (role && role !== existingAdmin.role) {
@@ -226,13 +226,14 @@ export async function PATCH(request: Request) {
 
     // Log this action
     const currentUsername = session.user?.name || 'Super Admin';
-    await prisma.adminLog.create({
-      data: {
-        action: `Super Admin "${currentUsername}" mengubah admin "${existingAdmin.username}" (${logChanges.join(', ')}).`
-      }
+    await logAudit({
+      user: currentUsername,
+      ip: ip,
+      endpoint: '/api/admins',
+      action: `Update Admin: ${existingAdmin.username} (${logChanges.join(', ')})`,
+      status: 'Berhasil'
     });
 
-<<<<<<< HEAD
     // Sync users and logs to db.json
     try {
       const allUsers = await prisma.user.findMany();
@@ -243,8 +244,6 @@ export async function PATCH(request: Request) {
       console.error('Failed to sync users/logs to db.json after PATCH:', e);
     }
 
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({
       success: true,
       admin: { id: updatedAdmin.id, username: updatedAdmin.username, role: updatedAdmin.role }
@@ -258,7 +257,7 @@ export async function PATCH(request: Request) {
 // DELETE: Delete admin (restricted to SUPER_ADMIN)
 export async function DELETE(request: Request) {
   try {
-    const { authorized, session } = await checkSuperAdmin();
+    const { authorized, session, ip } = await checkSuperAdmin(request);
     if (!authorized || !session) {
       return NextResponse.json({ error: 'Akses ditolak. Anda bukan Super Admin.' }, { status: 403 });
     }
@@ -289,13 +288,14 @@ export async function DELETE(request: Request) {
     });
 
     // Log this action
-    await prisma.adminLog.create({
-      data: {
-        action: `Super Admin "${currentUsername}" menghapus admin "${existingAdmin.username}" dengan peran ${existingAdmin.role}.`
-      }
+    await logAudit({
+      user: currentUsername || 'Super Admin',
+      ip: ip,
+      endpoint: '/api/admins',
+      action: `Hapus Admin: ${existingAdmin.username} (${existingAdmin.role})`,
+      status: 'Berhasil'
     });
 
-<<<<<<< HEAD
     // Sync users and logs to db.json
     try {
       const allUsers = await prisma.user.findMany();
@@ -306,8 +306,6 @@ export async function DELETE(request: Request) {
       console.error('Failed to sync users/logs to db.json after DELETE:', e);
     }
 
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Failed to delete admin:', error);

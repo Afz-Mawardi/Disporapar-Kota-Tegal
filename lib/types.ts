@@ -86,10 +86,7 @@ export interface GalleryPhoto {
   title: string;
   category: string;
   imageUrl: string;
-<<<<<<< HEAD
   date: string;
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
   showOnHomepage?: boolean;
 }
 

@@ -1,14 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-<<<<<<< HEAD
 import fs from 'fs';
 import path from 'path';
 
 export const revalidate = 20;
-=======
-
-export const dynamic = 'force-dynamic';
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 
 const DEFAULT_LINKS = [
   { id: 'laporgub', title: 'LaporGub!', url: 'https://laporgub.jatengprov.go.id/' },
@@ -16,7 +11,6 @@ const DEFAULT_LINKS = [
   { id: 'ppid', title: 'PPID', url: 'https://ppid.tegalkota.go.id/' }
 ];
 
-<<<<<<< HEAD
 function saveToLocalDbJson(key: string, data: any) {
   const dbPath = path.join(process.cwd(), 'lib', 'db.json');
   try {
@@ -33,8 +27,6 @@ function saveToLocalDbJson(key: string, data: any) {
   }
 }
 
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 // GET: Retrieve all dynamic external links
 export async function GET() {
   try {
@@ -54,7 +46,6 @@ export async function GET() {
       links = await prisma.externalLink.findMany();
     }
     
-<<<<<<< HEAD
     // Backup to db.json if database was empty but successfully seeded/read
     saveToLocalDbJson('externalLinks', links);
     
@@ -73,11 +64,6 @@ export async function GET() {
     } catch (e) {
       console.error('Failed to load external links from backup:', e);
     }
-=======
-    return NextResponse.json(links);
-  } catch (error: any) {
-    console.error('Failed to get external links, returning defaults:', error);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json(DEFAULT_LINKS);
   }
 }
@@ -113,12 +99,9 @@ export async function POST(request: Request) {
       })
     );
 
-<<<<<<< HEAD
     // Save to local db.json backup
     saveToLocalDbJson('externalLinks', links);
 
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Failed to save external links:', error);

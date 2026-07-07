@@ -222,11 +222,7 @@ export default function AdminLayoutClient({
         {notification && (
           <div
             onClick={() => setNotification(null)}
-<<<<<<< HEAD
             className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-=======
-            className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
               }`}
           >
             {notification.type === 'success' ? (
@@ -262,11 +258,7 @@ export default function AdminLayoutClient({
             </div>
 
             {/* Nav links */}
-<<<<<<< HEAD
             <div className="flex-grow overflow-y-auto pr-1 admin-sidebar-scrollbar">
-=======
-            <div className="flex-grow overflow-y-auto select-none pr-1 admin-sidebar-scrollbar">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
               <nav className="p-4 space-y-2.5">
                 {/* Dashboard Link */}
                 {renderSidebarLink('dashboard', 'Dashboard', '/admin/dashboard', <LayoutDashboard className="w-4 h-4" />)}
@@ -432,11 +424,7 @@ export default function AdminLayoutClient({
             <div className="flex items-center gap-3 shrink-0 relative">
               <button
                 onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-<<<<<<< HEAD
                 className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 border border-slate-200 rounded-xl transition-all cursor-pointer"
-=======
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 border border-slate-200 rounded-xl transition-all cursor-pointer select-none"
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
               >
                 <div className="w-7 h-7 rounded-full bg-[#0E3B66] text-white flex items-center justify-center font-bold text-xs shadow-xs">
                   {(currentAdminUsername || 'A')[0].toUpperCase()}
@@ -482,11 +470,7 @@ export default function AdminLayoutClient({
 
             {/* Admin Footer */}
             <footer className="mt-8 pt-2 border-t border-slate-200 text-center shrink-0">
-<<<<<<< HEAD
               <p className="text-[10px] font-mono text-slate-400">
-=======
-              <p className="text-[10px] font-mono text-slate-400 select-none">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                 Copyright &copy; {new Date().getFullYear()} DISPORAPAR Kota Tegal &bull; Developed by Afz-ysx
               </p>
             </footer>

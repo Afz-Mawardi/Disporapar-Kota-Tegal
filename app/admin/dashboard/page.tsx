@@ -39,11 +39,7 @@ export default function AdminDashboard() {
   // Dynamic state for complaints and external links
   const [complaints, setComplaints] = useState<any[]>([]);
   const [externalLinks, setExternalLinks] = useState<any[]>([]);
-<<<<<<< HEAD
   const [isLoading, setIsLoading] = useState(false);
-=======
-  const [isLoading, setIsLoading] = useState(true);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
   const [hoveredMonthIdx, setHoveredMonthIdx] = useState<number | null>(null);
   const [barLimitMode, setBarLimitMode] = useState('dynamic');
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
@@ -51,10 +47,6 @@ export default function AdminDashboard() {
   // Fetch dynamic statistics
   const fetchData = async () => {
     try {
-<<<<<<< HEAD
-=======
-      setIsLoading(true);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
       const [complaintsRes, externalLinksRes] = await Promise.all([
         fetch('/api/complaints'),
         fetch('/api/external-links')
@@ -73,11 +65,6 @@ export default function AdminDashboard() {
       }
     } catch (err) {
       console.error('Failed to fetch dashboard statistics:', err);
-<<<<<<< HEAD
-=======
-    } finally {
-      setIsLoading(false);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     }
   };
 
@@ -400,11 +387,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Year selector dropdown (drop list) */}
-<<<<<<< HEAD
             <div className="relative shrink-0 self-start sm:self-auto">
-=======
-            <div className="relative shrink-0 self-start sm:self-auto select-none">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
               <select
                 value={selectedYear}
                 onChange={(e) => {
@@ -423,11 +406,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Legend Horizontal */}
-<<<<<<< HEAD
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-4 text-[10px] font-bold font-mono uppercase tracking-wider border-b border-slate-100 pb-3">
-=======
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-4 text-[10px] font-bold font-mono uppercase tracking-wider select-none border-b border-slate-100 pb-3">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#0E3B66]" />
               <span className="text-slate-600">Berita</span>
@@ -443,11 +422,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* SVG Multi Line Chart Area */}
-<<<<<<< HEAD
           <div className="relative w-full border border-slate-100/50 bg-slate-50/50 rounded-[20px] p-4 flex items-center justify-center">
-=======
-          <div className="relative w-full border border-slate-100/50 bg-slate-50/50 rounded-[20px] p-4 flex items-center justify-center select-none">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             <div className="relative w-full">
               <svg viewBox="0 0 500 210" className="w-full h-auto overflow-visible">
                 {/* Horizontal Grid Lines */}
@@ -525,7 +500,6 @@ export default function AdminDashboard() {
                     transform: hoveredMonthIdx >= 6 ? 'translateX(-100%) translateX(-15px)' : 'translateX(15px)'
                   }}
                 >
-<<<<<<< HEAD
                   <div className="font-mono text-[11px] text-slate-300 font-semibold uppercase tracking-widest leading-none border-b border-white/10 pb-2">
                     {lineChartMonths[hoveredMonthIdx].full}
                   </div>
@@ -544,26 +518,6 @@ export default function AdminDashboard() {
                       <span className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6] shrink-0" />
                       <span className="text-slate-200 font-semibold uppercase tracking-wider text-[10px] font-mono">Galeri:</span>
                       <span className="font-medium text-white text-base ml-auto leading-none">{monthlyGallery[hoveredMonthIdx]}</span>
-=======
-                  <div className="font-mono text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none border-b border-white/10 pb-2">
-                    {lineChartMonths[hoveredMonthIdx].full}
-                  </div>
-                  <div className="space-y-2 pt-0.5 text-xs">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6] shrink-0" />
-                      <span className="text-slate-200 font-extrabold uppercase tracking-wider text-[10px] font-mono">Berita:</span>
-                      <span className="font-mono font-black text-white text-base ml-auto leading-none">{monthlyNews[hoveredMonthIdx]}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#FF7A00] shrink-0" />
-                      <span className="text-slate-200 font-extrabold uppercase tracking-wider text-[10px] font-mono">Agenda:</span>
-                      <span className="font-mono font-black text-white text-base ml-auto leading-none">{monthlyEvents[hoveredMonthIdx]}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6] shrink-0" />
-                      <span className="text-slate-200 font-extrabold uppercase tracking-wider text-[10px] font-mono">Galeri:</span>
-                      <span className="font-mono font-black text-white text-base ml-auto leading-none">{monthlyGallery[hoveredMonthIdx]}</span>
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                     </div>
                   </div>
                 </div>
@@ -764,7 +718,6 @@ export default function AdminDashboard() {
               <p className="text-[10px] text-slate-400 mt-1">Daftar laporan pengaduan internal terakhir dari warga</p>
             </div>
 
-<<<<<<< HEAD
             <div className="flex-grow flex flex-col my-4 overflow-hidden">
               <div className="divide-y divide-slate-100 h-full">
                 {recentComplaints.length > 0 ? (
@@ -795,48 +748,17 @@ export default function AdminDashboard() {
                     <span className="font-mono text-[9px] font-black uppercase tracking-wider">
                       Belum ada aduan masuk
                     </span>
-=======
-            <div className="flex-grow flex flex-col justify-center my-4 overflow-hidden">
-              <div className="divide-y divide-slate-100">
-                {recentComplaints.map((item, idx) => (
-                  <div key={idx} className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
-                    <div className="min-w-0 flex-1">
-                      <h4 className="text-xs font-bold text-slate-800 truncate" title={item.title}>
-                        {item.title}
-                      </h4>
-                      <p className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1.5 font-medium">
-                        {getStatusTextBadge(item.status)}
-                        <span>•</span>
-                        <span>{formatDate(item.createdAt)}</span>
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                {recentComplaints.length === 0 && (
-                  <div className="py-12 text-center text-slate-400 flex flex-col items-center justify-center">
-                    <ShieldAlert className="w-8 h-8 opacity-20 mb-2" />
-                    <span className="font-mono text-[9px] font-black uppercase tracking-wider">Belum ada aduan masuk</span>
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                   </div>
                 )}
               </div>
             </div>
 
-<<<<<<< HEAD
             <div className="flex justify-end">
               <a
                 href="/admin/pengaduan/internal"
                 className="text-[11px] font-bold tracking-[0.2em] text-[#0E3B66] hover:text-[#FF7A00] flex items-center gap-1.5 active:translate-x-0.5 transition-all uppercase"
               >
                 <span>Semua Pengaduan →</span>
-=======
-            <div className="flex justify-start">
-              <a
-                href="/admin/pengaduan/internal"
-                className="text-xs font-bold tracking-[0.2em] text-[#0E3B66] hover:text-[#FF7A00] flex items-center gap-1.5 active:translate-x-0.5 transition-all uppercase"
-              >
-                <span>Lihat Semua Pengaduan →</span>
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
               </a>
             </div>
           </div>

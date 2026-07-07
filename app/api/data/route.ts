@@ -5,15 +5,9 @@ import path from 'path';
 
 import dbData from '@/lib/db.json';
 import { OfficeInfo, WelcomeMessage, HomepageSettings } from '@/lib/types';
-<<<<<<< HEAD
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-=======
-
-const OFFICE_INFO = dbData.officeInfo as unknown as OfficeInfo;
-const WELCOME_MESSAGE = dbData.welcomeMessage as unknown as WelcomeMessage;
-const INITIAL_HOMEPAGE_SETTINGS = dbData.homepageSettings as unknown as HomepageSettings;
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
+import { logAudit } from '@/lib/audit';
 
 const OFFICE_INFO = dbData.officeInfo as unknown as OfficeInfo;
 const WELCOME_MESSAGE = dbData.welcomeMessage as unknown as WelcomeMessage;
@@ -223,7 +217,6 @@ export async function GET() {
   } catch (error) {
     console.error('Failed to read database, returning db.json instead:', error);
 
-<<<<<<< HEAD
     // Read directly from file to bypass Next.js/Node static import caching
     const dbPath = path.join(process.cwd(), 'lib', 'db.json');
     let currentDbData = dbData;
@@ -246,24 +239,11 @@ export async function GET() {
       welcomeMessage: currentDbData.welcomeMessage || WELCOME_MESSAGE,
       heroSlides: currentDbData.heroSlides || [],
       categories: currentDbData.categories || {
-=======
-    // Format db.json contents as expected by GET response
-    return NextResponse.json({
-      news: dbData.news || [],
-      events: dbData.events || [],
-      gallery: dbData.gallery || [],
-      services: dbData.services || [],
-      officeInfo: dbData.officeInfo || OFFICE_INFO,
-      welcomeMessage: dbData.welcomeMessage || WELCOME_MESSAGE,
-      heroSlides: dbData.heroSlides || [],
-      categories: dbData.categories || {
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
         news: ['Pariwisata', 'Olahraga', 'Kepemudaan', 'Pengumuman', 'Event'],
         gallery: ['Pariwisata', 'Olahraga', 'Kepemudaan'],
         services: ['SOP', 'Formulir', 'Berkas Layanan'],
         retribusi: ['Olahraga', 'Pariwisata', 'Kepemudaan']
       },
-<<<<<<< HEAD
       homepageSettings: currentDbData.homepageSettings || INITIAL_HOMEPAGE_SETTINGS,
       priorityPrograms: currentDbData.priorityPrograms || [],
       users: ((currentDbData as any).users || []).length > 0 ? (currentDbData as any).users.map((u: any) => ({ id: u.id, username: u.username })) : [
@@ -279,34 +259,12 @@ export async function GET() {
         facilities: Array.isArray(c.facilities) ? c.facilities : (c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : [])
       })),
       pariwisataCards: (currentDbData.pariwisataCards || []).map((c: any) => ({
-=======
-      homepageSettings: dbData.homepageSettings || INITIAL_HOMEPAGE_SETTINGS,
-      priorityPrograms: dbData.priorityPrograms || [],
-      users: [
-        { id: 'env-super-admin', username: process.env.DEFAULT_SUPER_ADMIN_USERNAME || 'superadmin' },
-        { id: 'env-regular-admin', username: process.env.DEFAULT_REGULAR_ADMIN_USERNAME || 'admin' }
-      ],
-      kepemudaanCards: (dbData.kepemudaanCards || []).map((c: any) => ({
-        ...c,
-        facilities: Array.isArray(c.facilities) ? c.facilities : (c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : [])
-      })),
-      olahragaCards: (dbData.olahragaCards || []).map((c: any) => ({
-        ...c,
-        facilities: Array.isArray(c.facilities) ? c.facilities : (c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : [])
-      })),
-      pariwisataCards: (dbData.pariwisataCards || []).map((c: any) => ({
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
         ...c,
         capacity: c.operationalHours || c.capacity || '',
         facilities: Array.isArray(c.facilities) ? c.facilities : (c.facilities ? c.facilities.split(',').map((f: string) => f.trim()).filter(Boolean) : [])
       })),
-<<<<<<< HEAD
       bidangBottomCards: currentDbData.bidangBottomCards || [],
       retribusi: currentDbData.retribusi || [],
-=======
-      bidangBottomCards: dbData.bidangBottomCards || [],
-      retribusi: dbData.retribusi || [],
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
       isFallback: true
     });
   }
@@ -318,6 +276,12 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized. Akses ditolak.' }, { status: 401 });
+    }
+    const ip = (request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')) || 'Unknown IP';
+    const currentUsername = (session.user as any)?.username || 'Admin';
+
     const body = await request.json();
     const { type, data } = body;
 
@@ -757,7 +721,6 @@ export async function POST(request: Request) {
           }
         });
       }
-<<<<<<< HEAD
 
       // Sync users and logs to db.json
       try {
@@ -768,12 +731,11 @@ export async function POST(request: Request) {
       } catch (e) {
         console.error('Failed to sync users and logs after admin self-update:', e);
       }
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     } else {
       return NextResponse.json({ error: 'Invalid data type' }, { status: 400 });
     }
 
+    await logAudit({ user: currentUsername || 'System', ip: ip || 'Unknown', endpoint: '/api/data', action: 'Operasi API Data Berhasil', status: 'Berhasil' });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to update database', error);

@@ -71,10 +71,7 @@ export default function AgendaEventAdminPage() {
 
   // Form states
   const [searchQuery, setSearchQuery] = useState<string>('');
-<<<<<<< HEAD
   const [isSaving, setIsSaving] = useState<boolean>(false);
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 
   const filteredEvents = events.filter(item => {
     const q = searchQuery.toLowerCase().trim();
@@ -154,7 +151,6 @@ export default function AgendaEventAdminPage() {
     setIsDeleteModalOpen(true);
   };
 
-<<<<<<< HEAD
   const handleConfirmDelete = async () => {
     if (!deleteTargetId) return;
 
@@ -181,22 +177,6 @@ export default function AgendaEventAdminPage() {
     setIsSaving(false);
     if (!success) {
       showNotification('Gagal menghapus data dari server.', 'error');
-=======
-  const handleConfirmDelete = () => {
-    if (!deleteTargetId) return;
-
-    if (deleteTargetId === 'bulk') {
-      const remainingEvents = events.filter(item => !selectedIds.includes(item.id));
-      setEvents(remainingEvents);
-      showNotification(`${selectedIds.length} agenda berhasil dihapus.`, 'success');
-      setSelectedIds([]);
-      setIsSelectMode(false);
-    } else {
-      const remainingEvents = events.filter(item => item.id !== deleteTargetId);
-      setEvents(remainingEvents);
-      showNotification('Agenda berhasil dihapus.', 'success');
-      setSelectedIds(prev => prev.filter(id => id !== deleteTargetId));
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     }
     setIsDeleteModalOpen(false);
     setDeleteTargetId(null);
@@ -207,13 +187,7 @@ export default function AgendaEventAdminPage() {
     setDeleteTargetId(null);
   };
 
-<<<<<<< HEAD
   const handleSubmit = async (e: React.FormEvent) => {
-=======
-
-
-  const handleSubmit = (e: React.FormEvent) => {
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
@@ -288,11 +262,7 @@ export default function AgendaEventAdminPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-<<<<<<< HEAD
           className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-=======
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             }`}
         >
           {notification.type === 'success' ? (
@@ -536,16 +506,10 @@ export default function AgendaEventAdminPage() {
                   </button>
                   <button
                     type="submit"
-<<<<<<< HEAD
                     disabled={isSaving}
                     className="px-6 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer font-mono text-xs uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSaving ? 'Menyimpan...' : 'Simpan'}
-=======
-                    className="px-6 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer font-mono text-xs uppercase tracking-wider"
-                  >
-                    Simpan
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                   </button>
                 </div>
               </>
@@ -588,18 +552,11 @@ export default function AgendaEventAdminPage() {
                 <button
                   type="button"
                   onClick={handleConfirmDelete}
-<<<<<<< HEAD
                   disabled={isSaving}
                   className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
                 >
                   {isSaving ? 'Menghapus...' : 'Ya, Hapus'}
-=======
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
-                  style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
-                >
-                  Ya, Hapus
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                 </button>
               </div>
             </div>

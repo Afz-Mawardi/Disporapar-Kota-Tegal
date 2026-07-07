@@ -319,7 +319,6 @@ export default function PariwisataAdminPage() {
 
   const bottomCard = useMemo(() => bidangBottomCards.find(c => c.id === 'pariwisata') || {
     id: 'pariwisata',
-<<<<<<< HEAD
     tag: '',
     title: '',
     description: '',
@@ -328,16 +327,6 @@ export default function PariwisataAdminPage() {
     imageUrl: '',
     sectionTag: '',
     sectionTitle: ''
-=======
-    tag: 'Mitra Pelaku Usaha Wisata',
-    title: 'Kembangkan Usaha Pariwisata & Kuliner Kreatif Anda Bersama Kami',
-    description: 'DISPORAPAR mendukung penuh pelaku industri penginapan, restoran Sate Tegal legendaris, agen perjalanan, serta pemandu wisata bahari untuk mengajukan data usaha resmi agar terdaftar secara luas di bawah rekomendasi katalog pariwisata terpadu.',
-    buttonText: 'Urus Izin Usaha & TDUP',
-    buttonLink: '/pelayanan',
-    imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800',
-    sectionTag: 'Destinasi Wisata',
-    sectionTitle: 'Destinasi Wisata Terpopuler & Unggulan'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
   }, [bidangBottomCards]);
 
   useEffect(() => {
@@ -384,11 +373,7 @@ export default function PariwisataAdminPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-<<<<<<< HEAD
           className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-=======
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             }`}
         >
           {notification.type === 'success' ? (

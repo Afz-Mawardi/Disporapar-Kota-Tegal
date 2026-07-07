@@ -9,10 +9,6 @@ import {
   ShieldAlert,
   Loader2,
   AlertCircle,
-<<<<<<< HEAD
-=======
-  FileSpreadsheet,
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
   SquareDot,
   CheckSquare,
   X
@@ -22,11 +18,7 @@ export default function RiwayatAdminPage() {
   const { data: session, status } = useSession();
 
   const [logs, setLogs] = useState<any[]>([]);
-<<<<<<< HEAD
   const [isLoading, setIsLoading] = useState(false);
-=======
-  const [isLoading, setIsLoading] = useState(true);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
   const [isAuthorized, setIsAuthorized] = useState(true);
 
   // Selection Mode States
@@ -35,10 +27,7 @@ export default function RiwayatAdminPage() {
 
   // Delete Modal State
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-<<<<<<< HEAD
   const [deleteTargetId, setDeleteTargetId] = useState<string | 'bulk' | null>(null);
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
   const [deleteWarningMessage, setDeleteWarningMessage] = useState('');
 
   // Notification Toast
@@ -53,17 +42,9 @@ export default function RiwayatAdminPage() {
 
   const fetchLogs = useCallback(async () => {
     try {
-<<<<<<< HEAD
       const res = await fetch('/api/admins/history');
       if (res.status === 403) {
         setIsAuthorized(false);
-=======
-      setIsLoading(true);
-      const res = await fetch('/api/admins/history');
-      if (res.status === 403) {
-        setIsAuthorized(false);
-        setIsLoading(false);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
         return;
       }
       if (res.ok) {
@@ -78,11 +59,6 @@ export default function RiwayatAdminPage() {
     } catch (err) {
       console.error(err);
       showNotification('Gagal terhubung dengan server.', 'error');
-<<<<<<< HEAD
-=======
-    } finally {
-      setIsLoading(false);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     }
   }, [showNotification]);
 
@@ -120,7 +96,6 @@ export default function RiwayatAdminPage() {
     }
   };
 
-<<<<<<< HEAD
   // Delete confirmation methods
   const openSingleDeleteModal = (id: string) => {
     setDeleteTargetId(id);
@@ -131,45 +106,28 @@ export default function RiwayatAdminPage() {
   const openBulkDeleteModal = () => {
     if (selectedIds.length === 0) return;
     setDeleteTargetId('bulk');
-=======
-  // Bulk Delete
-  const openBulkDeleteModal = () => {
-    if (selectedIds.length === 0) return;
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     setDeleteWarningMessage(`Apakah Anda yakin ingin menghapus ${selectedIds.length} data riwayat aktivitas terpilih secara permanen?`);
     setIsDeleteModalOpen(true);
   };
 
   const handleCancelDelete = () => {
     setIsDeleteModalOpen(false);
-<<<<<<< HEAD
     setDeleteTargetId(null);
   };
 
   const handleConfirmDelete = async () => {
     const idsToDelete = deleteTargetId === 'bulk' ? selectedIds : (deleteTargetId ? [deleteTargetId] : []);
     if (idsToDelete.length === 0) return;
-=======
-  };
-
-  const handleConfirmDelete = async () => {
-    if (selectedIds.length === 0) return;
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 
     try {
       const res = await fetch('/api/admins/history', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-<<<<<<< HEAD
         body: JSON.stringify({ ids: idsToDelete })
-=======
-        body: JSON.stringify({ ids: selectedIds })
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
       });
 
       const data = await res.json();
       if (res.ok && data.success) {
-<<<<<<< HEAD
         showNotification(`${idsToDelete.length} data riwayat berhasil dihapus.`, 'success');
         setLogs(prev => prev.filter(item => !idsToDelete.includes(item.id)));
         if (deleteTargetId === 'bulk') {
@@ -180,24 +138,13 @@ export default function RiwayatAdminPage() {
         }
       } else {
         showNotification(data.error || 'Gagal menghapus riwayat.', 'error');
-=======
-        showNotification(`${selectedIds.length} data riwayat berhasil dihapus.`, 'success');
-        setLogs(prev => prev.filter(item => !selectedIds.includes(item.id)));
-        setSelectedIds([]);
-        setIsSelectMode(false);
-      } else {
-        showNotification(data.error || 'Gagal menghapus riwayat terpilih.', 'error');
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
       }
     } catch (err) {
       console.error(err);
       showNotification('Terjadi kesalahan koneksi.', 'error');
     } finally {
       setIsDeleteModalOpen(false);
-<<<<<<< HEAD
       setDeleteTargetId(null);
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     }
   };
 
@@ -217,40 +164,6 @@ export default function RiwayatAdminPage() {
     }
   };
 
-<<<<<<< HEAD
-=======
-  // Export to Excel (CSV format helper)
-  const exportToExcel = () => {
-    const headers = ['No', 'Tanggal & Waktu', 'Aktivitas Perubahan'];
-    const rows = logs.map((item, index) => [
-      index + 1,
-      formatDate(item.createdAt),
-      item.action
-    ]);
-
-    const csvContent = 'sep=;\r\n' + [
-      headers.join(';'),
-      ...rows.map(row =>
-        row.map(val => {
-          const cleanVal = String(val)
-            .replace(/\r?\n|\r/g, ' ')
-            .replace(/"/g, '""');
-          return `"${cleanVal}"`;
-        }).join(';')
-      )
-    ].join('\r\n');
-
-    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Riwayat_Perubahan_Admin_${new Date().toLocaleDateString('id-ID').replace(/\//g, '-')}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 
   // Render Access Denied
   if (!isAuthorized) {
@@ -275,11 +188,7 @@ export default function RiwayatAdminPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-<<<<<<< HEAD
           className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-=======
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             }`}
         >
           {notification.type === 'success' ? (
@@ -304,13 +213,8 @@ export default function RiwayatAdminPage() {
             <button
               onClick={handleToggleSelectMode}
               className={`px-5 py-2.5 text-xs font-mono font-extrabold uppercase tracking-wider rounded-full transition-all shadow-md active:scale-98 flex items-center gap-2 cursor-pointer ${isSelectMode
-<<<<<<< HEAD
                 ? 'bg-slate-700 hover:bg-slate-600 text-white'
                 : 'bg-[#0E3B66] hover:bg-[#0c3359] text-white'
-=======
-                  ? 'bg-slate-700 hover:bg-slate-600 text-white'
-                  : 'bg-[#0E3B66] hover:bg-[#0c3359] text-white'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                 }`}
             >
               {isSelectMode ? <CheckSquare className="w-4 h-4" /> : <SquareDot className="w-4 h-4" />}
@@ -327,18 +231,7 @@ export default function RiwayatAdminPage() {
               </button>
             )}
 
-<<<<<<< HEAD
 
-=======
-            <button
-              onClick={exportToExcel}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-mono font-extrabold uppercase tracking-wider rounded-full transition-all shadow-md active:scale-98 flex items-center gap-2 cursor-pointer"
-              title="Unduh Riwayat"
-            >
-              <FileSpreadsheet className="w-4 h-4" />
-              <span>Unduh Csv</span>
-            </button>
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
           </div>
 
           <div className="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider shrink-0">
@@ -352,11 +245,7 @@ export default function RiwayatAdminPage() {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-xs sm:text-sm font-inter">
             <thead>
-<<<<<<< HEAD
               <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
-=======
-              <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200 select-none">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                 {isSelectMode && (
                   <th className="py-4 px-3 text-center w-12 animate-fade-in">
                     <input
@@ -370,33 +259,15 @@ export default function RiwayatAdminPage() {
                 <th className="py-4 px-6 text-center w-16">No</th>
                 <th className="py-4 px-4 w-52">Waktu Perubahan</th>
                 <th className="py-4 px-6">Teks Perubahan / Log Perubahan</th>
-<<<<<<< HEAD
                 <th className="py-4 px-6 text-center w-28">Aksi</th>
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
               {logs.length === 0 ? (
                 <tr>
-<<<<<<< HEAD
                   <td colSpan={isSelectMode ? 5 : 4} className="py-12 text-center text-slate-400">
                     <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
                     <span className="font-mono text-[10px] font-bold uppercase">BELUM ADA RIWAYAT AKTIVITAS</span>
-=======
-                  <td colSpan={isSelectMode ? 4 : 3} className="py-12 text-center text-slate-400 select-none">
-                    {status === 'loading' || isLoading ? (
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <Loader2 className="w-6 h-6 animate-spin text-[#0E3B66]" />
-                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Memuat riwayat aktivitas...</span>
-                      </div>
-                    ) : (
-                      <>
-                        <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                        <span className="font-mono text-[10px] font-bold uppercase">BELUM ADA RIWAYAT AKTIVITAS</span>
-                      </>
-                    )}
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                   </td>
                 </tr>
               ) : (
@@ -425,7 +296,6 @@ export default function RiwayatAdminPage() {
                     <td className="py-4 px-6 text-slate-700 text-xs sm:text-sm font-medium leading-relaxed">
                       {log.action}
                     </td>
-<<<<<<< HEAD
                     <td className="py-4 px-6 text-center">
                       <div className="flex items-center justify-center">
                         <button
@@ -437,8 +307,6 @@ export default function RiwayatAdminPage() {
                         </button>
                       </div>
                     </td>
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                   </tr>
                 ))
               )}

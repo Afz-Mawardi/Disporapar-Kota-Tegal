@@ -214,11 +214,7 @@ export default function PengaduanInternalPage() {
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#F8FAFC] to-transparent z-10" />
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<<<<<<< HEAD
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 pointer-events-none" aria-hidden="true">
-=======
-          <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             Layanan Pengaduan
           </span>
           <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
@@ -233,14 +229,8 @@ export default function PengaduanInternalPage() {
         {notification && (
           <div
             onClick={() => setNotification(null)}
-<<<<<<< HEAD
             className={`fixed top-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs sm:text-sm font-bold font-inter shadow-xl transition-all duration-300 animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
               }`}
-=======
-            className={`fixed top-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs sm:text-sm font-bold font-inter shadow-xl transition-all duration-300 animate-fade-in cursor-pointer select-none ${
-              notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-            }`}
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
           >
             {notification.type === 'success' ? (
               <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 animate-bounce" />
@@ -264,19 +254,11 @@ export default function PengaduanInternalPage() {
               <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 mb-5">
                 <CheckCircle className="w-10 h-10" />
               </div>
-<<<<<<< HEAD
 
               <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
                 Terima Kasih!
               </h3>
 
-=======
-              
-              <h3 className="text-xl sm:text-2xl font-extrabold text-[#0E3B66] tracking-tight leading-tight">
-                Terima Kasih!
-              </h3>
-              
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
               <p className="text-sm text-slate-500 font-inter font-light mt-3 leading-relaxed">
                 Pengaduan Anda berhasil dikirim dan akan segera ditindaklanjuti.
               </p>
@@ -295,11 +277,7 @@ export default function PengaduanInternalPage() {
         {/* Form Card */}
         <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-10 lg:p-12 shadow-sm mb-6 transition-all duration-300">
           <form onSubmit={handleSubmit} className="space-y-6 text-left">
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             {/* Judul Pengaduan */}
             <div className="space-y-2">
               <label htmlFor="title" className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono flex items-center gap-1.5">
@@ -339,28 +317,16 @@ export default function PengaduanInternalPage() {
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono flex items-center gap-1.5">
                 Lampiran Foto <span className="text-slate-400 font-light font-sans text-[10px]">(Opsional)</span>
               </label>
-<<<<<<< HEAD
 
-=======
-              
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
               {!imagePreview ? (
                 <div
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-<<<<<<< HEAD
                   className={`border-2 border-dashed rounded-2xl p-6 text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${isDragOver
                       ? 'border-accent bg-accent/5 scale-[1.01] shadow-inner'
                       : 'border-slate-300 bg-slate-50 hover:bg-slate-100/70 hover:border-slate-400'
                     }`}
-=======
-                  className={`border-2 border-dashed rounded-2xl p-6 text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${
-                    isDragOver 
-                      ? 'border-accent bg-accent/5 scale-[1.01] shadow-inner' 
-                      : 'border-slate-300 bg-slate-50 hover:bg-slate-100/70 hover:border-slate-400'
-                  }`}
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <Upload className="w-8 h-8 text-slate-400 animate-pulse" />

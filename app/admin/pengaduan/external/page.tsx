@@ -12,11 +12,7 @@ import {
 
 export default function AdminExternalLinksPage() {
   const [links, setLinks] = useState<any[]>([]);
-<<<<<<< HEAD
   const [isLoading, setIsLoading] = useState(false);
-=======
-  const [isLoading, setIsLoading] = useState(true);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
   const [isSaving, setIsSaving] = useState(false);
 
   // Form states mapping
@@ -39,10 +35,6 @@ export default function AdminExternalLinksPage() {
 
   const fetchLinks = useCallback(async () => {
     try {
-<<<<<<< HEAD
-=======
-      setIsLoading(true);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
       const res = await fetch('/api/external-links');
       if (res.ok) {
         const data = await res.json();
@@ -72,11 +64,6 @@ export default function AdminExternalLinksPage() {
     } catch (err) {
       console.error(err);
       showNotification('Gagal terhubung dengan server.', 'error');
-<<<<<<< HEAD
-=======
-    } finally {
-      setIsLoading(false);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     }
   }, [showNotification]);
 
@@ -123,11 +110,7 @@ export default function AdminExternalLinksPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-<<<<<<< HEAD
           className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-=======
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             }`}
         >
           {notification.type === 'success' ? (
@@ -144,11 +127,7 @@ export default function AdminExternalLinksPage() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left text-xs sm:text-sm">
               <thead>
-<<<<<<< HEAD
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-450 uppercase text-[9px] sm:text-[10px] tracking-wider font-mono font-black">
-=======
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-450 uppercase text-[9px] sm:text-[10px] tracking-wider font-mono font-black select-none">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                   <th className="py-4 px-6 w-1/4">Menu Tautan</th>
                   <th className="py-4 px-4 w-1/3">Nama Menu Navbar</th>
                   <th className="py-4 px-4">URL Tujuan</th>

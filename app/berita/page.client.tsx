@@ -44,23 +44,14 @@ export default function BeritaPageClient({
   const filteredNews = sortedNews.filter((item) => {
     const matchesCategory = selectedCategory === 'Semua' || item.category === selectedCategory;
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-<<<<<<< HEAD
       item.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.content.toLowerCase().includes(searchQuery.toLowerCase());
-=======
-                          item.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          item.content.toLowerCase().includes(searchQuery.toLowerCase());
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     return matchesCategory && matchesSearch;
   });
 
   return (
     <div id="berita-page" className="w-full bg-[#F8FAFC] pb-24 font-sans text-slate-800">
-<<<<<<< HEAD
 
-=======
-      
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
       {/* Editorial Page Header */}
       <section className="relative py-20 sm:py-24 bg-gradient-to-br from-primary-950 via-primary-900 to-primary-950 text-white overflow-hidden">
         {/* Decorative Background Elements */}
@@ -68,15 +59,9 @@ export default function BeritaPageClient({
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#F8FAFC] to-transparent z-10" />
-<<<<<<< HEAD
 
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 pointer-events-none" aria-hidden="true">
-=======
-        
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             Media Publikasi & Pers Rilis Resmi
           </span>
           <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
@@ -88,11 +73,7 @@ export default function BeritaPageClient({
       {/* FILTER & SEARCH INTERACTIVE BAR */}
       <section className="sticky top-[68px] lg:top-[76px] z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 pb-4">
         <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-slate-100/80 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between transition-all duration-300">
-<<<<<<< HEAD
 
-=======
-          
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
           {/* Category Chips Tab Panel */}
           <div className="flex flex-wrap gap-2 items-center">
             {categories.map((cat) => (
@@ -100,18 +81,10 @@ export default function BeritaPageClient({
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-<<<<<<< HEAD
                 className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase font-mono transition-all cursor-pointer ${selectedCategory === cat
                     ? 'bg-primary text-white shadow-md shadow-primary/20 hover:bg-opacity-95'
                     : 'bg-slate-50 text-slate-500 hover:text-[#0E3B66] hover:bg-slate-100 border border-slate-200/50'
                   }`}
-=======
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase font-mono transition-all cursor-pointer ${
-                  selectedCategory === cat
-                    ? 'bg-primary text-white shadow-md shadow-primary/20 hover:bg-opacity-95'
-                    : 'bg-slate-50 text-slate-500 hover:text-[#0E3B66] hover:bg-slate-100 border border-slate-200/50'
-                }`}
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
               >
                 {cat}
               </button>
@@ -162,18 +135,10 @@ export default function BeritaPageClient({
                     </div>
                   )}
                   <div className="absolute top-4 left-4 z-10">
-<<<<<<< HEAD
                     <span className={`px-2.5 py-1 text-[9px] font-bold font-mono uppercase tracking-widest rounded-lg shadow-sm border ${news.category === 'Olahraga' ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40 backdrop-blur-xs' :
                         news.category === 'Kepemudaan' ? 'bg-blue-950/80 text-blue-400 border-blue-500/40 backdrop-blur-xs' :
                           'bg-amber-950/80 text-amber-400 border-amber-500/40 backdrop-blur-xs'
                       }`}>
-=======
-                    <span className={`px-2.5 py-1 text-[9px] font-bold font-mono uppercase tracking-widest rounded-lg shadow-sm border ${
-                      news.category === 'Olahraga' ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40 backdrop-blur-xs' :
-                      news.category === 'Kepemudaan' ? 'bg-blue-950/80 text-blue-400 border-blue-500/40 backdrop-blur-xs' :
-                      'bg-amber-950/80 text-amber-400 border-amber-500/40 backdrop-blur-xs'
-                    }`}>
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                       {news.category}
                     </span>
                   </div>

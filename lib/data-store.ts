@@ -436,11 +436,7 @@ function useDataStore<T>(
   initialData: T | undefined,
   fallbackData: T,
   getStored: () => T,
-<<<<<<< HEAD
   saveStored: (data: T) => any
-=======
-  saveStored: (data: T) => void
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 ) {
   const [data, setData] = useState<T>(initialData !== undefined ? initialData : fallbackData);
 
@@ -467,7 +463,6 @@ function useDataStore<T>(
     };
   }, [getStored]);
 
-<<<<<<< HEAD
   const updateData = async (newData: T): Promise<boolean> => {
     const result = saveStored(newData);
     if (result instanceof Promise) {
@@ -513,44 +508,6 @@ export function useWelcomeMessage(initialData?: WelcomeMessage) {
   return useDataStore(initialData, initialWelcomeMessage, getStoredWelcomeMessage, saveStoredWelcomeMessage);
 }
 
-=======
-  const updateData = (newData: T) => {
-    saveStored(newData);
-    setData(newData);
-  };
-
-  return [data, updateData] as const;
-}
-
-export function useNews(initialData?: News[]) {
-  return useDataStore(initialData, initialNews, getStoredNews, saveStoredNews);
-}
-
-export function useEvents(initialData?: EventAgenda[]) {
-  return useDataStore(initialData, initialEvents, getStoredEvents, saveStoredEvents);
-}
-
-export function useGallery(initialData?: typeof initialGallery) {
-  return useDataStore(initialData, initialGallery, getStoredGallery, saveStoredGallery);
-}
-
-export function usePublicServices(initialData?: PublicService[]) {
-  return useDataStore(initialData, initialServices, getStoredServices, saveStoredServices);
-}
-
-export function useOfficeInfo(initialData?: typeof initialOfficeInfo) {
-  return useDataStore(initialData, initialOfficeInfo, getStoredOfficeInfo, saveStoredOfficeInfo);
-}
-
-export function useCategories(initialData?: CategoryStore) {
-  return useDataStore(initialData, initialCategories, getStoredCategories, saveStoredCategories);
-}
-
-export function useWelcomeMessage(initialData?: WelcomeMessage) {
-  return useDataStore(initialData, initialWelcomeMessage, getStoredWelcomeMessage, saveStoredWelcomeMessage);
-}
-
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 export function useHeroSlides(initialData?: HeroSlide[]) {
   return useDataStore(initialData, initialHeroSlides, getStoredHeroSlides, saveStoredHeroSlides);
 }

@@ -29,7 +29,6 @@ export default function PariwisataPageClient({
   const [destinations] = usePariwisataCards(initialPariwisataCards);
   const [bottomCards] = useBidangBottomCards(initialBidangBottomCards);
   const bottomCard = bottomCards.find(c => c.id === 'pariwisata') || {
-<<<<<<< HEAD
     id: 'pariwisata',
     tag: '',
     title: '',
@@ -39,16 +38,6 @@ export default function PariwisataPageClient({
     imageUrl: '',
     sectionTag: '',
     sectionTitle: ''
-=======
-    tag: 'Mitra Pelaku Usaha Wisata',
-    title: 'Kembangkan Usaha Pariwisata & Kuliner Kreatif Anda Bersama Kami',
-    description: 'DISPORAPAR mendukung penuh pelaku industri penginapan, restoran Sate Tegal legendaris, agen perjalanan, serta pemandu wisata bahari untuk mengajukan data usaha resmi agar terdaftar secara luas di bawah rekomendasi katalog pariwisata terpadu.',
-    buttonText: 'Urus Izin Usaha & TDUP',
-    buttonLink: '/pelayanan',
-    imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800',
-    sectionTag: 'Destinasi Wisata',
-    sectionTitle: 'Destinasi Wisata Terpopuler & Unggulan'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
   };
 
   return (
@@ -63,11 +52,7 @@ export default function PariwisataPageClient({
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#F8FAFC] to-transparent z-10" />
 
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<<<<<<< HEAD
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 pointer-events-none" aria-hidden="true">
-=======
-          <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             Bidang Pariwisata
           </span>
           <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">

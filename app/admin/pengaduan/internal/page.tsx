@@ -17,23 +17,15 @@ import {
   AlertCircle,
   FileSpreadsheet,
   SquareDot,
-<<<<<<< HEAD
   CheckSquare,
   ChevronDown
-=======
-  CheckSquare
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 } from 'lucide-react';
 
 export default function AdminComplaintsPage() {
   const [complaints, setComplaints] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('Semua');
-<<<<<<< HEAD
   const [isLoading, setIsLoading] = useState(false);
-=======
-  const [isLoading, setIsLoading] = useState(true);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 
   // Modal Detail State
   const [selectedComplaint, setSelectedComplaint] = useState<any | null>(null);
@@ -86,10 +78,6 @@ export default function AdminComplaintsPage() {
 
   const fetchComplaints = useCallback(async () => {
     try {
-<<<<<<< HEAD
-=======
-      setIsLoading(true);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
       const res = await fetch('/api/complaints');
       if (res.ok) {
         const data = await res.json();
@@ -102,11 +90,6 @@ export default function AdminComplaintsPage() {
     } catch (err) {
       console.error(err);
       showNotification('Gagal terhubung dengan server.', 'error');
-<<<<<<< HEAD
-=======
-    } finally {
-      setIsLoading(false);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     }
   }, [showNotification]);
 
@@ -344,7 +327,6 @@ export default function AdminComplaintsPage() {
     }
   };
 
-<<<<<<< HEAD
   const formatDateOnly = (dateStr: string) => {
     try {
       const d = new Date(dateStr);
@@ -376,13 +358,6 @@ export default function AdminComplaintsPage() {
       index + 1,
       formatDateOnly(item.createdAt),
       formatTimeOnly(item.createdAt),
-=======
-  const exportToExcel = () => {
-    const headers = ['No', 'Tanggal', 'Judul Pengaduan', 'Isi Pengaduan', 'Kontak', 'Status', 'Catatan Admin', 'Gambar'];
-    const rows = filteredComplaints.map((item, index) => [
-      index + 1,
-      formatDate(item.createdAt),
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
       item.title,
       item.content,
       item.contact || 'Anonim',
@@ -422,11 +397,7 @@ export default function AdminComplaintsPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-<<<<<<< HEAD
           className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-=======
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             }`}
         >
           {notification.type === 'success' ? (
@@ -511,11 +482,7 @@ export default function AdminComplaintsPage() {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-xs sm:text-sm font-inter">
             <thead>
-<<<<<<< HEAD
               <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
-=======
-              <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200 select-none">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                 {isSelectMode && (
                   <th className="py-4 px-3 text-center w-12 animate-fade-in">
                     <input
@@ -538,24 +505,9 @@ export default function AdminComplaintsPage() {
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
               {filteredComplaints.length === 0 ? (
                 <tr>
-<<<<<<< HEAD
                   <td colSpan={isSelectMode ? 8 : 7} className="py-12 text-center text-slate-400">
                     <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
                     <span className="font-mono text-[10px] font-bold uppercase">TIDAK ADA DATA PENGADUAN</span>
-=======
-                  <td colSpan={isSelectMode ? 8 : 7} className="py-12 text-center text-slate-400 select-none">
-                    {isLoading ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin text-[#0E3B66]" />
-                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Memuat data...</span>
-                      </div>
-                    ) : (
-                      <>
-                        <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                        <span className="font-mono text-[10px] font-bold uppercase">TIDAK ADA DATA PENGADUAN</span>
-                      </>
-                    )}
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                   </td>
                 </tr>
               ) : (
@@ -716,11 +668,7 @@ export default function AdminComplaintsPage() {
               ) : (
                 <div className="space-y-1.5">
                   <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest font-mono block">Lampiran Foto</span>
-<<<<<<< HEAD
                   <div className="p-3.5 bg-slate-50 border border-slate-150 rounded-xl text-slate-400 text-xs flex items-center gap-2">
-=======
-                  <div className="p-3.5 bg-slate-50 border border-slate-150 rounded-xl text-slate-400 text-xs flex items-center gap-2 select-none">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                     <ImageIcon className="w-4.5 h-4.5 opacity-40 shrink-0" />
                     <span className="font-mono text-[9px] font-bold uppercase tracking-wider">Tidak ada lampiran foto</span>
                   </div>

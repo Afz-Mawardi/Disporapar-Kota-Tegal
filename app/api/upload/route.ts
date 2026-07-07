@@ -1,11 +1,37 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+import { logAudit } from '@/lib/audit';
 
 export const revalidate = 20;
 
+const ALLOWED_MIME_TYPES: Record<string, string> = {
+  'image/webp': '.webp',
+  'image/png': '.png',
+  'image/jpeg': '.jpg',
+  'image/jpg': '.jpg',
+  'application/pdf': '.pdf',
+  'application/zip': '.zip',
+  'application/x-zip-compressed': '.zip',
+  'application/msword': '.doc',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx'
+};
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized. Akses ditolak.' }, { status: 401 });
+    }
+
+    const ip = (request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')) || 'Unknown IP';
+    const user = (session.user as any).username || 'Unknown Admin';
+
     const { fileBase64, fileName, menu } = await request.json();
 
     if (!fileBase64) {
@@ -18,9 +44,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Format berkas base64 tidak valid.' }, { status: 400 });
     }
 
-    const mimeType = matches[1];
+    const mimeType = matches[1].toLowerCase();
     const base64Data = matches[2];
+    
+    // Validate MIME Type
+    if (!ALLOWED_MIME_TYPES[mimeType]) {
+      await logAudit({ user, ip, endpoint: '/api/upload', action: 'Upload', status: 'Gagal', details: { reason: 'Tipe MIME tidak diizinkan', mimeType } });
+      return NextResponse.json({ error: 'Tipe file tidak diizinkan. Dilarang mengunggah file berbahaya.' }, { status: 400 });
+    }
+
     const dataBuffer = Buffer.from(base64Data, 'base64');
+
+    // Validate File Size
+    if (dataBuffer.length > MAX_FILE_SIZE) {
+      await logAudit({ user, ip, endpoint: '/api/upload', action: 'Upload', status: 'Gagal', details: { reason: 'Ukuran file melebihi 5MB', size: dataBuffer.length } });
+      return NextResponse.json({ error: 'Ukuran file melebihi batas maksimal (5MB).' }, { status: 400 });
+    }
 
     // Clean up menu folder name
     const menuClean = (menu || 'uploads').toLowerCase().trim();
@@ -38,7 +77,7 @@ export async function POST(request: Request) {
     } else if (menuClean === 'pengaduan') {
       subFolder = 'uploads/pengaduan';
     } else if (menuClean === 'sambutan' || menuClean === 'beranda') {
-      subFolder = 'uploads/galeri'; // Fallback to galeri for static welcome & banner images
+      subFolder = 'uploads/galeri'; // Fallback to galeri
     }
 
     // Target upload directory
@@ -47,33 +86,9 @@ export async function POST(request: Request) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    // Determine extension based on fileName or mimeType
-    let extension = '';
-    if (fileName && fileName.includes('.')) {
-      extension = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
-    } else {
-      const mimeToExt: Record<string, string> = {
-        'image/webp': '.webp',
-        'image/png': '.png',
-        'image/jpeg': '.jpg',
-        'image/jpg': '.jpg',
-        'application/pdf': '.pdf',
-        'application/zip': '.zip',
-        'application/x-zip-compressed': '.zip',
-        'application/msword': '.doc',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx'
-      };
-      extension = mimeToExt[mimeType] || '.bin';
-    }
-
-    // Clean file name
-    const originalBaseName = fileName
-      ? fileName.substring(0, fileName.lastIndexOf('.'))
-      : 'upload';
-    const sanitizedBaseName = originalBaseName.replace(/[^a-zA-Z0-9.-]/g, '_');
-    
-    // Generate unique file name
-    const finalFileName = `${Date.now()}_${sanitizedBaseName}${extension}`;
+    // Generate secure random file name (Ignoring user's extension entirely to prevent path traversal & execution)
+    const secureExtension = ALLOWED_MIME_TYPES[mimeType];
+    const finalFileName = `${Date.now()}_${crypto.randomUUID()}${secureExtension}`;
     const filePath = path.join(uploadDir, finalFileName);
 
     // Write file to disk
@@ -82,6 +97,8 @@ export async function POST(request: Request) {
     // Relative public URL
     const fileUrl = `/${subFolder}/${finalFileName}`;
 
+    await logAudit({ user, ip, endpoint: '/api/upload', action: 'Upload', status: 'Berhasil', details: { fileUrl, size: dataBuffer.length } });
+
     return NextResponse.json({
       success: true,
       url: fileUrl,
@@ -89,6 +106,6 @@ export async function POST(request: Request) {
     });
   } catch (error: any) {
     console.error('File upload error:', error);
-    return NextResponse.json({ error: error.message || 'Gagal mengunggah berkas.' }, { status: 500 });
+    return NextResponse.json({ error: 'Gagal mengunggah berkas. Internal Server Error.' }, { status: 500 });
   }
 }

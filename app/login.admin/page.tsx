@@ -42,7 +42,6 @@ function LoginPageContent() {
   useEffect(() => {
     const hasLoginRecord = localStorage.getItem('disporapar_admin_login_time');
 
-<<<<<<< HEAD
     if (reason === 'db_error') {
       showNotification('Gagal menghubungkan database MySQL', 'error', null);
 
@@ -52,9 +51,6 @@ function LoginPageContent() {
       const newUrl = window.location.pathname;
       window.history.replaceState({ path: newUrl }, '', newUrl);
     } else if (status === 'unauthenticated' && (reason === 'expired' || hasLoginRecord)) {
-=======
-    if (status === 'unauthenticated' && (reason === 'expired' || hasLoginRecord)) {
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
       showNotification('Sesi Anda telah berakhir karena tidak ada aktivitas selama 20 menit.', 'error', null);
 
       // Clean up localStorage records immediately so it doesn't show again on manual refresh
@@ -131,11 +127,7 @@ function LoginPageContent() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-<<<<<<< HEAD
           className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-=======
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             }`}
         >
           {notification.type === 'success' ? (

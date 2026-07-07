@@ -319,7 +319,6 @@ export default function OlahragaAdminPage() {
 
   const bottomCard = useMemo(() => bidangBottomCards.find(c => c.id === 'olahraga') || {
     id: 'olahraga',
-<<<<<<< HEAD
     tag: '',
     title: '',
     description: '',
@@ -328,16 +327,6 @@ export default function OlahragaAdminPage() {
     imageUrl: '',
     sectionTag: '',
     sectionTitle: ''
-=======
-    tag: 'Pemberdayaan Atlet Daerah',
-    title: 'Pemusatan Latihan & Pembinaan Olahraga Berkelanjutan',
-    description: 'DISPORAPAR bersinergi erat bersama KONI (Komite Olahraga Nasional Indonesia) Kota Tegal secara terpadu mengelola pemusatan latihan atlet usia dini berkala, peningkatan kualifikasi lisensi pelatih nasional, serta penyelenggaraan bonus apresiasi kejuaraan PORPROV & PON.',
-    buttonText: 'Hubungi Layanan Atlet & KONI',
-    buttonLink: '/pelayanan',
-    imageUrl: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=800',
-    sectionTag: 'Sarana & Fasilitas Olahraga',
-    sectionTitle: 'Pusat Kegiatan Keolahragaan Kota Tegal'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
   }, [bidangBottomCards]);
 
   useEffect(() => {
@@ -384,11 +373,7 @@ export default function OlahragaAdminPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-<<<<<<< HEAD
           className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-=======
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             }`}
         >
           {notification.type === 'success' ? (

@@ -117,11 +117,7 @@ export default function Footer() {
                 alt="Amazing Tegal Logo"
                 width={375}
                 height={98}
-<<<<<<< HEAD
                 className="object-contain w-auto h-8 sm:h-9 shrink-0"
-=======
-                className="object-contain w-auto h-8 sm:h-9 select-none shrink-0"
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                 priority
               />
             </div>

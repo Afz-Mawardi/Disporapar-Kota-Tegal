@@ -299,11 +299,7 @@ export default function RetribusiAdminPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-<<<<<<< HEAD
           className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-=======
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             }`}
         >
           {notification.type === 'success' ? (
@@ -546,7 +542,6 @@ export default function RetribusiAdminPage() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4 text-left">
               <>
-<<<<<<< HEAD
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Nama Fasilitas / Layanan</label>
                   <input
@@ -571,32 +566,6 @@ export default function RetribusiAdminPage() {
                     ))}
                   </select>
                 </div>
-=======
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Nama Fasilitas / Layanan</label>
-                    <input
-                      type="text"
-                      required
-                      name="name"
-                      defaultValue={editingItem?.name || ''}
-                      placeholder="Contoh: Lapangan Tenis GOR Wisanggeni"
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Kategori Bidang</label>
-                    <select
-                      name="category"
-                      defaultValue={editingItem?.category || (getRetribusiCategories()[0] || 'Olahraga')}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 cursor-pointer"
-                    >
-                      {getRetribusiCategories().map((c) => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </select>
-                  </div>
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Biaya / Tarif Resmi</label>
@@ -610,7 +579,6 @@ export default function RetribusiAdminPage() {
                   />
                 </div>
 
-<<<<<<< HEAD
                 <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100 shrink-0">
                   <button
                     type="button"
@@ -631,73 +599,6 @@ export default function RetribusiAdminPage() {
                 </div>
               </>
             </form>
-=======
-                  <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsModalOpen(false);
-                        setEditingItem(null);
-                      }}
-                      className="px-5 py-2.5 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl transition-all cursor-pointer font-bold text-xs uppercase tracking-wider font-mono"
-                    >
-                      Batal
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-6 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer font-mono text-xs uppercase tracking-wider"
-                    >
-                      Simpan Tarif
-                    </button>
-                  </div>
-                </>
-              </form>
-            </div>
-          </div>
-        )}
-
-      {/* DELETE CONFIRMATION MODAL */}
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in font-inter">
-          <div className="absolute inset-0" onClick={handleCancelDelete} />
-          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-150 overflow-hidden flex flex-col relative z-10 animate-scale-in text-left">
-            {/* Modal Header */}
-            <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-              <h3 className="text-sm font-black text-[#0E3B66] uppercase tracking-wider font-mono">
-                Konfirmasi Hapus
-              </h3>
-              <button
-                onClick={handleCancelDelete}
-                className="p-1.5 text-slate-450 hover:text-slate-700 hover:bg-slate-200/50 rounded-xl transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6 space-y-4">
-              <p className="text-xs text-slate-500 leading-relaxed">
-                {deleteWarningMessage}
-              </p>
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={handleCancelDelete}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmDelete}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
-                  style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
-                >
-                  Ya, Hapus
-                </button>
-              </div>
-            </div>
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
           </div>
         </div>
       )}

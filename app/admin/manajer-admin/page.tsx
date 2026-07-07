@@ -19,15 +19,9 @@ import {
 
 export default function ManajerAdminPage() {
   const { data: session, status } = useSession();
-<<<<<<< HEAD
 
   const [admins, setAdmins] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-=======
-  
-  const [admins, setAdmins] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
   const [isAuthorized, setIsAuthorized] = useState(true);
 
   const sortedAdmins = useMemo(() => {
@@ -55,11 +49,7 @@ export default function ManajerAdminPage() {
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
   // Forms state
   const [usernameInput, setUsernameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
@@ -94,17 +84,9 @@ export default function ManajerAdminPage() {
 
   const fetchAdmins = useCallback(async () => {
     try {
-<<<<<<< HEAD
       const res = await fetch('/api/admins');
       if (res.status === 403) {
         setIsAuthorized(false);
-=======
-      setIsLoading(true);
-      const res = await fetch('/api/admins');
-      if (res.status === 403) {
-        setIsAuthorized(false);
-        setIsLoading(false);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
         return;
       }
       if (res.ok) {
@@ -119,11 +101,6 @@ export default function ManajerAdminPage() {
     } catch (err) {
       console.error(err);
       showNotification('Gagal terhubung dengan server.', 'error');
-<<<<<<< HEAD
-=======
-    } finally {
-      setIsLoading(false);
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     }
   }, [showNotification]);
 
@@ -324,11 +301,7 @@ export default function ManajerAdminPage() {
       {notification && (
         <div
           onClick={() => setNotification(null)}
-<<<<<<< HEAD
           className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
-=======
-          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-4 rounded-xl flex items-center gap-3 border text-xs font-bold font-inter transition-all animate-fade-in cursor-pointer select-none ${notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             }`}
         >
           {notification.type === 'success' ? (
@@ -366,11 +339,7 @@ export default function ManajerAdminPage() {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-xs sm:text-sm font-inter">
             <thead>
-<<<<<<< HEAD
               <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
-=======
-              <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200 select-none">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                 <th className="py-4 px-6 text-center w-16">No</th>
                 <th className="py-4 px-6">Username</th>
                 <th className="py-4 px-6 text-center w-48">Peran / Role</th>
@@ -380,24 +349,9 @@ export default function ManajerAdminPage() {
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
               {sortedAdmins.length === 0 ? (
                 <tr>
-<<<<<<< HEAD
                   <td colSpan={4} className="py-12 text-center text-slate-400">
                     <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
                     <span className="font-mono text-[10px] font-bold uppercase">TIDAK ADA DATA ADMINISTRATOR</span>
-=======
-                  <td colSpan={4} className="py-12 text-center text-slate-400 select-none">
-                    {status === 'loading' || isLoading ? (
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <Loader2 className="w-6 h-6 animate-spin text-[#0E3B66]" />
-                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Memuat data administrator...</span>
-                      </div>
-                    ) : (
-                      <>
-                        <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                        <span className="font-mono text-[10px] font-bold uppercase">TIDAK ADA DATA ADMINISTRATOR</span>
-                      </>
-                    )}
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                   </td>
                 </tr>
               ) : (

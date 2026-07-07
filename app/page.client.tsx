@@ -1,10 +1,6 @@
 'use client';
 
-<<<<<<< HEAD
 import React, { useState, useEffect, useMemo } from 'react';
-=======
-import React, { useState, useEffect } from 'react';
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
@@ -253,126 +249,8 @@ export default function HomePageClient({
     })
     .slice(0, 4);
 
-<<<<<<< HEAD
   const staticContent = useMemo(() => (
     <>
-=======
-  return (
-    <div className="w-full min-h-screen bg-[#F8FAFC] selection:bg-primary selection:text-white font-sans overflow-x-hidden">
-
-      {/* 1. CINEMATIC HERO BANNER - DYNAMIC */}
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center bg-slate-950 overflow-hidden">
-        {/* Slide backgrounds */}
-        {heroSlides.length > 0 && heroSlides[currentSlide] && (
-          <AnimatePresence>
-            <motion.div
-              key={currentSlide}
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 0.70, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
-              className="absolute inset-0"
-            >
-              {heroSlides[currentSlide].image ? (
-                <Image
-                  src={heroSlides[currentSlide].image}
-                  alt="Visual DISPORAPAR"
-                  fill
-                  priority
-                  className="object-cover"
-                  sizes="100vw"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0c2c4e] via-[#0E3B66] to-[#1e4e7e]" />
-              )}
-            </motion.div>
-          </AnimatePresence>
-        )}
-
-        {/* Ambient Overlays */}
-        <div className="absolute inset-0 bg-slate-950/45 z-10" />
-
-        {/* Main Hero Container */}
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col items-center justify-center text-center pt-20 sm:pt-24 pb-16">
-          {heroSlides.length > 0 && heroSlides[currentSlide] ? (
-            <div className="flex flex-col items-center max-w-4xl">
-              {/* Headline */}
-              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-6xl font-extrabold tracking-tight text-white leading-tight mb-4">
-                {heroSlides[currentSlide].title}
-              </h1>
-
-              {/* Value Proposition Description */}
-              <p className="text-slate-200 text-xs sm:text-sm md:text-base font-inter max-w-2xl mb-8 leading-relaxed font-light">
-                {/*Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal berkomitmen membangun kepemudaan kreatif, membina keolahragaan prestasi, serta memajukan destinasi wisata maritim yang unggul dan berdaya saing.*/}
-              </p>
-
-              {/* Redesigned CTAs */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4.5 w-full sm:w-auto">
-                <Link
-                  href={heroSlides[currentSlide].href}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6.5 py-3.5 bg-accent hover:bg-orange-500 text-white rounded-xl font-extrabold font-mono text-xs uppercase tracking-wider transition-all shadow-lg shadow-orange-500/20 active:scale-95 cursor-pointer"
-                >
-                  <span>{heroSlides[currentSlide].cta}</span>
-                  <ArrowRight className="w-4 h-4 text-white" />
-                </Link>
-                <a
-                  href="#agenda-section"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6.5 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/25 backdrop-blur-md rounded-xl font-extrabold font-mono text-xs uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
-                >
-                  <span>Agenda Terdekat</span>
-                </a>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center max-w-4xl">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-6xl font-extrabold tracking-tight text-white leading-tight mb-6">
-                DISPORAPAR Kota Tegal
-              </h1>
-            </div>
-          )}
-        </div>
-
-        {/* Left & Right Navigation Buttons */}
-        {heroSlides.length > 1 && (
-          <>
-            <button
-              onClick={handlePrevSlide}
-              className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 hidden sm:flex items-center justify-center transition-all backdrop-blur-md cursor-pointer group active:scale-95"
-              aria-label="Slide Sebelumnya"
-            >
-              <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
-            </button>
-            <button
-              onClick={handleNextSlide}
-              className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 hidden sm:flex items-center justify-center transition-all backdrop-blur-md cursor-pointer group active:scale-95"
-              aria-label="Slide Berikutnya"
-            >
-              <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
-            </button>
-          </>
-        )}
-
-        {/* Playful Bottom Fade Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#F8FAFC] to-transparent z-10 pointer-events-none" />
-
-        {/* Slide Indicators */}
-        {heroSlides.length > 1 && (
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 z-30">
-            {heroSlides.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentSlide(idx)}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-350 cursor-pointer ${currentSlide === idx ? 'bg-accent scale-110 shadow-md' : 'bg-white/50 hover:bg-white/80'
-                  }`}
-                aria-label={`Slide ${idx + 1}`}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
       {/* 2. QUICK ACCESS SERVICES */}
       <section className="relative z-30 mt-8 sm:mt-12 lg:mt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-[2rem] p-8 sm:p-10 shadow-xl border border-slate-100">
@@ -610,11 +488,7 @@ export default function HomePageClient({
                     })()}
 
                     {/* Left Date Panel */}
-<<<<<<< HEAD
                     <div className="shrink-0 w-[88px] sm:w-[96px] bg-[#0F3D6E] flex flex-col items-center justify-center text-center px-3">
-=======
-                    <div className="shrink-0 w-[88px] sm:w-[96px] bg-[#0F3D6E] flex flex-col items-center justify-center select-none text-center px-3">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                       <div className="text-3xl sm:text-[34px] font-extrabold text-white leading-none tracking-tight font-sans">
                         {dayNum}
                       </div>
@@ -876,11 +750,7 @@ export default function HomePageClient({
           </div>
 
           {/* Full-width Gallery Marquee Container (Edge to Edge) */}
-<<<<<<< HEAD
           <div className="w-full overflow-hidden py-4">
-=======
-          <div className="w-full overflow-hidden py-4 select-none">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             <div
               className="flex overflow-hidden"
               onMouseEnter={() => setIsGalleryPaused(true)}
@@ -943,14 +813,11 @@ export default function HomePageClient({
                             <h4 className="font-bold text-xs sm:text-sm text-white leading-snug tracking-tight">
                               {photo.title}
                             </h4>
-<<<<<<< HEAD
                             {photo.date && (
                               <span className="text-[9px] font-bold text-slate-350 font-mono tracking-wider block uppercase mt-0.5">
                                 {photo.date}
                               </span>
                             )}
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                           </div>
                         </div>
                       </div>
@@ -1115,7 +982,6 @@ export default function HomePageClient({
                   </div>
                 )}
               </div>
-<<<<<<< HEAD
               <div className="text-center mt-6 max-w-xl">
                 <p className="text-white font-bold text-sm sm:text-base tracking-tight leading-snug">
                   {selectedPhoto.title}
@@ -1125,12 +991,6 @@ export default function HomePageClient({
                     {selectedPhoto.category} • {selectedPhoto.date}
                   </span>
                 )}
-=======
-              <div className="text-center mt-0 max-w-xl">
-                <p className="text-white font-bold text-sm sm:text-base tracking-tight leading-snug mt-2 select-none">
-                  {selectedPhoto.title}
-                </p>
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
               </div>
             </div>
           </motion.div>
@@ -1231,7 +1091,6 @@ export default function HomePageClient({
         )}
       </AnimatePresence>
 
-<<<<<<< HEAD
 
     </>
   ), [newsList, eventsList, galleryPhotos, publicServices, homepageSettings, priorityPrograms, todayWIB, selectedPhoto, activeNewsDetail, isGalleryPaused]);
@@ -1352,8 +1211,6 @@ export default function HomePageClient({
       </section>
 
       {staticContent}
-=======
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     </div >
   );
 }

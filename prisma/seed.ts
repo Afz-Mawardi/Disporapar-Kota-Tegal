@@ -261,7 +261,6 @@ async function main() {
   }
 
   // 17. Seed Bidang Bottom Cards
-<<<<<<< HEAD
   if (dbData.bidangBottomCards && Array.isArray(dbData.bidangBottomCards)) {
     for (const item of dbData.bidangBottomCards) {
       await prisma.bidangBottomCard.create({
@@ -277,41 +276,6 @@ async function main() {
           sectionTitle: item.sectionTitle || ''
         }
       });
-=======
-  const defaultBidangBottomCards = [
-    {
-      id: 'kepemudaan',
-      tag: 'Layanan & Kemitraan Pemuda',
-      title: 'Kemitraan Organisasi & Legalitas Kepemudaan',
-      description: 'DISPORAPAR memandu, membina legalitas organisasi kepemudaan, serta memfasilitasi gerakan KNPI, Karang Taruna, dan Forum Anak Tegal (FAT) dalam upaya mewujudkan sinergi dan pemberdayaan potensi pemuda Kota Tegal secara berkelanjutan.',
-      buttonText: 'Hubungi Kemitraan Pemuda',
-      buttonLink: '/pelayanan',
-      imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800',
-      sectionTag: 'Program Strategis & Layanan Pemuda',
-      sectionTitle: 'Fasilitas Pembinaan Pemuda Kota Tegal'
-    },
-    {
-      id: 'olahraga',
-      tag: 'Pemberdayaan Atlet Daerah',
-      title: 'Pemusatan Latihan & Pembinaan Olahraga Berkelanjutan',
-      description: 'DISPORAPAR bersinergi erat bersama KONI (Komite Olahraga Nasional Indonesia) Kota Tegal secara terpadu mengelola pemusatan latihan atlet usia dini berkala, peningkatan kualifikasi lisensi pelatih nasional, serta penyelenggaraan bonus apresiasi kejuaraan PORPROV & PON.',
-      buttonText: 'Hubungi Layanan Atlet & KONI',
-      buttonLink: '/pelayanan',
-      imageUrl: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=800',
-      sectionTag: 'Sarana & Fasilitas Olahraga',
-      sectionTitle: 'Pusat Kegiatan Keolahragaan Kota Tegal'
-    },
-    {
-      id: 'pariwisata',
-      tag: 'Mitra Pelaku Usaha Wisata',
-      title: 'Kembangkan Usaha Pariwisata & Kuliner Kreatif Anda Bersama Kami',
-      description: 'DISPORAPAR mendukung penuh pelaku industri penginapan, restoran Sate Tegal legendaris, agen perjalanan, serta pemandu wisata bahari untuk mengajukan data usaha resmi agar terdaftar secara luas di bawah rekomendasi katalog pariwisata terpadu.',
-      buttonText: 'Urus Izin Usaha & TDUP',
-      buttonLink: '/pelayanan',
-      imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800',
-      sectionTag: 'Destinasi Wisata',
-      sectionTitle: 'Destinasi Wisata Terpopuler & Unggulan'
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
     }
     console.log(`Seeded ${dbData.bidangBottomCards.length} Bidang bottom cards.`);
   }

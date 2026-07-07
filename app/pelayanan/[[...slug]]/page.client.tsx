@@ -223,11 +223,7 @@ export default function PelayananPageClient({
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#F8FAFC] to-transparent z-10" />
 
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<<<<<<< HEAD
           <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 pointer-events-none" aria-hidden="true">
-=======
-          <span className="text-[10px] sm:text-xs font-bold text-transparent tracking-widest uppercase bg-transparent border border-transparent px-3.5 py-1.5 rounded-full inline-block font-mono mb-4 select-none pointer-events-none" aria-hidden="true">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
             PELAYANAN PUBLIK
           </span>
           <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mt-1 font-sans leading-none">
@@ -448,11 +444,7 @@ export default function PelayananPageClient({
                     </div>
 
                     <div className="pt-8 border-t border-white/10 mt-8 relative z-10 flex items-center gap-4">
-<<<<<<< HEAD
                       <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center font-bold text-sm text-sky-200 shrink-0">
-=======
-                      <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center font-bold text-sm text-sky-200 shrink-0 select-none">
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                         <Landmark className="w-5 h-5" />
                       </div>
                       <div className="space-y-0.5 min-w-0">
@@ -621,18 +613,10 @@ export default function PelayananPageClient({
                                 <td className="py-3.5 px-4 sm:py-4.5 sm:px-6 text-center font-mono text-slate-900 font-normal text-xs sm:text-sm">{idx + 1}</td>
                                 <td className="py-3.5 px-4 sm:py-4.5 sm:px-6 font-sans text-slate-900 font-normal text-xs sm:text-sm">{item.name}</td>
                                 <td className="py-3.5 px-4 sm:py-4.5 sm:px-6 text-center">
-<<<<<<< HEAD
                                   <span className={`px-2.5 py-1 text-xs font-bold font-mono uppercase tracking-wider rounded-lg border inline-block ${item.category === 'Olahraga' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
                                       item.category === 'Kepemudaan' ? 'bg-blue-50 text-blue-700 border-blue-100' :
                                         'bg-amber-50 text-amber-700 border-amber-100'
                                     }`}>
-=======
-                                  <span className={`px-2.5 py-1 text-xs font-bold font-mono uppercase tracking-wider rounded-lg border inline-block ${
-                                    item.category === 'Olahraga' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                                    item.category === 'Kepemudaan' ? 'bg-blue-50 text-blue-700 border-blue-100' :
-                                    'bg-amber-50 text-amber-700 border-amber-100'
-                                  }`}>
->>>>>>> 3b8443e7e394f95a2e225c3748e84582c01e2568
                                     {item.category}
                                   </span>
                                 </td>
