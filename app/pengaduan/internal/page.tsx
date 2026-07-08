@@ -263,9 +263,9 @@ export default function PengaduanInternalPage() {
               <button
                 type="button"
                 onClick={() => setShowSuccessModal(false)}
-                className="w-full py-3 bg-accent hover:bg-orange-500 text-white text-xs font-mono font-extrabold uppercase tracking-widest rounded-xl transition-all shadow-md"
+                className="w-full text-center py-3 bg-accent hover:bg-orange-500 text-white text-xs font-mono font-extrabold uppercase tracking-widest rounded-xl transition-all shadow-md"
               >
-                Tutup Halaman
+                Tutup
               </button>
             </div>
           </div>

@@ -92,6 +92,22 @@ export default function AdminLayoutClient({
     if (pathname.includes('/admin/manajer-admin')) setExpandedMenus((prev) => ({ ...prev, manajerAdmin: true }));
   }, [pathname]);
 
+  // Check for pending notifications from sessionStorage on mount or pathname change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const pending = sessionStorage.getItem('admin_pending_notification');
+      if (pending) {
+        try {
+          const { message, type } = JSON.parse(pending);
+          showNotification(message, type);
+        } catch (e) {
+          console.error(e);
+        }
+        sessionStorage.removeItem('admin_pending_notification');
+      }
+    }
+  }, [pathname]);
+
   // Global click listener to close notification when active
   useEffect(() => {
     if (!notification) return;
@@ -178,8 +194,13 @@ export default function AdminLayoutClient({
       localStorage.removeItem('disporapar_admin_login_time');
       localStorage.removeItem('disporapar_admin_last_activity');
       await signOut({ redirect: false });
-      if (!skipNotification) {
-        showNotificationRef.current('Berhasil keluar.', 'success');
+      if (!skipNotification && !isExpired) {
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('admin_pending_notification', JSON.stringify({
+            message: 'Berhasil keluar.',
+            type: 'success'
+          }));
+        }
       }
       router.push(isExpired ? '/login.admin?reason=expired' : '/login.admin');
       router.refresh();

@@ -484,7 +484,7 @@ export default function BerkasLayananAdminPage() {
 
       {/* Control Action Bar */}
       <div className="sticky top-0 z-20 flex flex-col xl:flex-row items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-md transition-all duration-300">
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center gap-3 w-full xl:w-auto">
           {/* Search bar */}
           <div className="relative w-full sm:w-60 shrink-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -521,7 +521,7 @@ export default function BerkasLayananAdminPage() {
           </button>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 justify-end w-full xl:w-auto self-stretch xl:self-auto">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center gap-3 justify-end w-full xl:w-auto self-stretch xl:self-auto">
           <div className="flex flex-wrap items-center gap-2 justify-start sm:justify-end w-full sm:w-auto">
             <button
               onClick={handleToggleSelectMode}

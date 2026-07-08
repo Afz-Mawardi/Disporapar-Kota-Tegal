@@ -30,7 +30,15 @@ Portal ini dirancang untuk menyajikan informasi publik seputar kepemudaan, olahr
 * **Silently Secure 404** — Mengamankan rute sensitif `/admin/*` dan `/api/admins/*` di [middleware.ts](./middleware.ts) dengan mengarahkan pengguna tanpa token sesi langsung ke halaman 404 palsu Next.js demi menyembunyikan panel admin dari pemindai otomatis.
 * **Audit Logging** — Setiap tindakan CRUD dan login terekam secara terenkapsulasi JSON pada tabel `riwayat_admin`.
 
+### 🎨 Peningkatan UI/UX & Usability
+* **Responsive Layout & Wrap** — Penerapan pembungkusan otomatis (`flex-wrap`) pada bilah kendali di berbagai sub-halaman admin mencegah meluapnya tombol edit kategori dan filter pencarian pada layar sedang.
+* **Pusat Panel Zoom Gambar** — Penyelarasan modal zoom lampiran gambar pengaduan agar berpusat persis di area kerja utama admin (tidak tertimpa sidebar kiri) dan memindahkan tombol tutup (`X`) ke dalam pojok kanan atas gambar.
+* **Notifikasi Lintas Pengalihan (Redirect)** — Mekanisme persistensi toast notifikasi via `sessionStorage` untuk memastikan pesan status sukses login/logout tetap tampil meskipun terjadi pemuatan ulang halaman/redirect.
+* **Format Riwayat Log Visual** — Mengurai JSON API mentah dan teks mutasi database menjadi visualisasi log yang interaktif, lengkap dengan badge kategori berwarna, informasi IP, endpoint, dan tautan unduhan berkas.
+
 ### 🚀 Optimasi Performa
+* **Docker Multi-Stage Build** — Konfigurasi standalone build produksi Next.js untuk mempercepat proses kompilasi container dan mereduksi ukuran images.
+* **Pembersihan Preload Warning** — Mengatasi peringatan preload SVG pada browser console untuk stabilitas Fast Refresh dan waktu respons server.
 * **Query Paralel (`Promise.all`)** — Memproses pengambilan data majemuk pada beranda utama secara paralel guna mereduksi *latency* koneksi database.
 * **Memoisasi Render Client** — Penerapan `useMemo` di [app/page.client.tsx](./app/page.client.tsx) mencegah render ulang (*re-render*) komponen statis saat transisi slider interval 5 detik.
 * **Incremental Static Regeneration (ISR)** — Caching halaman publik dengan waktu revalidasi 20 detik (`revalidate = 20`) untuk penyajian instan (~5ms).

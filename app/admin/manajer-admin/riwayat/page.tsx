@@ -11,7 +11,12 @@ import {
   AlertCircle,
   SquareDot,
   CheckSquare,
-  X
+  X,
+  User,
+  Key,
+  LogOut,
+  Upload,
+  Database
 } from 'lucide-react';
 
 export default function RiwayatAdminPage() {
@@ -164,6 +169,168 @@ export default function RiwayatAdminPage() {
     }
   };
 
+  const renderLogAction = (actionStr: string) => {
+    const trimmed = actionStr.trim();
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+      try {
+        const data = JSON.parse(trimmed);
+        const { user, ip, endpoint, aksi, status, fileUrl, size } = data;
+        const isSuccess = status?.toLowerCase() === 'berhasil';
+
+        // Action styling map
+        let actionIcon = <Database className="w-3.5 h-3.5" />;
+        let actionLabel = aksi || 'Aktivitas';
+        let badgeColor = 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100';
+
+        const actionLower = (aksi || '').toLowerCase();
+        if (actionLower === 'login') {
+          actionIcon = <Key className="w-3.5 h-3.5" />;
+          actionLabel = 'Login';
+          badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100/70';
+        } else if (actionLower === 'logout') {
+          actionIcon = <LogOut className="w-3.5 h-3.5" />;
+          actionLabel = 'Logout';
+          badgeColor = 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100/70';
+        } else if (actionLower === 'upload') {
+          actionIcon = <Upload className="w-3.5 h-3.5" />;
+          actionLabel = 'Upload';
+          badgeColor = 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100/70';
+        } else if (actionLower === 'delete') {
+          actionIcon = <Trash2 className="w-3.5 h-3.5" />;
+          actionLabel = 'Delete';
+          badgeColor = 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100/70';
+        } else if (actionLower.includes('api data') || actionLower.includes('operasi api')) {
+          actionIcon = <Database className="w-3.5 h-3.5" />;
+          actionLabel = 'API Data';
+          badgeColor = 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100/70';
+        }
+
+        const formatSize = (bytes: number) => {
+          if (!bytes) return '';
+          if (bytes < 1024) return `${bytes} B`;
+          if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+          return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        };
+
+        const getFileName = (url: string) => {
+          if (!url) return '';
+          return url.substring(url.lastIndexOf('/') + 1);
+        };
+
+        return (
+          <div className="space-y-2 py-1 text-left">
+            {/* Top row: User info & Action badges */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-800 font-bold rounded-md text-[10px] uppercase font-mono tracking-wider">
+                <User className="w-3 h-3 text-slate-500" />
+                {user || 'N/A'}
+              </span>
+
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 border rounded-md text-[10px] font-bold uppercase font-mono tracking-wider transition-colors ${badgeColor}`}>
+                {actionIcon}
+                {actionLabel}
+              </span>
+
+              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase font-mono tracking-wider border ${
+                isSuccess 
+                  ? 'bg-emerald-100/80 text-emerald-800 border-emerald-200' 
+                  : 'bg-rose-100/80 text-rose-800 border-rose-200'
+              }`}>
+                {isSuccess ? '✓ ' : '✗ '}
+                {status || 'Berhasil'}
+              </span>
+            </div>
+
+            {/* Bottom details */}
+            <div className="space-y-1 font-mono text-[10px] text-slate-500">
+              {fileUrl && (
+                <div className="flex items-start gap-1">
+                  <span className="text-slate-400 font-bold shrink-0">URL:</span>
+                  <a 
+                    href={fileUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-[#0E3B66] hover:underline break-all font-semibold"
+                  >
+                    {getFileName(fileUrl) || fileUrl} {size ? `(${formatSize(size)})` : ''}
+                  </a>
+                </div>
+              )}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[9px] text-slate-400">
+                {ip && (
+                  <div>
+                    <span className="font-bold">IP:</span> <span className="text-slate-550">{ip}</span>
+                  </div>
+                )}
+                {endpoint && (
+                  <div>
+                    <span className="font-bold">ENDPOINT:</span> <code className="bg-slate-100 border border-slate-150 px-1 py-0.2 rounded text-slate-600 font-mono text-[9px]">{endpoint}</code>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      } catch (e) {
+        // Fallback for parsing errors
+      }
+    }
+
+    // Try parsing plain text log
+    const plainTextRegex = /^(Admin|Super Admin) "([^"]+)" (mengubah|menambahkan|menghapus) berkas dokumen (baru )?"([^"]+)"(.*)$/;
+    const match = trimmed.match(plainTextRegex);
+    if (match) {
+      const [_, role, adminName, action, isNew, docName, details] = match;
+      
+      let actionColor = 'text-blue-600 border-blue-200 bg-blue-50/50';
+      let actionLabel = action;
+      if (action === 'menghapus') {
+        actionColor = 'text-rose-600 border-rose-200 bg-rose-50/50';
+      } else if (action === 'menambahkan') {
+        actionColor = 'text-emerald-600 border-emerald-200 bg-emerald-50/50';
+      }
+
+      return (
+        <div className="space-y-1.5 py-1 text-left">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 border rounded-md text-[9px] font-mono font-bold uppercase tracking-wider ${
+              role.toLowerCase().includes('super') 
+                ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100/70' 
+                : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200/70'
+            }`}>
+              <User className="w-3 h-3 opacity-70" />
+              {role}
+            </span>
+            <span className="text-xs font-bold text-slate-800">
+              {adminName}
+            </span>
+            <span className={`px-1.5 py-0.5 border rounded-md text-[9px] font-mono font-bold uppercase tracking-wide ${actionColor}`}>
+              {actionLabel}
+            </span>
+            <span className="text-[10px] text-slate-400 font-mono">
+              berkas {isNew || ''}dokumen
+            </span>
+          </div>
+          <div className="text-xs sm:text-sm font-semibold text-[#0E3B66]">
+            "{docName}"
+          </div>
+          {details && details.trim() && (
+            <div className="text-[10px] font-mono text-slate-400 mt-0.5 leading-relaxed">
+              {details.trim()}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Fallback for general plain text
+    return (
+      <div className="py-1 text-left text-xs sm:text-sm font-medium text-slate-700 leading-relaxed">
+        {actionStr}
+      </div>
+    );
+  };
+
 
   // Render Access Denied
   if (!isAuthorized) {
@@ -243,7 +410,7 @@ export default function RiwayatAdminPage() {
       {/* Data Table */}
       <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-xs sm:text-sm font-inter">
+          <table className="w-full min-w-[950px] border-collapse text-left text-xs sm:text-sm font-inter">
             <thead>
               <tr className="bg-[#051424] text-white font-mono text-[10px] tracking-widest uppercase border-b border-slate-200">
                 {isSelectMode && (
@@ -294,7 +461,7 @@ export default function RiwayatAdminPage() {
                       {formatDate(log.createdAt)}
                     </td>
                     <td className="py-4 px-6 text-slate-700 text-xs sm:text-sm font-medium leading-relaxed">
-                      {log.action}
+                      {renderLogAction(log.action)}
                     </td>
                     <td className="py-4 px-6 text-center">
                       <div className="flex items-center justify-center">

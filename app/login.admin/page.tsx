@@ -60,6 +60,18 @@ function LoginPageContent() {
       // Clean up search parameters immediately so refreshing the page doesn't show it again
       const newUrl = window.location.pathname;
       window.history.replaceState({ path: newUrl }, '', newUrl);
+      sessionStorage.removeItem('admin_pending_notification');
+    } else {
+      const pending = sessionStorage.getItem('admin_pending_notification');
+      if (pending) {
+        try {
+          const { message, type } = JSON.parse(pending);
+          showNotification(message, type);
+        } catch (e) {
+          console.error(e);
+        }
+        sessionStorage.removeItem('admin_pending_notification');
+      }
     }
   }, [status, reason]);
 
@@ -108,7 +120,10 @@ function LoginPageContent() {
       } else {
         localStorage.setItem('disporapar_admin_login_time', Date.now().toString());
         localStorage.setItem('disporapar_admin_last_activity', Date.now().toString());
-        showNotification('Berhasil masuk ke panel admin!', 'success');
+        sessionStorage.setItem('admin_pending_notification', JSON.stringify({
+          message: 'Berhasil masuk ke panel admin!',
+          type: 'success'
+        }));
         router.push('/admin/dashboard');
         router.refresh();
       }

@@ -411,7 +411,7 @@ export default function AdminComplaintsPage() {
 
       {/* Control Action Bar */}
       <div className="sticky top-0 z-20 flex flex-col xl:flex-row items-center justify-between gap-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-md transition-all duration-300">
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center gap-3 w-full xl:w-auto">
           {/* Search bar */}
           <div className="relative w-full sm:w-60 shrink-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -441,7 +441,7 @@ export default function AdminComplaintsPage() {
           </select>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 justify-end w-full xl:w-auto self-stretch xl:self-auto">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center gap-3 justify-end w-full xl:w-auto self-stretch xl:self-auto">
           <div className="flex flex-wrap items-center gap-2 justify-start sm:justify-end w-full sm:w-auto">
             <button
               onClick={handleToggleSelectMode}
@@ -720,14 +720,14 @@ export default function AdminComplaintsPage() {
 
       {/* SECONDARY ZOOM POPUP MODAL */}
       {zoomedImage && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-y-0 right-0 left-0 md:left-64 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm animate-fade-in">
           {/* Close zoom by clicking backdrop outside image */}
           <div className="absolute inset-0 cursor-zoom-out" onClick={() => setZoomedImage(null)} />
 
           <div className="relative max-w-4xl max-h-[85vh] z-10 animate-scale-in">
             <button
               onClick={() => setZoomedImage(null)}
-              className="absolute -top-12 right-0 p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer flex items-center justify-center"
+              className="absolute top-4 right-4 p-2 text-white/85 hover:text-white bg-slate-950/50 hover:bg-slate-950/80 rounded-full transition-all cursor-pointer flex items-center justify-center z-20"
               title="Tutup"
             >
               <X className="w-6 h-6" />
