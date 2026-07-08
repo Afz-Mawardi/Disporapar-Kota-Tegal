@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "start:prod": "NODE_ENV=production node server.js",
+    "setup": "npm install && npx prisma generate && npm run build",
     "lint": "eslint .",
     "clean": "next clean",
     "seed": "npx prisma db seed"

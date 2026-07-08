@@ -29,6 +29,8 @@ Portal ini dirancang untuk menyajikan informasi publik seputar kepemudaan, olahr
 * **Upload Security & RCE Prevention** — Sanitasi unggahan berkas di [app/api/upload/route.ts](./app/api/upload/route.ts) dengan membuang nama asli berkas, memvalidasi MIME type secara ketat (PNG, JPG, PDF, ZIP, DOCX), membatasi kapasitas maksimal 5MB, dan mengacak nama file via UUIDv4.
 * **Silently Secure 404** — Mengamankan rute sensitif `/admin/*` dan `/api/admins/*` di [middleware.ts](./middleware.ts) dengan mengarahkan pengguna tanpa token sesi langsung ke halaman 404 palsu Next.js demi menyembunyikan panel admin dari pemindai otomatis.
 * **Audit Logging** — Setiap tindakan CRUD dan login terekam secara terenkapsulasi JSON pada tabel `riwayat_admin`.
+* **Auto-Logout Sesi Inaktif (Idle Session Timeout)** — Melindungi akses panel admin dengan fitur pemutusan sesi otomatis jika administrator tidak melakukan aktivitas apa pun (inaktif) selama 10 menit berturut-turut.
+
 
 ### 🎨 Peningkatan UI/UX & Usability
 * **Responsive Layout & Wrap** — Penerapan pembungkusan otomatis (`flex-wrap`) pada bilah kendali di berbagai sub-halaman admin mencegah meluapnya tombol edit kategori dan filter pencarian pada layar sedang.

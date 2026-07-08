@@ -1,0 +1,19 @@
+# .htaccess untuk cPanel Node.js
+# File ini digunakan jika aplikasi di-proxy melalui Apache ke Node.js
+
+# Aktifkan RewriteEngine
+RewriteEngine On
+
+# Jangan rewrite untuk file/direktori yang ada
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Proxy semua request ke Node.js server
+# (Port disesuaikan dengan yang diset di cPanel)
+RewriteRule ^(.*)$ http://127.0.0.1:%{ENV:PORT}/$1 [P,L]
+
+# Header keamanan tambahan
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options SAMEORIGIN
+Header always set X-XSS-Protection "1; mode=block"

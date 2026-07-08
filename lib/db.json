@@ -397,7 +397,7 @@
     },
     "retribusiLegal": {
       "title": "Peraturan Daerah Tentang Retribusi",
-      "content": "Penetapan tarif penggunaan retribusi pemanfaatan sewa fasilitas gedung olahraga daerah serta retribusi tanda masuk tempat rekreasi pariwisata bahari didasarkan pada draf regulasi Peraturan Daerah Kota Tegal No. 5 Tahun 2025. Biaya retribusi disetor langsung menuju kas daerah secara sah."
+      "content": "Penetapan tarif penggunaan retribusi pemanfaatan sewa fasilitas gedung olahraga daerah serta retribusi tanda masuk tempat rekreasi pariwisata bahari didasarkan pada draf regulasi Peraturan Daerah Kota Tegal No. 4 Tahun 2025. Biaya retribusi disetor langsung menuju kas daerah secara sah."
     }
   },
   "retribusi": [
@@ -619,128 +619,7 @@
       "url": "https://ppid.tegalkota.go.id/"
     }
   ],
-  "complaints": [
-    {
-      "id": "ad1d3093-6c63-427f-a36d-fae7805f1fec",
-      "title": "acas",
-      "content": "adv",
-      "imageUrl": "/uploads/pengaduan/1782415453662_e3806a2e-c0cf-4b26-981b-3d13d51b7bf6.webp",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:24:13.798Z"
-    },
-    {
-      "id": "df1ab728-9c5b-4b98-99bd-08acaac5dde6",
-      "title": "as",
-      "content": "S",
-      "imageUrl": "",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:22:07.899Z"
-    },
-    {
-      "id": "80eb3c52-277a-42e1-963e-38b4fd97da8b",
-      "title": "a",
-      "content": "as",
-      "imageUrl": "",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:21:58.499Z"
-    },
-    {
-      "id": "9cad8597-be78-4813-a0f3-caca9a84add2",
-      "title": "a",
-      "content": "as",
-      "imageUrl": "/uploads/pengaduan/1782415275255_9cd7435d-15da-433c-9572-37c3b1f47445.webp",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:21:15.381Z"
-    },
-    {
-      "id": "d97b6220-6b00-40c7-8684-92aead4b8f8b",
-      "title": "as",
-      "content": "as",
-      "imageUrl": "/uploads/pengaduan/1782415247922_40a43d7b-6235-441a-a99d-d963bc51a7c1.webp",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:20:48.079Z"
-    },
-    {
-      "id": "3e561552-0df3-4455-bc14-d1839d1d8fad",
-      "title": "as",
-      "content": "as",
-      "imageUrl": "",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:20:18.276Z"
-    },
-    {
-      "id": "42b7ccb0-eb95-475b-a5bc-2650bd713443",
-      "title": "as",
-      "content": "as",
-      "imageUrl": "/uploads/pengaduan/1782415198385_1f34e2f0-f2c0-4985-ba9e-23111619113d.webp",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:19:58.520Z"
-    },
-    {
-      "id": "f3d58b9e-f81c-4768-9020-4a02112e4423",
-      "title": "as",
-      "content": "as",
-      "imageUrl": "/uploads/pengaduan/1782415168158_3d0fb567-a63f-4c51-8ba3-6feb2d010297.webp",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:19:28.296Z"
-    },
-    {
-      "id": "e0d0ada6-ee9d-498e-98fe-7e69627a1e84",
-      "title": "asc",
-      "content": "as\nas",
-      "imageUrl": "",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:18:52.949Z"
-    },
-    {
-      "id": "35c9b02f-50f4-45ff-8d34-d033d5815729",
-      "title": "sc",
-      "content": "x z",
-      "imageUrl": "",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:18:15.189Z"
-    },
-    {
-      "id": "48fa65b8-5e6c-41ec-bae9-9f2cb66aa1c0",
-      "title": "sc",
-      "content": "sc",
-      "imageUrl": "",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:17:42.852Z"
-    },
-    {
-      "id": "ea6166f5-0d90-40eb-94c7-3910e98819a6",
-      "title": "cek",
-      "content": "cek",
-      "imageUrl": "/uploads/pengaduan/1782415005074_4ed34bc1-3e8c-46a9-920d-33e325d1b6bf.webp",
-      "contact": "",
-      "status": "Baru",
-      "notes": "",
-      "createdAt": "2026-06-25T19:16:45.210Z"
-    }
-  ],
+  "complaints": [],
   "adminLogs": [],
   "users": [
     {
