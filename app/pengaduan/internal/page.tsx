@@ -252,7 +252,7 @@ export default function PengaduanInternalPage() {
               className="bg-white rounded-3xl p-8 max-w-md w-full border border-slate-100 shadow-2xl text-center space-y-5 animate-scale-in"
             >
               <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto border border-emerald-200">
-                <CheckCircle className="w-8 h-8 text-emerald-600 animate-bounce" />
+                <CheckCircle className="w-8 h-8 text-emerald-600" />
               </div>
               <div className="space-y-1.5">
                 <h3 className="text-lg font-black text-slate-800 uppercase tracking-wider font-mono">Pengaduan Terkirim</h3>
@@ -311,7 +311,7 @@ export default function PengaduanInternalPage() {
             {/* Lampiran Gambar */}
             <div className="space-y-2.5">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                Lampiran Foto <span className="text-slate-400 font-light font-sans text-[10px]">(Opsional)</span>
+                Tambahkan Gambar <span className="text-slate-400 font-light font-sans text-[10px]">(Opsional)</span>
               </label>
 
               {!imagePreview ? (
@@ -320,8 +320,8 @@ export default function PengaduanInternalPage() {
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                   className={`border-2 border-dashed rounded-2xl p-6 text-center flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 relative ${isDragOver
-                      ? 'border-accent bg-accent/5 scale-[1.01] shadow-inner'
-                      : 'border-slate-300 bg-slate-50 hover:bg-slate-100/70 hover:border-slate-400'
+                    ? 'border-accent bg-accent/5 scale-[1.01] shadow-inner'
+                    : 'border-slate-300 bg-slate-50 hover:bg-slate-100/70 hover:border-slate-400'
                     }`}
                   onClick={() => fileInputRef.current?.click()}
                 >

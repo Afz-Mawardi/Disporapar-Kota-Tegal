@@ -11,6 +11,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { useWelcomeMessage } from '@/lib/data-store';
+import { uploadFileBase64, deleteFileByUrl } from '@/lib/upload-utils';
 
 const convertImageToWebP = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -84,27 +85,9 @@ export default function SambutanPage() {
       }
       showNotification('Sedang mengompresi dan mengunggah gambar...', 'success');
       convertImageToWebP(file)
-        .then(async (webpBase64) => {
-          try {
-            const res = await fetch('/api/upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                fileBase64: webpBase64,
-                fileName: file.name.substring(0, file.name.lastIndexOf('.')) + '.webp',
-                menu: 'sambutan'
-              })
-            });
-            const result = await res.json();
-            if (result.success) {
-              setWelcomeImage(result.url);
-              showNotification('Gambar berhasil diunggah dan disimpan.', 'success');
-            } else {
-              throw new Error(result.error || 'Gagal menyimpan gambar di server.');
-            }
-          } catch (err: any) {
-            showNotification(err.message || 'Gagal mengunggah gambar ke server.', 'error');
-          }
+        .then((webpBase64) => {
+          setWelcomeImage(webpBase64);
+          showNotification('Gambar berhasil diproses dan siap disimpan.', 'success');
         })
         .catch((err) => {
           showNotification(err.message || 'Gagal memproses gambar.', 'error');
@@ -112,28 +95,37 @@ export default function SambutanPage() {
     }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const name = formData.get('welcomeName') as string;
     const nip = formData.get('welcomeNip') as string;
     const content = formData.get('welcomeContent') as string;
-    const imageUrl = welcomeImage;
 
     if (!name.trim() || !content.trim()) {
       showNotification('Nama dan Isi Sambutan wajib diisi.', 'error');
       return;
     }
 
-    setWelcomeMessage({
-      name,
-      nip: nip ? nip.trim() : '',
-      content,
-      imageUrl
-    });
+    try {
+      const finalImageUrl = await uploadFileBase64(welcomeImage, `sambutan-${Date.now()}.webp`, 'sambutan');
 
-    setIsEditing(false);
-    showNotification('Sambutan Kepala Dinas berhasil disimpan!', 'success');
+      if (welcomeMessage.imageUrl && welcomeMessage.imageUrl !== finalImageUrl) {
+        await deleteFileByUrl(welcomeMessage.imageUrl);
+      }
+
+      setWelcomeMessage({
+        name,
+        nip: nip ? nip.trim() : '',
+        content,
+        imageUrl: finalImageUrl
+      });
+
+      setIsEditing(false);
+      showNotification('Sambutan Kepala Dinas berhasil disimpan!', 'success');
+    } catch (err: any) {
+      showNotification(err.message || 'Gagal menyimpan data.', 'error');
+    }
   };
 
   return (
@@ -276,9 +268,9 @@ export default function SambutanPage() {
                   <input
                     type="text"
                     name="welcomeImageUrl"
-                    value={welcomeImage && !welcomeImage.startsWith('data:') ? welcomeImage : ''}
+                    value={welcomeImage.startsWith('data:') || welcomeImage.startsWith('/uploads/') ? '' : welcomeImage}
                     onChange={(e) => setWelcomeImage(e.target.value)}
-                    placeholder="Masukkan tautan foto..."
+                    placeholder="Masukkan tautan foto eksternal..."
                     className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#0E3B66] font-medium text-slate-800"
                   />
                 </div>
@@ -288,16 +280,16 @@ export default function SambutanPage() {
                 <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
                   <div className="flex items-center gap-2 min-w-0">
                     <ImageIcon className="w-4 h-4 text-accent shrink-0" />
-                    <span className="text-slate-800 font-bold truncate max-w-[280px]">
-                      {welcomeImage.startsWith('data:') ? 'Gambar Terunggah (Local)' : welcomeImage}
+                    <span className="text-slate-800 font-bold truncate max-w-[300px]">
+                      {welcomeImage}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setWelcomeImage('')}
-                    className="p-1 text-slate-450 hover:text-red-600 rounded-md transition-colors"
+                    className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer"
                   >
-                    <X className="w-4 h-4" />
+                    Hapus
                   </button>
                 </div>
               )}

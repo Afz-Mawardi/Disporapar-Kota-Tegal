@@ -9,6 +9,7 @@ Aplikasi portal informasi terintegrasi dan database modern terpusat milik **Dina
 [![Prisma ORM](https://img.shields.io/badge/Prisma-ORM-2d3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
 [![MySQL Database](https://img.shields.io/badge/MySQL-Database-4479a1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Security Argon2id](https://img.shields.io/badge/Security-Argon2id-red?style=for-the-badge&logo=shield&logoColor=white)](https://en.wikipedia.org/wiki/Argon2)
+[![Docker Ready](https://img.shields.io/badge/Docker-Ready-2496ed?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License MIT](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 </div>
@@ -69,15 +70,55 @@ Portal ini dirancang untuk menyajikan informasi publik seputar kepemudaan, olahr
    ```
 
 5. **Akses Aplikasi**
-   * **Portal Publik**: [http://localhost:3000](http://localhost:3000)
-   * **Akses Login Admin**: [http://localhost:3000/login.admin](http://localhost:3000/login.admin)
+    * **Portal Publik**: [http://localhost:3000](http://localhost:3000)
+    * **Akses Login Admin**: [http://localhost:3000/login.admin](http://localhost:3000/login.admin)
 
 > [!IMPORTANT]
 > Mengakses langsung `http://localhost:3000/admin` tanpa sesi login yang sah akan menghasilkan tampilan **404 Not Found**. Anda wajib masuk secara manual melalui halaman `/login.admin`.
 
 ---
 
-## 📂 Struktur Utama Berkas Sensitif
+## 🐳 Panduan Menjalankan Project dengan Docker (Rekomendasi Produksi)
+
+Aplikasi ini sudah dilengkapi dengan konfigurasi Docker multi-stage (standalone build) dan Docker Compose untuk efisiensi performa dan kemudahan deployment.
+
+### 📋 Prasyarat
+* **Docker** & **Docker Compose** terpasang di sistem Anda.
+
+### 🛠️ Langkah Menjalankan
+
+1. **Jalankan Container Stack**
+   Jalankan perintah berikut untuk mengompilasi Next.js standalone build dan menyalakan server MySQL serta aplikasi:
+   ```bash
+   docker compose up -d --build
+   ```
+
+2. **Migrasi Database Otomatis**
+   Container aplikasi (`web`) akan mendeteksi database MySQL (`db`), menunggu hingga port 3306 siap menerima koneksi, lalu menjalankan perintah `npx prisma migrate deploy` secara otomatis sebelum server web dimulai.
+
+3. **Seeding Data Awal (Dummy Data)**
+   Untuk mengisi database dengan data default (akun administrator, berita, agenda, pariwisata, fasilitas, retribusi, dll.), jalankan perintah seed berikut di dalam container:
+   ```bash
+   docker compose exec web npx prisma db seed
+   ```
+
+4. **Memantau Aktivitas & Log**
+   Untuk memantau logs startup aplikasi dan proses migrasi secara real-time:
+   ```bash
+   docker compose logs -f
+   ```
+
+5. **Menghentikan Kontainer**
+   ```bash
+   docker compose down
+   ```
+
+---
+
+## 📂 Struktur Utama Berkas Konfigurasi & Berkas Sensitif
 * 📄 [schema.prisma](./prisma/schema.prisma) — Skema database relasional proyek.
 * 📄 [middleware.ts](./middleware.ts) — Gerbang penyaringan sesi login admin.
+* 🐳 [Dockerfile](./Dockerfile) — Konfigurasi build Next.js standalone multi-stage.
+* 🐳 [docker-compose.yml](./docker-compose.yml) — Orkestrasi kontainer layanan web dan MySQL database.
+* 📄 [entrypoint.sh](./entrypoint.sh) — Script startup untuk menunggu database dan menjalankan migrasi Prisma.
 * 📄 [package.json](./package.json) — Konfigurasi package, dependensi modul, dan script build.

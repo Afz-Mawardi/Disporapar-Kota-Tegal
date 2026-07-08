@@ -24,15 +24,27 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Unauthorized. Akses ditolak.' }, { status: 401 });
+    const ip = (request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')) || 'Unknown IP';
+
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      return NextResponse.json({ error: 'Format JSON tidak valid.' }, { status: 400 });
     }
 
-    const ip = (request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')) || 'Unknown IP';
-    const user = (session.user as any).username || 'Unknown Admin';
+    const { fileBase64, fileName, menu } = body;
+    const menuClean = (menu || 'uploads').toLowerCase().trim();
+    const isPublicUpload = menuClean === 'pengaduan';
 
-    const { fileBase64, fileName, menu } = await request.json();
+    let user = 'Public Guest';
+    if (!isPublicUpload) {
+      const session = await getServerSession(authOptions);
+      if (!session || !session.user) {
+        return NextResponse.json({ error: 'Unauthorized. Akses ditolak.' }, { status: 401 });
+      }
+      user = (session.user as any).username || 'Unknown Admin';
+    }
 
     if (!fileBase64) {
       return NextResponse.json({ error: 'Data berkas tidak ditemukan.' }, { status: 400 });
@@ -46,7 +58,7 @@ export async function POST(request: Request) {
 
     const mimeType = matches[1].toLowerCase();
     const base64Data = matches[2];
-    
+
     // Validate MIME Type
     if (!ALLOWED_MIME_TYPES[mimeType]) {
       await logAudit({ user, ip, endpoint: '/api/upload', action: 'Upload', status: 'Gagal', details: { reason: 'Tipe MIME tidak diizinkan', mimeType } });
@@ -61,9 +73,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Ukuran file melebihi batas maksimal (5MB).' }, { status: 400 });
     }
 
-    // Clean up menu folder name
-    const menuClean = (menu || 'uploads').toLowerCase().trim();
-    
     // Map menu labels to designated paths under public/uploads/
     let subFolder = 'uploads';
     if (menuClean === 'berita') {
@@ -77,7 +86,7 @@ export async function POST(request: Request) {
     } else if (menuClean === 'pengaduan') {
       subFolder = 'uploads/pengaduan';
     } else if (menuClean === 'sambutan' || menuClean === 'beranda') {
-      subFolder = 'uploads/galeri'; // Fallback to galeri
+      subFolder = 'uploads/berandaprofil';
     }
 
     // Target upload directory
@@ -107,5 +116,48 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('File upload error:', error);
     return NextResponse.json({ error: 'Gagal mengunggah berkas. Internal Server Error.' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized. Akses ditolak.' }, { status: 401 });
+    }
+
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      return NextResponse.json({ error: 'Format JSON tidak valid.' }, { status: 400 });
+    }
+
+    const { fileUrl } = body;
+    if (!fileUrl || typeof fileUrl !== 'string' || !fileUrl.startsWith('/uploads/')) {
+      return NextResponse.json({ success: true }); // Ignore external URLs or invalid paths silently
+    }
+
+    // Securely construct the file path
+    const uploadDir = path.join(process.cwd(), 'public');
+    const filePath = path.join(uploadDir, fileUrl.replace(/\//g, path.sep));
+
+    // Ensure the file path is within public/uploads/ to prevent path traversal
+    if (!filePath.startsWith(path.join(uploadDir, 'uploads'))) {
+      return NextResponse.json({ error: 'Invalid file path.' }, { status: 400 });
+    }
+
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+
+      const ip = (request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')) || 'Unknown IP';
+      const user = (session.user as any).username || 'Unknown Admin';
+      await logAudit({ user, ip, endpoint: '/api/upload', action: 'Delete', status: 'Berhasil', details: { fileUrl } });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('File delete error:', error);
+    return NextResponse.json({ error: 'Gagal menghapus berkas. Internal Server Error.' }, { status: 500 });
   }
 }

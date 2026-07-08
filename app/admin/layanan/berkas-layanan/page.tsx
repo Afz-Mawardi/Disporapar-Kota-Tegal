@@ -15,6 +15,7 @@ import {
   CheckSquare
 } from 'lucide-react';
 import { usePublicServices, useCategories } from '@/lib/data-store';
+import { uploadFileBase64, deleteFileByUrl } from '@/lib/upload-utils';
 
 const getFileFormat = (downloadUrl?: string, title?: string): 'pdf' | 'zip' | 'word' | 'unknown' => {
   if (!downloadUrl || downloadUrl === '#' || downloadUrl === '') return 'unknown';
@@ -157,6 +158,7 @@ export default function BerkasLayananAdminPage() {
   const [uploadedFileName, setUploadedFileName] = useState<string>('');
   const [uploadedFileSize, setUploadedFileSize] = useState<string>('');
   const [isDragOverModal, setIsDragOverModal] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // Filtered Services data
   const filteredServices = services
@@ -186,11 +188,13 @@ export default function BerkasLayananAdminPage() {
     setUploadedFileSize('');
     if (type === 'edit' && item) {
       setUploadedFileSize(item.fileSize || '');
-      if (item.downloadUrl && item.downloadUrl.startsWith('data:')) {
+      if (item.downloadUrl) {
         setUploadedFileBase64(item.downloadUrl);
-        setUploadedFileName('Berkas Terunggah');
-      } else if (item.downloadUrl) {
-        setUploadedFileName(item.downloadUrl.substring(item.downloadUrl.lastIndexOf('/') + 1));
+        if (item.downloadUrl.startsWith('data:')) {
+          setUploadedFileName('Berkas Terunggah');
+        } else {
+          setUploadedFileName(item.downloadUrl.substring(item.downloadUrl.lastIndexOf('/') + 1));
+        }
       }
     }
     setIsModalOpen(true);
@@ -249,20 +253,38 @@ export default function BerkasLayananAdminPage() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!deleteTargetId) return;
 
+    setIsSaving(true);
+    let success = false;
+
     if (deleteTargetId === 'bulk') {
+      const itemsToDelete = services.filter(item => selectedIds.includes(item.id));
       const remainingServices = services.filter(item => !selectedIds.includes(item.id));
-      setServices(remainingServices);
-      showNotification(`${selectedIds.length} berkas berhasil dihapus.`, 'success');
-      setSelectedIds([]);
-      setIsSelectMode(false);
+      success = await setServices(remainingServices);
+      if (success) {
+        for (const item of itemsToDelete) {
+          if (item.downloadUrl) await deleteFileByUrl(item.downloadUrl);
+        }
+        showNotification(`${selectedIds.length} berkas berhasil dihapus.`, 'success');
+        setSelectedIds([]);
+        setIsSelectMode(false);
+      }
     } else {
+      const itemToDelete = services.find(item => item.id === deleteTargetId);
       const remainingServices = services.filter(item => item.id !== deleteTargetId);
-      setServices(remainingServices);
-      showNotification('Berkas berhasil dihapus.', 'success');
-      setSelectedIds(prev => prev.filter(id => id !== deleteTargetId));
+      success = await setServices(remainingServices);
+      if (success) {
+        if (itemToDelete?.downloadUrl) await deleteFileByUrl(itemToDelete.downloadUrl);
+        showNotification('Berkas berhasil dihapus.', 'success');
+        setSelectedIds(prev => prev.filter(id => id !== deleteTargetId));
+      }
+    }
+
+    setIsSaving(false);
+    if (!success) {
+      showNotification('Gagal menghapus data dari server.', 'error');
     }
     setIsDeleteModalOpen(false);
     setDeleteTargetId(null);
@@ -301,74 +323,84 @@ export default function BerkasLayananAdminPage() {
       showNotification('Sedang mengunggah berkas...', 'success');
 
       const reader = new FileReader();
-      reader.onloadend = async () => {
+      reader.onloadend = () => {
         const docBase64 = reader.result as string;
-        try {
-          const res = await fetch('/api/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fileBase64: docBase64,
-              fileName: file.name,
-              menu: 'berkas'
-            })
-          });
-          const result = await res.json();
-          if (result.success) {
-            setUploadedFileBase64(result.url);
-            showNotification('Berkas berhasil diunggah.', 'success');
-          } else {
-            throw new Error(result.error || 'Gagal menyimpan berkas di server.');
-          }
-        } catch (err: any) {
-          showNotification(err.message || 'Gagal mengunggah berkas ke server.', 'error');
-          e.target.value = '';
-        }
+        setUploadedFileBase64(docBase64);
+        showNotification('Berkas siap diunggah saat disimpan.', 'success');
+      };
+      reader.onerror = () => {
+        showNotification('Gagal membaca berkas.', 'error');
+        e.target.value = '';
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
     const title = formData.get('title') as string;
     const category = formData.get('category') as string;
     const urlInput = formData.get('downloadUrl') as string;
-    const downloadUrl = uploadedFileBase64 || urlInput || '';
+    const initialDownloadUrl = uploadedFileBase64 || urlInput || '';
 
     if (!title.trim()) {
       showNotification('Nama berkas wajib diisi.', 'error');
       return;
     }
 
-    if (modalType === 'add') {
-      const newItem = {
-        id: `s-${Date.now()}`,
-        title,
-        description: '',
-        category,
-        downloadUrl,
-        fileSize: uploadedFileSize || '1.2 MB',
-        showOnHomepage: true
-      };
-      setServices([newItem, ...services]);
-      showNotification('Berkas berhasil ditambahkan.', 'success');
-    } else if (modalType === 'edit' && editingItem) {
-      const updatedItem = {
-        ...editingItem,
-        title,
-        category,
-        downloadUrl,
-        fileSize: uploadedFileSize || editingItem.fileSize || '1.2 MB'
-      };
-      setServices(services.map(s => s.id === editingItem.id ? updatedItem : s));
-      showNotification('Berkas berhasil diubah.', 'success');
+    setIsSaving(true);
+    let success = false;
+
+    try {
+      const finalFileName = uploadedFileName ? `berkas-${Date.now()}-${uploadedFileName.replace(/\s+/g, '-')}` : `berkas-${Date.now()}`;
+      const finalDownloadUrl = await uploadFileBase64(initialDownloadUrl, finalFileName, 'berkas');
+
+      if (modalType === 'add') {
+        const newItem = {
+          id: `s-${Date.now()}`,
+          title,
+          description: '',
+          category,
+          downloadUrl: finalDownloadUrl,
+          fileSize: uploadedFileSize || '1.2 MB',
+          showOnHomepage: true
+        };
+        success = await setServices([newItem, ...services]);
+        if (success) {
+          showNotification('Berkas berhasil ditambahkan.', 'success');
+        }
+      } else if (modalType === 'edit' && editingItem) {
+        if (editingItem.downloadUrl && editingItem.downloadUrl !== finalDownloadUrl) {
+          await deleteFileByUrl(editingItem.downloadUrl);
+        }
+
+        const updatedItem = {
+          ...editingItem,
+          title,
+          category,
+          downloadUrl: finalDownloadUrl,
+          fileSize: uploadedFileSize || editingItem.fileSize || '1.2 MB'
+        };
+        success = await setServices(services.map(s => s.id === editingItem.id ? updatedItem : s));
+        if (success) {
+          showNotification('Berkas berhasil diubah.', 'success');
+        }
+      }
+
+      if (success) {
+        setIsModalOpen(false);
+        setEditingItem(null);
+      }
+    } catch (err: any) {
+      showNotification(err.message || 'Terjadi kesalahan saat menyimpan berkas.', 'error');
     }
 
-    setIsModalOpen(false);
-    setEditingItem(null);
+    setIsSaving(false);
+    if (!success) {
+      showNotification('Gagal menyimpan perubahan ke server.', 'error');
+    }
   };
 
   // Category Manager Methods
@@ -675,7 +707,7 @@ export default function BerkasLayananAdminPage() {
                       <input
                         type="text"
                         name="downloadUrl"
-                        value={uploadedFileBase64.startsWith('data:') ? '' : uploadedFileBase64 || editingItem?.downloadUrl || ''}
+                        value={uploadedFileBase64.startsWith('data:') || uploadedFileBase64.startsWith('/uploads/') ? '' : uploadedFileBase64}
                         onChange={(e) => setUploadedFileBase64(e.target.value)}
                         placeholder="https://example.com/file.pdf"
                         className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
@@ -683,12 +715,12 @@ export default function BerkasLayananAdminPage() {
                     </div>
                   </div>
 
-                  {uploadedFileName && (
+                  {uploadedFileBase64 && (
                     <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
                       <div className="flex items-center gap-2 min-w-0">
                         <FileText className="w-4 h-4 text-accent shrink-0" />
-                        <span className="text-slate-800 font-bold truncate max-w-[200px]">
-                          {uploadedFileName}
+                        <span className="text-slate-800 font-bold truncate max-w-[300px]">
+                          {uploadedFileBase64}
                         </span>
                       </div>
                       <button
@@ -722,9 +754,10 @@ export default function BerkasLayananAdminPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer font-mono text-xs uppercase tracking-wider"
+                    disabled={isSaving}
+                    className="px-6 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer font-mono text-xs uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Simpan Berkas
+                    {isSaving ? 'Menyimpan...' : 'Simpan Berkas'}
                   </button>
                 </div>
               </>
@@ -767,10 +800,11 @@ export default function BerkasLayananAdminPage() {
                 <button
                   type="button"
                   onClick={handleConfirmDelete}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer"
+                  disabled={isSaving}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold font-mono text-[10px] uppercase cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
                 >
-                  Ya, Hapus
+                  {isSaving ? 'Menghapus...' : 'Ya, Hapus'}
                 </button>
               </div>
             </div>

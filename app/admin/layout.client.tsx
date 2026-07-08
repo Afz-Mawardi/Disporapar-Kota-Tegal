@@ -311,9 +311,9 @@ export default function AdminLayoutClient({
                   </button>
                   {expandedMenus.publikasi && (
                     <div className="pl-4 border-l border-white/10 space-y-1 mt-1">
-                      {renderSidebarLink('agenda-event', 'Agenda Event', '/admin/publikasi/agenda-event', <Calendar className="w-3.5 h-3.5" />)}
+                      {renderSidebarLink('agenda', 'Agenda', '/admin/publikasi/agenda', <Calendar className="w-3.5 h-3.5" />)}
                       {renderSidebarLink('berita', 'Berita', '/admin/publikasi/berita', <Newspaper className="w-3.5 h-3.5" />)}
-                      {renderSidebarLink('galeri-foto', 'Galeri Foto', '/admin/publikasi/galeri-foto', <ImageIcon className="w-3.5 h-3.5" />)}
+                      {renderSidebarLink('galeri', 'Galeri', '/admin/publikasi/galeri', <ImageIcon className="w-3.5 h-3.5" />)}
                     </div>
                   )}
                 </div>
@@ -439,10 +439,10 @@ export default function AdminLayoutClient({
               {isProfileDropdownOpen && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setIsProfileDropdownOpen(false)} />
-                  <div className="absolute right-0 top-full mt-2 w-48 z-40 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden py-1.5 animate-fade-in text-left">
+                  <div className="absolute right-0 top-full mt-2 w-40 z-40 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden py-1.5 animate-fade-in text-left">
                     <div className="px-4 py-2 border-b border-slate-100 sm:hidden">
                       <p className="text-xs font-bold text-[#0E3B66] truncate">{currentAdminUsername || 'Admin'}</p>
-                      <p className="text-[10px] text-slate-400 font-mono uppercase">Administrator</p>
+                      <p className="text-[9px] text-slate-400 font-mono uppercase">administrator</p>
                     </div>
 
 
@@ -453,7 +453,7 @@ export default function AdminLayoutClient({
                         setIsProfileDropdownOpen(false);
                         handleLogout();
                       }}
-                      className="w-full text-left px-4 py-2 hover:bg-red-50 hover:text-red-700 transition-colors text-xs font-bold text-red-600 flex items-center gap-2 border-t border-slate-100 cursor-pointer"
+                      className="w-full text-left px-4 py-2 hover:bg-red-50 hover:text-red-700 transition-colors text-xs font-bold text-red-600 flex items-center gap border-slate-100 cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5" />
                       <span>Logout</span>

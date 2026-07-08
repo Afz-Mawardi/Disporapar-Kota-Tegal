@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useOlahragaCards, useBidangBottomCards } from '@/lib/data-store';
 import { BidangCard } from '@/lib/types';
+import { uploadFileBase64, deleteFileByUrl } from '@/lib/upload-utils';
 
 // Helper to convert image to WebP format
 const convertImageToWebP = (file: File): Promise<string> => {
@@ -78,6 +79,9 @@ export default function OlahragaAdminPage() {
   const [buttonLink, setButtonLink] = useState<string>('');
   const [bannerImageUrl, setBannerImageUrl] = useState<string>('');
   const [isEditingBanner, setIsEditingBanner] = useState<boolean>(false);
+  const [isBannerDragOverModal, setIsBannerDragOverModal] = useState<boolean>(false);
+
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // Notifications
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -163,30 +167,10 @@ export default function OlahragaAdminPage() {
         e.target.value = '';
         return;
       }
-      showNotification('Sedang memproses gambar...', 'success');
       convertImageToWebP(file)
-        .then(async (webpBase64) => {
-          try {
-            const res = await fetch('/api/upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                fileBase64: webpBase64,
-                fileName: file.name.substring(0, file.name.lastIndexOf('.')) + '.webp',
-                menu: 'olahraga'
-              })
-            });
-            const result = await res.json();
-            if (result.success) {
-              setUploadedImageBase64(result.url);
-              showNotification('Gambar berhasil diunggah dan disimpan.', 'success');
-            } else {
-              throw new Error(result.error || 'Gagal menyimpan gambar di server.');
-            }
-          } catch (err: any) {
-            showNotification(err.message || 'Gagal mengunggah gambar ke server.', 'error');
-            e.target.value = '';
-          }
+        .then((webpBase64) => {
+          setUploadedImageBase64(webpBase64);
+          showNotification('Gambar berhasil diproses dan siap disimpan.', 'success');
         })
         .catch((err) => {
           showNotification(err.message || 'Gagal memproses gambar.', 'error');
@@ -195,12 +179,33 @@ export default function OlahragaAdminPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleBannerFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 3 * 1024 * 1024) {
+        showNotification('Ukuran gambar maksimal 3MB.', 'error');
+        e.target.value = '';
+        return;
+      }
+      convertImageToWebP(file)
+        .then((webpBase64) => {
+          setBannerImageUrl(webpBase64);
+          showNotification('Gambar banner berhasil diproses dan siap disimpan.', 'success');
+        })
+        .catch((err) => {
+          showNotification(err.message || 'Gagal memproses gambar.', 'error');
+          e.target.value = '';
+        });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
     if (modalType === 'delete') {
       if (editingItem) {
+        if (editingItem.imageUrl) await deleteFileByUrl(editingItem.imageUrl);
         setOlahragaCards(olahragaCards.filter(c => c.id !== editingItem.id));
         showNotification('Data berhasil dihapus.', 'success');
       }
@@ -213,7 +218,6 @@ export default function OlahragaAdminPage() {
     const description = formData.get('description') as string;
     const facilitiesRaw = formData.get('facilities') as string;
     const facilities = facilitiesRaw ? facilitiesRaw.split(',').map((f: string) => f.trim()).filter(Boolean) : [];
-    const imageUrl = uploadedImageBase64;
     const facilitiesTitle = formData.get('facilitiesTitle') as string || 'Fasilitas Area';
 
     if (!title.trim()) {
@@ -229,49 +233,67 @@ export default function OlahragaAdminPage() {
     const capacityIcon = details[1]?.icon || 'Users';
     const priceIcon = details[2]?.icon || 'Ticket';
 
-    if (modalType === 'add') {
-      const newItem = {
-        id: `oc-${Date.now()}`,
-        title,
-        description,
-        location,
-        capacity,
-        price,
-        facilities,
-        imageUrl,
-        locationIcon,
-        capacityIcon,
-        priceIcon,
-        facilitiesTitle,
-        details
-      };
-      setOlahragaCards([newItem, ...olahragaCards]);
-      showNotification('Data berhasil ditambahkan.', 'success');
-    } else if (modalType === 'edit' && editingItem) {
-      const updatedItem = {
-        ...editingItem,
-        title,
-        description,
-        location,
-        capacity,
-        price,
-        facilities,
-        imageUrl,
-        locationIcon,
-        capacityIcon,
-        priceIcon,
-        facilitiesTitle,
-        details
-      };
-      setOlahragaCards(olahragaCards.map(c => c.id === editingItem.id ? updatedItem : c));
-      showNotification('Data berhasil diubah.', 'success');
+    setIsSaving(true);
+    let success = false;
+
+    try {
+      const finalImageUrl = await uploadFileBase64(uploadedImageBase64, `olahraga-card-${Date.now()}.webp`, 'olahraga');
+
+      if (modalType === 'add') {
+        const newItem = {
+          id: `oc-${Date.now()}`,
+          title,
+          description,
+          location,
+          capacity,
+          price,
+          facilities,
+          imageUrl: finalImageUrl,
+          locationIcon,
+          capacityIcon,
+          priceIcon,
+          facilitiesTitle,
+          details
+        };
+        success = await setOlahragaCards([newItem, ...olahragaCards]);
+        if (success) showNotification('Data berhasil ditambahkan.', 'success');
+      } else if (modalType === 'edit' && editingItem) {
+        if (editingItem.imageUrl && editingItem.imageUrl !== finalImageUrl) {
+          await deleteFileByUrl(editingItem.imageUrl);
+        }
+
+        const updatedItem = {
+          ...editingItem,
+          title,
+          description,
+          location,
+          capacity,
+          price,
+          facilities,
+          imageUrl: finalImageUrl,
+          locationIcon,
+          capacityIcon,
+          priceIcon,
+          facilitiesTitle,
+          details
+        };
+        success = await setOlahragaCards(olahragaCards.map(c => c.id === editingItem.id ? updatedItem : c));
+        if (success) showNotification('Data berhasil diubah.', 'success');
+      }
+    } catch (err: any) {
+      showNotification(err.message || 'Terjadi kesalahan saat menyimpan data.', 'error');
     }
 
-    setIsModalOpen(false);
-    setEditingItem(null);
+    setIsSaving(false);
+    if (success) {
+      setIsModalOpen(false);
+      setEditingItem(null);
+    } else {
+      showNotification('Gagal menyimpan perubahan ke server.', 'error');
+    }
   };
 
-  const handleUpdateBottomCard = (e: React.FormEvent) => {
+  const handleUpdateBottomCard = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!bannerTitle.trim() || !bannerDescription.trim() || !buttonText.trim() || !sectionTitle.trim()) {
@@ -279,42 +301,63 @@ export default function OlahragaAdminPage() {
       return;
     }
 
-    let exists = false;
-    const updated = bidangBottomCards.map(c => {
-      if (c.id === 'olahraga') {
-        exists = true;
-        return {
-          id: c.id,
+    setIsSaving(true);
+    let success = false;
+
+    try {
+      const finalBannerUrl = await uploadFileBase64(bannerImageUrl, `olahraga-banner-${Date.now()}.webp`, 'olahraga');
+      const existingBanner = bidangBottomCards.find(c => c.id === 'olahraga');
+
+      if (existingBanner?.imageUrl && existingBanner.imageUrl !== finalBannerUrl) {
+        await deleteFileByUrl(existingBanner.imageUrl);
+      }
+
+      let exists = false;
+      const updated = bidangBottomCards.map(c => {
+        if (c.id === 'olahraga') {
+          exists = true;
+          return {
+            id: c.id,
+            tag: '',
+            title: bannerTitle,
+            description: bannerDescription,
+            buttonText,
+            buttonLink: buttonLink || '/pelayanan',
+            imageUrl: finalBannerUrl,
+            sectionTag: '',
+            sectionTitle
+          };
+        }
+        return c;
+      });
+
+      if (!exists) {
+        updated.push({
+          id: 'olahraga',
           tag: '',
           title: bannerTitle,
           description: bannerDescription,
           buttonText,
           buttonLink: buttonLink || '/pelayanan',
-          imageUrl: bannerImageUrl,
+          imageUrl: finalBannerUrl,
           sectionTag: '',
           sectionTitle
-        };
+        });
       }
-      return c;
-    });
 
-    if (!exists) {
-      updated.push({
-        id: 'olahraga',
-        tag: '',
-        title: bannerTitle,
-        description: bannerDescription,
-        buttonText,
-        buttonLink: buttonLink || '/pelayanan',
-        imageUrl: bannerImageUrl,
-        sectionTag: '',
-        sectionTitle
-      });
+      success = await setBidangBottomCards(updated);
+      if (success) {
+        setIsEditingBanner(false);
+        showNotification('Banner informasi bawah berhasil diperbarui!', 'success');
+      }
+    } catch (err: any) {
+      showNotification(err.message || 'Terjadi kesalahan saat menyimpan banner.', 'error');
     }
 
-    setBidangBottomCards(updated);
-    setIsEditingBanner(false);
-    showNotification('Banner informasi bawah berhasil diperbarui!', 'success');
+    setIsSaving(false);
+    if (!success) {
+      showNotification('Gagal menyimpan perubahan ke server.', 'error');
+    }
   };
 
   const bottomCard = useMemo(() => bidangBottomCards.find(c => c.id === 'olahraga') || {
@@ -564,50 +607,64 @@ export default function OlahragaAdminPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-mono">Teks Tombol (CTA)</label>
-              <input
-                type="text"
-                name="buttonText"
-                required
-                value={buttonText}
-                onChange={(e) => setButtonText(e.target.value)}
-                disabled={!isEditingBanner}
-                className={`w-full px-4 py-2.5 border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 transition-all ${isEditingBanner ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'
-                  }`}
-                placeholder="Contoh: Hubungi KONI"
-              />
+          <div className="space-y-2 pt-2 border-t border-slate-100 mt-5">
+            <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider font-mono">Foto Banner Bawah</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Local Upload */}
+              <div className={`p-4 border-2 border-dashed rounded-xl text-center flex flex-col items-center justify-center gap-2 transition-all duration-200 relative ${!isEditingBanner ? 'opacity-50 cursor-not-allowed bg-slate-50 border-slate-200' : isBannerDragOverModal
+                ? 'border-accent bg-accent/5 scale-[1.02] shadow-md cursor-pointer'
+                : 'border-slate-350 bg-slate-50/50 hover:bg-slate-50 cursor-pointer'
+                }`}>
+                <Upload className="w-5 h-5 text-slate-400" />
+                <span className="text-[10px] font-extrabold text-[#0E3B66] uppercase tracking-wider font-mono">Unggah Foto</span>
+                <span className="text-[8px] text-slate-400 block font-light leading-none">Maksimal 3MB (WEBP/PNG/JPG)</span>
+                {isEditingBanner && (
+                  <input
+                    type="file"
+                    accept="image/webp, image/png, image/jpeg, image/jpg"
+                    onChange={handleBannerFileChange}
+                    onDragEnter={() => setIsBannerDragOverModal(true)}
+                    onDragLeave={() => setIsBannerDragOverModal(false)}
+                    onDrop={() => setIsBannerDragOverModal(false)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                )}
+              </div>
+
+              {/* URL input */}
+              <div className="space-y-1.5 flex flex-col justify-center">
+                <span className="text-[8.5px] font-bold text-slate-440 font-mono">Atau Masukkan URL Link Foto:</span>
+                <input
+                  type="text"
+                  name="imageUrl"
+                  value={bannerImageUrl.startsWith('data:') || bannerImageUrl.startsWith('/uploads/') ? '' : bannerImageUrl}
+                  onChange={(e) => setBannerImageUrl(e.target.value)}
+                  disabled={!isEditingBanner}
+                  placeholder="https://example.com/img.webp"
+                  className={`w-full px-3 py-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 transition-all ${isEditingBanner ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'}`}
+                />
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-[#0E3B66] tracking-wider uppercase font-mono font-extrabold">Tautan / Link Tombol (CTA)</label>
-              <input
-                type="text"
-                name="buttonLink"
-                required
-                value={buttonLink}
-                onChange={(e) => setButtonLink(e.target.value)}
-                disabled={!isEditingBanner}
-                className={`w-full px-4 py-2.5 border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 transition-all ${isEditingBanner ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'
-                  }`}
-                placeholder="Contoh: /pelayanan atau https://wa.me/..."
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-mono">URL / Tautan Foto Banner</label>
-              <input
-                type="text"
-                name="imageUrl"
-                value={bannerImageUrl}
-                onChange={(e) => setBannerImageUrl(e.target.value)}
-                disabled={!isEditingBanner}
-                className={`w-full px-4 py-2.5 border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800 transition-all ${isEditingBanner ? 'bg-white border-slate-350' : 'bg-slate-50 border-slate-200 cursor-not-allowed text-slate-550'
-                  }`}
-                placeholder="https://images.unsplash.com/..."
-              />
-            </div>
+            {bannerImageUrl && (
+              <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <ImageIcon className="w-4 h-4 text-accent shrink-0" />
+                  <span className="text-slate-800 font-bold truncate max-w-[800px]">
+                    {bannerImageUrl}
+                  </span>
+                </div>
+                {isEditingBanner && (
+                  <button
+                    type="button"
+                    onClick={() => setBannerImageUrl('')}
+                    className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer"
+                  >
+                    Hapus
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
@@ -851,9 +908,9 @@ export default function OlahragaAdminPage() {
                           <input
                             type="text"
                             name="imageUrl"
-                            value={uploadedImageBase64 && !uploadedImageBase64.startsWith('data:') ? uploadedImageBase64 : ''}
+                            value={uploadedImageBase64.startsWith('data:') || uploadedImageBase64.startsWith('/uploads/') ? '' : uploadedImageBase64}
                             onChange={(e) => setUploadedImageBase64(e.target.value)}
-                            placeholder="Masukkan tautan gambar..."
+                            placeholder="https://example.com/img.webp"
                             className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                           />
                         </div>
@@ -863,8 +920,8 @@ export default function OlahragaAdminPage() {
                         <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
                           <div className="flex items-center gap-2 min-w-0">
                             <ImageIcon className="w-4 h-4 text-accent shrink-0" />
-                            <span className="text-slate-800 font-bold truncate max-w-[200px]">
-                              {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64}
+                            <span className="text-slate-800 font-bold truncate max-w-[300px]">
+                              {uploadedImageBase64}
                             </span>
                           </div>
                           <button
@@ -893,9 +950,10 @@ export default function OlahragaAdminPage() {
                     </button>
                     <button
                       type="submit"
-                      className="px-6 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer font-mono text-xs uppercase tracking-wider"
+                      disabled={isSaving}
+                      className="px-6 py-2.5 bg-accent hover:bg-orange-500 text-white font-extrabold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer font-mono text-xs uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Simpan Data
+                      {isSaving ? 'Menyimpan...' : 'Simpan Data'}
                     </button>
                   </div>
                 </>

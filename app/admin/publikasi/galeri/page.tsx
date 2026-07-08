@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useGallery, useCategories } from '@/lib/data-store';
 import { sortItemsByDateTime } from '@/lib/utils';
+import { uploadFileBase64, deleteFileByUrl } from '@/lib/upload-utils';
 
 // Helper to parse Indonesian date format (e.g. "24 Mei 2026") to YYYY-MM-DD
 const parseIndonesianDateToYYYYMMDD = (dateStr: string): string => {
@@ -196,17 +197,24 @@ export default function GaleriFotoAdminPage() {
     let success = false;
 
     if (deleteTargetId === 'bulk') {
+      const itemsToDelete = gallery.filter(item => selectedIds.includes(item.id));
       const remainingGallery = gallery.filter(item => !selectedIds.includes(item.id));
       success = await setGallery(remainingGallery);
       if (success) {
+        // Hapus file fisik secara asinkron
+        for (const item of itemsToDelete) {
+          if (item.imageUrl) await deleteFileByUrl(item.imageUrl);
+        }
         showNotification(`${selectedIds.length} foto berhasil dihapus.`, 'success');
         setSelectedIds([]);
         setIsSelectMode(false);
       }
     } else {
+      const itemToDelete = gallery.find(item => item.id === deleteTargetId);
       const remainingGallery = gallery.filter(item => item.id !== deleteTargetId);
       success = await setGallery(remainingGallery);
       if (success) {
+        if (itemToDelete?.imageUrl) await deleteFileByUrl(itemToDelete.imageUrl);
         showNotification('Foto galeri berhasil dihapus.', 'success');
         setSelectedIds(prev => prev.filter(id => id !== deleteTargetId));
       }
@@ -234,28 +242,9 @@ export default function GaleriFotoAdminPage() {
         return;
       }
       convertImageToWebP(file)
-        .then(async (webpBase64) => {
-          try {
-            const res = await fetch('/api/upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                fileBase64: webpBase64,
-                fileName: file.name.substring(0, file.name.lastIndexOf('.')) + '.webp',
-                menu: 'galeri'
-              })
-            });
-            const result = await res.json();
-            if (result.success) {
-              setUploadedImageBase64(result.url);
-              showNotification('Gambar berhasil diunggah.', 'success');
-            } else {
-              throw new Error(result.error || 'Gagal menyimpan gambar di server.');
-            }
-          } catch (err: any) {
-            showNotification(err.message || 'Gagal mengunggah gambar ke server.', 'error');
-            e.target.value = '';
-          }
+        .then((webpBase64) => {
+          setUploadedImageBase64(webpBase64);
+          showNotification('Gambar berhasil diproses dan siap disimpan.', 'success');
         })
         .catch((err) => {
           showNotification(err.message || 'Gagal memproses gambar.', 'error');
@@ -292,35 +281,45 @@ export default function GaleriFotoAdminPage() {
     setIsSaving(true);
     let success = false;
 
-    if (modalType === 'add') {
-      const newItem = {
-        id: `g-${Date.now()}`,
-        title,
-        category,
-        imageUrl,
-        date,
-        showOnHomepage: true
-      };
-      success = await setGallery([newItem, ...gallery]);
-      if (success) {
-        setIsModalOpen(false);
-        setEditingItem(null);
-        showNotification('Foto galeri berhasil ditambahkan.', 'success');
+    try {
+      const finalImageUrl = await uploadFileBase64(uploadedImageBase64, `galeri-${Date.now()}.webp`, 'galeri');
+
+      if (modalType === 'add') {
+        const newItem = {
+          id: `g-${Date.now()}`,
+          title,
+          category,
+          imageUrl: finalImageUrl,
+          date,
+          showOnHomepage: true
+        };
+        success = await setGallery([newItem, ...gallery]);
+        if (success) {
+          setIsModalOpen(false);
+          setEditingItem(null);
+          showNotification('Foto galeri berhasil ditambahkan.', 'success');
+        }
+      } else if (modalType === 'edit' && editingItem) {
+        if (editingItem.imageUrl && editingItem.imageUrl !== finalImageUrl) {
+          await deleteFileByUrl(editingItem.imageUrl);
+        }
+
+        const updatedItem = {
+          ...editingItem,
+          title,
+          category,
+          imageUrl: finalImageUrl,
+          date
+        };
+        success = await setGallery(gallery.map(g => g.id === editingItem.id ? updatedItem : g));
+        if (success) {
+          setIsModalOpen(false);
+          setEditingItem(null);
+          showNotification('Foto galeri berhasil diubah.', 'success');
+        }
       }
-    } else if (modalType === 'edit' && editingItem) {
-      const updatedItem = {
-        ...editingItem,
-        title,
-        category,
-        imageUrl,
-        date
-      };
-      success = await setGallery(gallery.map(g => g.id === editingItem.id ? updatedItem : g));
-      if (success) {
-        setIsModalOpen(false);
-        setEditingItem(null);
-        showNotification('Foto galeri berhasil diubah.', 'success');
-      }
+    } catch (err: any) {
+      showNotification(err.message || 'Terjadi kesalahan saat menyimpan data.', 'error');
     }
 
     setIsSaving(false);
@@ -665,9 +664,9 @@ export default function GaleriFotoAdminPage() {
                       <input
                         type="text"
                         name="imageUrl"
-                        value={uploadedImageBase64 && !uploadedImageBase64.startsWith('data:') ? uploadedImageBase64 : ''}
+                        value={uploadedImageBase64.startsWith('data:') || uploadedImageBase64.startsWith('/uploads/') ? '' : uploadedImageBase64}
                         onChange={(e) => setUploadedImageBase64(e.target.value)}
-                        placeholder="Masukkan tautan gambar..."
+                        placeholder="https://example.com/img.webp"
                         className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                       />
                     </div>
@@ -677,8 +676,8 @@ export default function GaleriFotoAdminPage() {
                     <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
                       <div className="flex items-center gap-2 min-w-0">
                         <ImageIcon className="w-4 h-4 text-accent shrink-0" />
-                        <span className="text-slate-800 font-bold truncate max-w-[200px]">
-                          {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64}
+                        <span className="text-slate-800 font-bold truncate max-w-[300px]">
+                          {uploadedImageBase64}
                         </span>
                       </div>
                       <button

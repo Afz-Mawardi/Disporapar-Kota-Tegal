@@ -17,6 +17,7 @@ import {
 import Image from 'next/image';
 import { useHeroSlides } from '@/lib/data-store';
 import { HeroSlide } from '@/lib/types';
+import { uploadFileBase64, deleteFileByUrl } from '@/lib/upload-utils';
 
 // Helper to convert image and upload to server
 const convertImageToWebP = (file: File): Promise<string> => {
@@ -88,28 +89,9 @@ export default function HeroSliderPage() {
       }
       showNotification('Sedang mengompresi dan mengunggah gambar...', 'success');
       convertImageToWebP(file)
-        .then(async (webpBase64) => {
-          try {
-            const res = await fetch('/api/upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                fileBase64: webpBase64,
-                fileName: file.name.substring(0, file.name.lastIndexOf('.')) + '.webp',
-                menu: 'beranda'
-              })
-            });
-            const result = await res.json();
-            if (result.success) {
-              setUploadedImageBase64(result.url);
-              showNotification('Gambar berhasil diunggah dan disimpan ke server.', 'success');
-            } else {
-              throw new Error(result.error || 'Gagal menyimpan gambar di server.');
-            }
-          } catch (err: any) {
-            showNotification(err.message || 'Gagal mengunggah gambar ke server.', 'error');
-            e.target.value = '';
-          }
+        .then((webpBase64) => {
+          setUploadedImageBase64(webpBase64);
+          showNotification('Gambar berhasil diproses dan siap disimpan.', 'success');
         })
         .catch((err) => {
           showNotification(err.message || 'Gagal memproses gambar.', 'error');
@@ -131,12 +113,13 @@ export default function HeroSliderPage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
     if (modalType === 'delete') {
       if (editingItem) {
+        if (editingItem.image) await deleteFileByUrl(editingItem.image);
         setHeroSlides(heroSlides.filter(s => s.id !== editingItem.id));
         showNotification('Data berhasil dihapus.', 'success');
       }
@@ -148,37 +131,45 @@ export default function HeroSliderPage() {
     const title = formData.get('title') as string;
     const cta = formData.get('cta') as string;
     const href = formData.get('href') as string;
-    const image = uploadedImageBase64;
 
     if (!title.trim() || !cta.trim() || !href.trim()) {
       showNotification('Semua bidang wajib diisi.', 'error');
       return;
     }
 
-    if (modalType === 'add') {
-      const newItem: HeroSlide = {
-        id: `slide-${Date.now()}`,
-        tagline: '',
-        title,
-        cta,
-        href,
-        image
-      };
-      setHeroSlides([...heroSlides, newItem]);
-      showNotification('Slide Beranda berhasil ditambahkan.', 'success');
-    } else if (modalType === 'edit' && editingItem) {
-      setHeroSlides(heroSlides.map(item => item.id === editingItem.id ? {
-        ...item,
-        title,
-        cta,
-        href,
-        image
-      } : item));
-      showNotification('Slide Beranda berhasil diubah.', 'success');
-    }
+    try {
+      const finalImageUrl = await uploadFileBase64(uploadedImageBase64, `hero-${Date.now()}.webp`, 'beranda');
 
-    setIsModalOpen(false);
-    setEditingItem(null);
+      if (modalType === 'add') {
+        const newItem: HeroSlide = {
+          id: `slide-${Date.now()}`,
+          tagline: '',
+          title,
+          cta,
+          href,
+          image: finalImageUrl
+        };
+        setHeroSlides([...heroSlides, newItem]);
+        showNotification('Slide Beranda berhasil ditambahkan.', 'success');
+      } else if (modalType === 'edit' && editingItem) {
+        if (editingItem.image && editingItem.image !== finalImageUrl) {
+          await deleteFileByUrl(editingItem.image);
+        }
+        setHeroSlides(heroSlides.map(item => item.id === editingItem.id ? {
+          ...item,
+          title,
+          cta,
+          href,
+          image: finalImageUrl
+        } : item));
+        showNotification('Slide Beranda berhasil diubah.', 'success');
+      }
+
+      setIsModalOpen(false);
+      setEditingItem(null);
+    } catch (err: any) {
+      showNotification(err.message || 'Terjadi kesalahan saat menyimpan data.', 'error');
+    }
   };
 
   return (
@@ -383,9 +374,9 @@ export default function HeroSliderPage() {
                         <input
                           type="text"
                           name="imageUrl"
-                          value={uploadedImageBase64 && !uploadedImageBase64.startsWith('data:') ? uploadedImageBase64 : ''}
+                          value={uploadedImageBase64.startsWith('data:') || uploadedImageBase64.startsWith('/uploads/') ? '' : uploadedImageBase64}
                           onChange={(e) => setUploadedImageBase64(e.target.value)}
-                          placeholder="Masukkan tautan gambar..."
+                          placeholder="https://example.com/img.webp"
                           className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                         />
                       </div>
@@ -395,16 +386,16 @@ export default function HeroSliderPage() {
                       <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
                         <div className="flex items-center gap-2 min-w-0">
                           <ImageIcon className="w-4 h-4 text-accent shrink-0" />
-                          <span className="text-slate-800 font-bold truncate max-w-[200px]">
-                            {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64}
+                          <span className="text-slate-800 font-bold truncate max-w-[300px]">
+                            {uploadedImageBase64}
                           </span>
                         </div>
                         <button
                           type="button"
                           onClick={() => setUploadedImageBase64('')}
-                          className="p-1 text-slate-450 hover:text-red-600 rounded-md transition-colors"
+                          className="text-red-500 hover:text-red-700 font-bold uppercase text-[10px] tracking-wider cursor-pointer"
                         >
-                          <X className="w-4 h-4" />
+                          Hapus
                         </button>
                       </div>
                     )}

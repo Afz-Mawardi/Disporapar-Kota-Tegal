@@ -374,7 +374,7 @@ export default function ManajerAdminPage() {
                       </td>
                       <td className="py-4 px-6 text-center">
                         {admin.role === 'SUPER_ADMIN' ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold font-mono uppercase tracking-wider text-purple-800 bg-purple-50 border border-purple-200 px-2.5 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold font-mono uppercase tracking-wider text-purple-800 bg-purple-100 border border-purple-200 px-2.5 py-0.5 rounded-full">
                             Super Admin
                           </span>
                         ) : (

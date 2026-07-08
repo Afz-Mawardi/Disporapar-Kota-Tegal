@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: disporapar_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: prototype_disporapar
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: disporapar_web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=mysql://root:root_password@db:3306/prototype_disporapar
+      - DEFAULT_SUPER_ADMIN_USERNAME=${DEFAULT_SUPER_ADMIN_USERNAME:-superadmin}
+      - DEFAULT_SUPER_ADMIN_PASSWORD=${DEFAULT_SUPER_ADMIN_PASSWORD:-super26_dinporapar}
+      - DEFAULT_REGULAR_ADMIN_USERNAME=${DEFAULT_REGULAR_ADMIN_USERNAME:-admin}
+      - DEFAULT_REGULAR_ADMIN_PASSWORD=${DEFAULT_REGULAR_ADMIN_PASSWORD:-admin26_dinporapar}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-f38ad8ec7f96b9967114b0b1464ee8c4d115456fef38f15891469e38d77bfdbf}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:

@@ -823,7 +823,7 @@ export default function HomePageClient({
             </div>
           </div>
 
-          {/* Start a new max-w-7xl container for the "Seluruh Galeri Foto" button */}
+          {/* Start a new max-w-7xl container for the "Seluruh Galeri" button */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
             <div className="text-center">
               <Link

@@ -262,8 +262,8 @@ export default function AdminDashboard() {
     { label: 'Publikasi Beranda', val: news.filter(n => n.showOnHomepage).length, color: '#0D3357' },
     { label: 'Pilar Program', val: priorityPrograms.length, color: '#FF7A00' },
     { label: 'Berita', val: news.length, color: '#0E3B66' },
-    { label: 'Agenda Event', val: events.length, color: '#FF9433' },
-    { label: 'Galeri Foto', val: gallery.length, color: '#3B6C9C' },
+    { label: 'Agenda', val: events.length, color: '#FF9433' },
+    { label: 'Galeri', val: gallery.length, color: '#3B6C9C' },
     { label: 'Berkas Layanan', val: services.length, color: '#5283B3' }
   ];
   const maxValInData = Math.max(...barData.map(b => b.val));
@@ -383,7 +383,7 @@ export default function AdminDashboard() {
                 <TrendingUp className="w-5 h-5 text-[#FF7A00]" />
                 <span>Aktivitas Bulanan</span>
               </h3>
-              <p className="text-[10px] text-slate-400 mt-1">Perbandingan tren publikasi berita, agenda event, dan galeri foto</p>
+              <p className="text-[10px] text-slate-400 mt-1">Perbandingan tren publikasi berita, agenda, dan galeri</p>
             </div>
 
             {/* Year selector dropdown (drop list) */}

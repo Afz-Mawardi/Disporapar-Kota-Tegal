@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useNews, useCategories } from '@/lib/data-store';
 import { sortItemsByDateTime } from '@/lib/utils';
+import { uploadFileBase64, deleteFileByUrl } from '@/lib/upload-utils';
 
 // Helper to parse Indonesian date format (e.g. "24 Mei 2026") to YYYY-MM-DD
 const parseIndonesianDateToYYYYMMDD = (dateStr: string): string => {
@@ -196,17 +197,24 @@ export default function BeritaAdminPage() {
     let success = false;
 
     if (deleteTargetId === 'bulk') {
+      const itemsToDelete = news.filter(item => selectedIds.includes(item.id));
       const remainingNews = news.filter(item => !selectedIds.includes(item.id));
       success = await setNews(remainingNews);
       if (success) {
+        // Hapus file fisik secara asinkron
+        for (const item of itemsToDelete) {
+          if (item.imageUrl) await deleteFileByUrl(item.imageUrl);
+        }
         showNotification(`${selectedIds.length} berita berhasil dihapus.`, 'success');
         setSelectedIds([]);
         setIsSelectMode(false);
       }
     } else {
+      const itemToDelete = news.find(item => item.id === deleteTargetId);
       const remainingNews = news.filter(item => item.id !== deleteTargetId);
       success = await setNews(remainingNews);
       if (success) {
+        if (itemToDelete?.imageUrl) await deleteFileByUrl(itemToDelete.imageUrl);
         showNotification('Berita berhasil dihapus.', 'success');
         setSelectedIds(prev => prev.filter(id => id !== deleteTargetId));
       }
@@ -234,28 +242,9 @@ export default function BeritaAdminPage() {
         return;
       }
       convertImageToWebP(file)
-        .then(async (webpBase64) => {
-          try {
-            const res = await fetch('/api/upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                fileBase64: webpBase64,
-                fileName: file.name.substring(0, file.name.lastIndexOf('.')) + '.webp',
-                menu: 'berita'
-              })
-            });
-            const result = await res.json();
-            if (result.success) {
-              setUploadedImageBase64(result.url);
-              showNotification('Gambar berhasil diunggah.', 'success');
-            } else {
-              throw new Error(result.error || 'Gagal menyimpan gambar di server.');
-            }
-          } catch (err: any) {
-            showNotification(err.message || 'Gagal mengunggah gambar ke server.', 'error');
-            e.target.value = '';
-          }
+        .then((webpBase64) => {
+          setUploadedImageBase64(webpBase64);
+          showNotification('Gambar berhasil diproses dan siap disimpan.', 'success');
         })
         .catch((err) => {
           showNotification(err.message || 'Gagal memproses gambar.', 'error');
@@ -302,42 +291,52 @@ export default function BeritaAdminPage() {
     setIsSaving(true);
     let success = false;
 
-    if (modalType === 'add') {
-      const newItem = {
-        id: `news-${Date.now()}`,
-        title,
-        excerpt,
-        content,
-        category,
-        date,
-        imageUrl,
-        author,
-        featured: false,
-        showOnHomepage: true
-      };
-      success = await setNews([newItem, ...news]);
-      if (success) {
-        setIsModalOpen(false);
-        setEditingItem(null);
-        showNotification('Berita berhasil ditambahkan.', 'success');
+    try {
+      const finalImageUrl = await uploadFileBase64(uploadedImageBase64, `berita-${Date.now()}.webp`, 'berita');
+
+      if (modalType === 'add') {
+        const newItem = {
+          id: `news-${Date.now()}`,
+          title,
+          excerpt,
+          content,
+          category,
+          date,
+          imageUrl: finalImageUrl,
+          author,
+          featured: false,
+          showOnHomepage: true
+        };
+        success = await setNews([newItem, ...news]);
+        if (success) {
+          setIsModalOpen(false);
+          setEditingItem(null);
+          showNotification('Berita berhasil ditambahkan.', 'success');
+        }
+      } else if (modalType === 'edit' && editingItem) {
+        if (editingItem.imageUrl && editingItem.imageUrl !== finalImageUrl) {
+          await deleteFileByUrl(editingItem.imageUrl);
+        }
+
+        const updatedItem = {
+          ...editingItem,
+          title,
+          excerpt,
+          content,
+          category,
+          author,
+          date,
+          imageUrl: finalImageUrl
+        };
+        success = await setNews(news.map(n => n.id === editingItem.id ? updatedItem : n));
+        if (success) {
+          setIsModalOpen(false);
+          setEditingItem(null);
+          showNotification('Berita berhasil diubah.', 'success');
+        }
       }
-    } else if (modalType === 'edit' && editingItem) {
-      const updatedItem = {
-        ...editingItem,
-        title,
-        excerpt,
-        content,
-        category,
-        author,
-        date,
-        imageUrl
-      };
-      success = await setNews(news.map(n => n.id === editingItem.id ? updatedItem : n));
-      if (success) {
-        setIsModalOpen(false);
-        setEditingItem(null);
-        showNotification('Berita berhasil diubah.', 'success');
-      }
+    } catch (err: any) {
+      showNotification(err.message || 'Terjadi kesalahan saat menyimpan data.', 'error');
     }
 
     setIsSaving(false);
@@ -708,9 +707,9 @@ export default function BeritaAdminPage() {
                       <input
                         type="text"
                         name="imageUrl"
-                        value={uploadedImageBase64 && !uploadedImageBase64.startsWith('data:') ? uploadedImageBase64 : ''}
+                        value={uploadedImageBase64.startsWith('data:') || uploadedImageBase64.startsWith('/uploads/') ? '' : uploadedImageBase64}
                         onChange={(e) => setUploadedImageBase64(e.target.value)}
-                        placeholder="Masukkan tautan gambar..."
+                        placeholder="https://example.com/img.webp"
                         className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-accent font-medium text-slate-800"
                       />
                     </div>
@@ -720,8 +719,8 @@ export default function BeritaAdminPage() {
                     <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono mt-3">
                       <div className="flex items-center gap-2 min-w-0">
                         <ImageIcon className="w-4 h-4 text-accent shrink-0" />
-                        <span className="text-slate-800 font-bold truncate max-w-[200px]">
-                          {uploadedImageBase64.startsWith('data:') ? 'Gambar Terunggah (Local)' : uploadedImageBase64}
+                        <span className="text-slate-800 font-bold truncate max-w-[300px]">
+                          {uploadedImageBase64}
                         </span>
                       </div>
                       <button

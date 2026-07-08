@@ -3,7 +3,7 @@
     {
       "id": "news-1",
       "title": "Festival Pesisir Tegal 2026: Sinergi Pariwisata Bahari dan Kebudayaan Lokal Resmi Dibuka",
-      "excerpt": "Festival tahunan pariwisata Pantai Alam Indah resmi dibuka oleh Walikota Tegal bersama DISPORAPAR dengan target 50.000 pengunjung lokal dan mancanegara.",
+      "excerpt": "Kota Tegal menyambut perhelatan Festival Pesisir Tegal 2026 yang berlangsung meriah di pesisir Pantai Alam Indah. Acara dibuka langsung dengan pertunj...",
       "content": "Kota Tegal menyambut perhelatan Festival Pesisir Tegal 2026 yang berlangsung meriah di pesisir Pantai Alam Indah. Acara dibuka langsung dengan pertunjukan tarian tradisional pesisiran, pameran UMKM ekonomi kreatif, lomba perahu hias bahari, dan festival moci bersama 5.000 masyarakat. DISPORAPAR Kota Tegal mengusung visi modernisasi wisata bahari dengan tetap melestarikan keasrian alam dan budaya pesisir utara Jawa Tengah.",
       "category": "Pariwisata",
       "date": "24 Mei 2026",
@@ -163,7 +163,7 @@
       "title": "SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)",
       "description": "Panduan tata cara penyewaan sarana prasarana olahraga milik daerah untuk kegiatan olahraga maupun luar olahraga.",
       "category": "SOP",
-      "downloadUrl": "/uploads/dokumen/1781977938236_Strategi_responden_IPP.zip",
+      "downloadUrl": "#",
       "fileSize": "16 KB",
       "showOnHomepage": true
     },
@@ -171,8 +171,8 @@
       "id": "s-10",
       "title": "Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)",
       "description": "Pendaftaran berkas seleksi delegasi pemuda andalan Kota Tegal ke tingkat provinsi untuk dikirim ke kancah global.",
-      "category": "Formulir",
-      "downloadUrl": "/uploads/dokumen/1781977908230_wmp.docx",
+      "category": "SOP",
+      "downloadUrl": "#",
       "fileSize": "934 KB",
       "showOnHomepage": true
     },
@@ -180,25 +180,16 @@
       "id": "s-3",
       "title": "Berkas Layanan Rekomendasi Tanda Daftar Usaha Pariwisata (TDUP)",
       "description": "Persyaratan lengkap, durasi penyelesaian, dan jaminan keamanan penerbitan rekomendasi teknis pariwisata.",
-      "category": "Berkas Layanan",
+      "category": "Berkas",
       "downloadUrl": "#",
       "fileSize": "1.8 MB",
-      "showOnHomepage": false
-    },
-    {
-      "id": "s-6",
-      "title": "Berkas Layanan Standar Operasional Pengelolaan Pondok Wisata (Homestay)",
-      "description": "Dokumen panduan standar pelayanan akomodasi rakyat untuk menunjang pariwisata bahari terpadu di Kota Tegal.",
-      "category": "Berkas Layanan",
-      "downloadUrl": "#",
-      "fileSize": "2.1 MB",
       "showOnHomepage": false
     },
     {
       "id": "s-7",
       "title": "Formulir Pengajuan Stimulus Sarana Prasarana Klub Olahraga Masyarakat",
       "description": "Formulir administrasi usulan bantuan bola, net, rompi, dan perbaikan sarana olahraga tingkat RW binaan dinas.",
-      "category": "Formulir",
+      "category": "Berkas",
       "downloadUrl": "#",
       "fileSize": "380 KB",
       "showOnHomepage": false
@@ -207,8 +198,8 @@
       "id": "s-9",
       "title": "Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan",
       "description": "Formulir basis data sertifikasi kurasi produk kriya, batik Tegalan, logam, dan makanan khas untuk event pameran daerah.",
-      "category": "Berkas Layanan",
-      "downloadUrl": "/uploads/dokumen/1781977188734_souvenir.pdf",
+      "category": "SOP",
+      "downloadUrl": "#",
       "fileSize": "190 KB",
       "showOnHomepage": true
     }
@@ -257,7 +248,7 @@
     "name": "Khusnul Hidayati, S.E,. M.Si.",
     "nip": "",
     "content": "Assalamualaikum Warahmatullahi Wabarakatuh, Salam sejahtera bagi kita semua, Shalom, Om Swastyastu, Namo Buddhaya, Salam Kebajikan.\nPuji syukur kehadirat Allah SWT, berkat kemudahan teknologi digital kini DISPORAPAR Kota Tegal meluncurkan portal informasi dan database modern terpusat dalam menyongsong Smart Government Kota Tegal. Website ini kami dedikasikan sebagai jembatan penghubung antara kebijakan publik dinas dengan keterlibatan aktif masyarakat secara terbuka.\nKami meyakini bahwa generasi muda Kota Tegal memiliki elan kreatif luar biasa, atlet kita memiliki stamina bahari tangguh pemburu prestasi, dan wisata pesisir kita memiliki pesona unik yang layak memperoleh sorotan nasional. Mari berkolaborasi membangun Kota Tegal menjadi episentrum prestasi wisata dan kepemudaan.\nWassalamualaikum Warahmatullahi Wabarakatuh.",
-    "imageUrl": "/uploads/sambutan/1781461848923_kabid_Image_5_Jun_2026__14.29.31.webp"
+    "imageUrl": "/uploads/berandaprofil/1782411437112_1b19ecff-f492-479f-aa37-1be4ee9ddaf6.webp"
   },
   "heroSlides": [
     {
@@ -308,8 +299,8 @@
     ],
     "services": [
       "SOP",
-      "Formulir",
-      "Berkas Layanan"
+      "Berkas",
+      "Formulir"
     ],
     "retribusi": [
       "Olahraga",
@@ -324,7 +315,7 @@
       "description": "Revitalisasi pariwisata bahari PAI terpadu, pengembangan wisata religi cagar sejarah Alun-alun & Taman Pancasila serta sertifikasi pembinaan usaha kuliner legendaris Tegal.",
       "points": [
         "Kampung Seni & Galeri Wisata PAI",
-        "Lembaga Pengelola Usaha Pariwisata (TDUP)",
+        "Lembaga Pengelola Usaha Pariwisata",
         "Festival Pesisir & Kuliner Tahunan"
       ]
     },
@@ -333,7 +324,7 @@
       "title": "Pemberdayaan Pemuda Kreatif",
       "description": "Menjaring ekosistem wirausaha muda terdidik dalam program Akselerator AWMT, pembemainan berkelanjutan KNPI/OK, pembekalan Paskibraka serta inkubasi Youth Creative Hub.",
       "points": [
-        "Akselerator Wirausaha Muda (AWMT)",
+        "Akselerator Wirausaha Muda",
         "Seleksi & Pendidikan Paskibraka",
         "Tegal Youth Co-Working Space"
       ]
@@ -462,7 +453,13 @@
       "id": "ret-9",
       "name": "Co-working Space & Youth Hub Room",
       "category": "Kepemudaan",
-      "fee": "Gratis (Bagi Organisasi Binaan)"
+      "fee": "Gratis  Sung"
+    },
+    {
+      "id": "ret-1782403169143",
+      "name": "Layanan Bebas Finansial",
+      "category": "Kepemudaan",
+      "fee": "1 B per 3 hoours"
     }
   ],
   "bidangBottomCards": [
@@ -508,15 +505,9 @@
       "location": "Kejambon, Tegal Timur, Kota Tegal",
       "capacity": "500 Kursi",
       "price": "Rp 100.000 / Jam",
-      "facilities": [
-        "Panggung Utama",
-        "Sound System",
-        "Kursi Lipat",
-        "AC/Kipas Angin",
-        "Area Parkir"
-      ],
+      "facilities": "Panggung Utama, Sound System, Kursi Lipat, AC/Kipas Angin, Area Parkir",
       "imageUrl": "https://picsum.photos/seed/gedung_pemuda/800/600",
-      "createdAt": "2026-06-25T07:05:57.092Z"
+      "createdAt": "2026-06-25T15:58:00.972Z"
     },
     {
       "id": "kc-1",
@@ -525,15 +516,9 @@
       "location": "Mintaragen, Tegal Timur, Kota Tegal",
       "capacity": "1.500 Peserta",
       "price": "Rp 150.000 / Hari",
-      "facilities": [
-        "Area Tenda Luas",
-        "MCK Bersih",
-        "Pendopo Utama",
-        "Akses Air Bersih",
-        "Pos Keamanan"
-      ],
+      "facilities": "Area Tenda Luas, MCK Bersih, Pendopo Utama, Akses Air Bersih, Pos Keamanan",
       "imageUrl": "https://picsum.photos/seed/bumi_perkemahan/800/600",
-      "createdAt": "2026-06-25T07:05:58.092Z"
+      "createdAt": "2026-06-25T15:58:01.972Z"
     },
     {
       "id": "kc-3",
@@ -542,15 +527,9 @@
       "location": "Slerok, Tegal Timur, Kota Tegal",
       "capacity": "50 Orang",
       "price": "Gratis (Bagi Organisasi Binaan)",
-      "facilities": [
-        "Akses WiFi Cepat",
-        "Colokan Listrik",
-        "AC Dingin",
-        "Meja & Kursi Kerja",
-        "Whiteboard"
-      ],
+      "facilities": "Akses WiFi Cepat, Colokan Listrik, AC Dingin, Meja & Kursi Kerja, Whiteboard",
       "imageUrl": "https://picsum.photos/seed/creative_hub_room/800/600",
-      "createdAt": "2026-06-25T07:05:59.092Z"
+      "createdAt": "2026-06-25T15:58:02.972Z"
     }
   ],
   "olahragaCards": [
@@ -642,6 +621,26 @@
   ],
   "complaints": [
     {
+      "id": "c2c7d928-cc62-49d3-9720-1bf3831e59a3",
+      "title": "a",
+      "content": "as",
+      "imageUrl": "",
+      "contact": "",
+      "status": "Baru",
+      "notes": "",
+      "createdAt": "2026-06-25T16:01:39.887Z"
+    },
+    {
+      "id": "da42d199-4fab-44fd-9d3a-c39724ef2d3b",
+      "title": "vsdfv",
+      "content": "asssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+      "imageUrl": "/uploads/pengaduan/1782399416851_26113b73-a0b4-4992-8514-1898d4cf745f.webp",
+      "contact": "",
+      "status": "Baru",
+      "notes": "",
+      "createdAt": "2026-06-25T14:56:57.411Z"
+    },
+    {
       "id": "6d41548c-d0f4-45e8-8ba7-0cc04ca04793",
       "title": "ddddsg",
       "content": "gdrgdgfdxg",
@@ -714,445 +713,445 @@
   ],
   "adminLogs": [
     {
-      "id": "1d102b95-ec68-4478-8078-93bd1e4e2934",
-      "action": "{\"waktu\":\"2026-06-25T12:26:11.065Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/admins\",\"aksi\":\"Update Admin: admin (password diperbarui (Argon2))\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T12:26:11.066Z"
+      "id": "6130e34f-449d-47d5-bba4-c4e7c25a023a",
+      "action": "Admin \"admin\" mengubah berkas dokumen \"Formulir Pengajuan Stimulus Sarana Prasarana Klub Olahraga Masyarakat\" (kategori diubah menjadi \"Berkas\").",
+      "createdAt": "2026-06-25T18:23:42.809Z"
     },
     {
-      "id": "452a5f91-624f-49f9-8127-5cfb4a4909d4",
-      "action": "{\"waktu\":\"2026-06-25T12:25:51.323Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T12:25:51.324Z"
+      "id": "80258388-dcc0-42d1-93e5-da42a10326ef",
+      "action": "{\"waktu\":\"2026-06-25T18:23:30.942Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:23:30.951Z"
     },
     {
-      "id": "e9cb6a57-1431-4760-903b-eef836258237",
-      "action": "{\"waktu\":\"2026-06-25T12:25:38.323Z\",\"user\":\"admin\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T12:25:38.324Z"
+      "id": "5946e8c6-406f-4fcc-a2b6-3f49c7ad8f7b",
+      "action": "Admin \"admin\" mengubah berkas dokumen \"Berkas Layanan Rekomendasi Tanda Daftar Usaha Pariwisata (TDUP)\" (kategori diubah menjadi \"Berkas\").",
+      "createdAt": "2026-06-25T18:23:30.901Z"
     },
     {
-      "id": "0f8b0f17-5ee9-41a0-90c4-94cc00b4df83",
-      "action": "{\"waktu\":\"2026-06-25T12:25:25.565Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T12:25:25.566Z"
+      "id": "397a1416-96b7-4c2b-bc6f-2140208dacff",
+      "action": "{\"waktu\":\"2026-06-25T18:23:16.625Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:23:16.632Z"
     },
     {
-      "id": "534c40ed-c875-4449-a350-a94d93bbaaa2",
-      "action": "{\"waktu\":\"2026-06-25T12:25:25.557Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Password Migration to Argon2\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T12:25:25.559Z"
+      "id": "b376f084-ad64-4bdc-9a51-23eeb39d9bab",
+      "action": "{\"waktu\":\"2026-06-25T18:23:08.075Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:23:08.079Z"
     },
     {
-      "id": "94b65cd5-487a-42df-9c4a-296091326b54",
-      "action": "{\"waktu\":\"2026-06-25T12:24:47.590Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Gagal\",\"reason\":\"Invalid password\"}",
-      "createdAt": "2026-06-25T12:24:47.593Z"
+      "id": "0823af8d-5852-484d-a08e-59b9992bf916",
+      "action": "{\"waktu\":\"2026-06-25T18:22:52.919Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:22:52.924Z"
     },
     {
-      "id": "5c3f3bfe-1949-4257-bfad-eb5b2feabd89",
-      "action": "{\"waktu\":\"2026-06-25T12:24:39.998Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Gagal\",\"reason\":\"Invalid password\"}",
-      "createdAt": "2026-06-25T12:24:40.001Z"
+      "id": "395276dc-2d77-4fb6-b905-b45a04c06085",
+      "action": "Admin \"admin\" mengubah berkas dokumen \"Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan\" (kategori diubah menjadi \"SOP\").",
+      "createdAt": "2026-06-25T18:22:52.813Z"
     },
     {
-      "id": "5370e4a7-255b-4b8b-a1e7-1980d83fa8b9",
-      "action": "{\"waktu\":\"2026-06-25T12:24:27.709Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Gagal\",\"reason\":\"Invalid password\"}",
-      "createdAt": "2026-06-25T12:24:27.712Z"
+      "id": "4b94c199-e3cc-460d-ba06-d0e556abcda0",
+      "action": "Admin \"admin\" mengubah berkas dokumen \"Berkas Layanan Rekomendasi Tanda Daftar Usaha Pariwisata (TDUP)\" (kategori diubah menjadi \"SOP\").",
+      "createdAt": "2026-06-25T18:22:52.736Z"
     },
     {
-      "id": "606c6271-02f5-4593-9b82-75a89ec7ceb8",
-      "action": "{\"waktu\":\"2026-06-25T09:12:08.341Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T09:12:08.351Z"
+      "id": "8c8a8ff6-3654-428c-9cf3-07caa8fbb976",
+      "action": "{\"waktu\":\"2026-06-25T18:22:52.729Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:22:52.734Z"
     },
     {
-      "id": "685f89a9-7782-46da-8965-c1e1b3361caf",
-      "action": "{\"waktu\":\"2026-06-25T09:11:38.478Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T09:11:38.481Z"
+      "id": "0d56bd36-4ef6-4999-adfc-0fb12319ae05",
+      "action": "{\"waktu\":\"2026-06-25T18:22:41.083Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:22:41.091Z"
     },
     {
-      "id": "3525efb0-f4d6-4c99-969b-7138a4cbca43",
-      "action": "{\"waktu\":\"2026-06-25T09:11:04.744Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782378664730_cdd0aba1-0935-4a59-ba55-9c2b5804a184.webp\",\"size\":58460}",
-      "createdAt": "2026-06-25T09:11:04.751Z"
+      "id": "ac8fab40-2568-4977-afc3-33762afded42",
+      "action": "Admin \"admin\" mengubah berkas dokumen \"Formulir Pengajuan Stimulus Sarana Prasarana Klub Olahraga Masyarakat\" (kategori diubah menjadi \"SOP\").",
+      "createdAt": "2026-06-25T18:22:40.991Z"
     },
     {
-      "id": "781c6d8e-3c6a-426d-9b23-8cbac30c6726",
-      "action": "{\"waktu\":\"2026-06-25T09:07:47.114Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782378467111_605d2e86-9ac1-467e-8148-2752b123be84.webp\",\"size\":58460}",
-      "createdAt": "2026-06-25T09:07:47.118Z"
+      "id": "9db58bef-86f9-4e60-905b-426e641ab1b8",
+      "action": "Admin \"admin\" mengubah berkas dokumen \"Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)\" (kategori diubah menjadi \"SOP\").",
+      "createdAt": "2026-06-25T18:22:40.948Z"
     },
     {
-      "id": "31297d53-f8f3-463f-a55f-6c54c89be0e8",
-      "action": "{\"waktu\":\"2026-06-25T09:05:53.754Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782378353750_0fbb179f-72b6-494d-ab5f-d363ec14632e.webp\",\"size\":147570}",
-      "createdAt": "2026-06-25T09:05:53.759Z"
+      "id": "00e997ca-a7f0-4708-be8e-acafd715e670",
+      "action": "{\"waktu\":\"2026-06-25T18:22:40.942Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:22:40.946Z"
     },
     {
-      "id": "8a53fdf9-87cc-45a0-8591-aeae7f1a91f7",
-      "action": "{\"waktu\":\"2026-06-25T09:05:29.571Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782378329566_94a501da-9e99-41a1-a4f5-1c7d254717a6.webp\",\"size\":58460}",
-      "createdAt": "2026-06-25T09:05:29.584Z"
+      "id": "44da4e72-b109-413a-a3e3-ff09f9f645c4",
+      "action": "{\"waktu\":\"2026-06-25T18:18:04.170Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:18:04.180Z"
     },
     {
-      "id": "4f9eb584-f44e-43f3-83ea-977000fdc6fa",
-      "action": "{\"waktu\":\"2026-06-25T08:52:17.839Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:52:17.842Z"
+      "id": "be5a01d4-dc89-45de-ab10-9d9466676c46",
+      "action": "{\"waktu\":\"2026-06-25T18:18:03.986Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Delete\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/berandaprofil/1782411403923_b028bead-89d3-4e9c-80de-246fe6feb473.webp\"}",
+      "createdAt": "2026-06-25T18:18:03.995Z"
     },
     {
-      "id": "7117f715-209e-45a5-aa93-540f6716cd92",
-      "action": "{\"waktu\":\"2026-06-25T08:44:56.694Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:44:56.697Z"
+      "id": "e38a4618-b5c9-436b-b1a5-d311295cba96",
+      "action": "{\"waktu\":\"2026-06-25T18:17:17.600Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:17:17.609Z"
     },
     {
-      "id": "2cfdf7cd-9b5f-4a91-8c5c-f5f3805702be",
-      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)\" (ditampilkan di beranda).",
-      "createdAt": "2026-06-25T08:44:56.627Z"
+      "id": "8397feee-c258-464b-ad66-9f60f0e72f14",
+      "action": "{\"waktu\":\"2026-06-25T18:17:17.117Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/berandaprofil/1782411437112_1b19ecff-f492-479f-aa37-1be4ee9ddaf6.webp\",\"size\":42576}",
+      "createdAt": "2026-06-25T18:17:17.127Z"
     },
     {
-      "id": "edb25d67-fdfe-4144-9c72-51ac2e702253",
-      "action": "{\"waktu\":\"2026-06-25T08:44:51.519Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:44:51.522Z"
+      "id": "adb44492-33d4-4f6b-bb15-37cb9a0a8725",
+      "action": "{\"waktu\":\"2026-06-25T18:16:44.105Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:16:44.108Z"
     },
     {
-      "id": "353ba1b0-6a93-499f-bffc-c34e70e10309",
-      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan\" (ditampilkan di beranda).",
-      "createdAt": "2026-06-25T08:44:51.477Z"
+      "id": "849d2175-cba9-4f22-94dd-47177b4a8288",
+      "action": "{\"waktu\":\"2026-06-25T18:16:43.928Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/berandaprofil/1782411403923_b028bead-89d3-4e9c-80de-246fe6feb473.webp\",\"size\":48140}",
+      "createdAt": "2026-06-25T18:16:43.932Z"
     },
     {
-      "id": "e13ba9ae-ddfc-4036-9c6f-8b04980c702b",
-      "action": "{\"waktu\":\"2026-06-25T08:44:46.452Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:44:46.455Z"
+      "id": "d4a65e16-b93b-4703-9bce-e489567b4498",
+      "action": "{\"waktu\":\"2026-06-25T18:15:55.642Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:15:55.655Z"
     },
     {
-      "id": "eb76b112-1455-45bc-adc4-90452da37405",
-      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)\" (ditampilkan di beranda).",
-      "createdAt": "2026-06-25T08:44:46.410Z"
+      "id": "ab3886b8-3717-4468-a27e-4ede97fee61d",
+      "action": "Admin \"admin\" menghapus berkas dokumen \"Apa yang di maksud dengan dokumen\".",
+      "createdAt": "2026-06-25T18:15:55.597Z"
     },
     {
-      "id": "a00cc65e-7cd9-41fd-949d-59148a02ab00",
-      "action": "{\"waktu\":\"2026-06-25T08:44:37.452Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:44:37.456Z"
+      "id": "66e6f4d6-a5e4-4e95-9431-03868fe5e4ac",
+      "action": "{\"waktu\":\"2026-06-25T18:15:31.715Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:15:31.726Z"
     },
     {
-      "id": "1d9ce97c-a930-42a8-9a80-dcfecedd0e82",
-      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)\" (disembunyikan dari beranda).",
-      "createdAt": "2026-06-25T08:44:37.255Z"
+      "id": "ceae4c07-0eb1-4c23-95d0-dbf7267f9c96",
+      "action": "{\"waktu\":\"2026-06-25T18:15:31.541Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Delete\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/berita/1782411318360_988fe7c8-1d76-4ac4-b9fa-6f6105bd4fc9.webp\"}",
+      "createdAt": "2026-06-25T18:15:31.552Z"
     },
     {
-      "id": "bbe69a3d-1c5d-4237-ad2c-4de0e7179abf",
-      "action": "{\"waktu\":\"2026-06-25T08:44:33.158Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:44:33.161Z"
+      "id": "9ce74041-a15f-46ca-b68b-1d3d603c9e17",
+      "action": "{\"waktu\":\"2026-06-25T18:15:18.504Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:15:18.515Z"
     },
     {
-      "id": "95841a0c-cf1e-4013-a56d-ce697ec45d16",
-      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)\" (disembunyikan dari beranda).",
-      "createdAt": "2026-06-25T08:44:33.084Z"
+      "id": "d03f112e-4ef7-4af4-a933-d3891a36388d",
+      "action": "{\"waktu\":\"2026-06-25T18:15:18.364Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/berita/1782411318360_988fe7c8-1d76-4ac4-b9fa-6f6105bd4fc9.webp\",\"size\":48140}",
+      "createdAt": "2026-06-25T18:15:18.376Z"
     },
     {
-      "id": "cf6f8fc2-8803-4020-8c1f-db5512fa2121",
-      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)\" (ditampilkan di beranda).",
-      "createdAt": "2026-06-25T08:44:32.946Z"
+      "id": "5f9fc443-02c9-484d-b536-5f72e43deaa0",
+      "action": "{\"waktu\":\"2026-06-25T18:15:03.238Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:15:03.241Z"
     },
     {
-      "id": "cc001b8d-b76c-43f0-b6b8-751f787193ed",
-      "action": "{\"waktu\":\"2026-06-25T08:44:28.914Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:44:28.917Z"
+      "id": "002e4119-bf7a-4c7a-91ab-294b2b6a4265",
+      "action": "{\"waktu\":\"2026-06-25T18:15:03.057Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Delete\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782411282910_139ca430-f715-412b-b4f9-f67df0a8ae7f.webp\"}",
+      "createdAt": "2026-06-25T18:15:03.061Z"
     },
     {
-      "id": "8308e55e-2fa4-46b3-931c-3d6f7d7a8f04",
-      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)\" (disembunyikan dari beranda).",
-      "createdAt": "2026-06-25T08:44:28.836Z"
+      "id": "59643525-02e0-410d-a903-6d7b272d03f3",
+      "action": "{\"waktu\":\"2026-06-25T18:14:43.519Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:14:43.523Z"
     },
     {
-      "id": "d89a8fb0-f8ee-4954-afd5-6b285e23fad4",
-      "action": "{\"waktu\":\"2026-06-25T08:44:24.164Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:44:24.167Z"
+      "id": "93bf1d57-fd2f-4db9-acd2-1a437a2c65a5",
+      "action": "{\"waktu\":\"2026-06-25T18:14:42.915Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782411282910_139ca430-f715-412b-b4f9-f67df0a8ae7f.webp\",\"size\":48140}",
+      "createdAt": "2026-06-25T18:14:42.921Z"
     },
     {
-      "id": "0541b8ff-2a99-4fbe-a02c-b4bf932f4d41",
-      "action": "{\"waktu\":\"2026-06-25T08:44:24.122Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:44:24.126Z"
+      "id": "cdd470b6-6157-4e14-9a0b-b9c398faeff1",
+      "action": "{\"waktu\":\"2026-06-25T18:14:24.606Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:14:24.609Z"
     },
     {
-      "id": "098b89f5-37e4-4be3-9591-58623db2940a",
-      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan\" (disembunyikan dari beranda).",
-      "createdAt": "2026-06-25T08:44:24.064Z"
+      "id": "cccb7e35-cc72-4356-b05d-dab989dbc261",
+      "action": "{\"waktu\":\"2026-06-25T18:14:18.740Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Delete\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782411022828_46473405-9d5e-4460-b611-519664ba4eb0.webp\"}",
+      "createdAt": "2026-06-25T18:14:18.745Z"
     },
     {
-      "id": "63aae7a8-fdb6-4c99-93bc-8aec2db196a8",
-      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan\" (disembunyikan dari beranda).",
-      "createdAt": "2026-06-25T08:44:24.062Z"
+      "id": "1a84861e-760f-4104-b4c3-d5a5caa09bb1",
+      "action": "{\"waktu\":\"2026-06-25T18:10:26.364Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:10:26.368Z"
     },
     {
-      "id": "262ce025-00d1-476d-92ef-156a5c456356",
-      "action": "{\"waktu\":\"2026-06-25T08:36:05.597Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:36:05.602Z"
+      "id": "5880f46c-fdf2-408f-b075-19a0a6bf5eca",
+      "action": "{\"waktu\":\"2026-06-25T18:10:22.832Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782411022828_46473405-9d5e-4460-b611-519664ba4eb0.webp\",\"size\":48140}",
+      "createdAt": "2026-06-25T18:10:22.837Z"
     },
     {
-      "id": "ed87d18f-893c-4342-9e49-c5a6c53d0468",
-      "action": "Super Admin \"superadmin\" menghapus berkas dokumen \"zca,\".",
-      "createdAt": "2026-06-25T08:36:05.545Z"
+      "id": "d8d09921-e5a4-469e-b3b8-344767af1ddb",
+      "action": "{\"waktu\":\"2026-06-25T18:02:16.110Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:02:16.116Z"
     },
     {
-      "id": "97ef95b5-2bba-4a1d-bb59-363c5cc69126",
-      "action": "{\"waktu\":\"2026-06-25T08:36:00.156Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:36:00.160Z"
+      "id": "83722c75-0379-4962-8aa7-5b176bcf01a8",
+      "action": "Admin \"admin\" menghapus berkas dokumen \"AAA\".",
+      "createdAt": "2026-06-25T18:02:16.055Z"
     },
     {
-      "id": "91590e52-f043-47b7-a03a-a172bfb6b719",
-      "action": "Super Admin \"superadmin\" menghapus berkas dokumen \"jkas\".",
-      "createdAt": "2026-06-25T08:36:00.109Z"
+      "id": "a19cb91e-06df-47b9-aab0-6144e4c86f98",
+      "action": "{\"waktu\":\"2026-06-25T18:02:05.197Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:02:05.201Z"
     },
     {
-      "id": "3d66c8ee-e10b-464f-aab3-0e1f77fbf1e8",
-      "action": "{\"waktu\":\"2026-06-25T08:35:50.638Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:35:50.642Z"
+      "id": "916143dd-6c2c-4c13-9adf-8bffc75287bf",
+      "action": "Admin \"admin\" menambahkan berkas dokumen baru \"AAA\".",
+      "createdAt": "2026-06-25T18:02:05.148Z"
     },
     {
-      "id": "887f93ea-144e-4629-b73e-fa0ed59c62d0",
-      "action": "Super Admin \"superadmin\" menambahkan berkas dokumen baru \"jkas\".",
-      "createdAt": "2026-06-25T08:35:50.579Z"
+      "id": "8dc751ed-857a-40fc-882f-34d34275ec7c",
+      "action": "{\"waktu\":\"2026-06-25T18:02:03.751Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/dokumen/1782410523745_101eee85-e95f-43d3-b154-4f1ef4449e8e.docx\",\"size\":2149287}",
+      "createdAt": "2026-06-25T18:02:03.755Z"
     },
     {
-      "id": "188d7caf-f718-4d76-b8bc-3d245ded3d68",
-      "action": "{\"waktu\":\"2026-06-25T08:35:42.583Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:35:42.587Z"
+      "id": "cb20e57d-20df-44d3-a19f-13860eebc4f4",
+      "action": "{\"waktu\":\"2026-06-25T18:00:50.175Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T18:00:50.179Z"
     },
     {
-      "id": "a92749b4-3ae4-444f-81ca-2baefab98a73",
-      "action": "Super Admin \"superadmin\" menambahkan berkas dokumen baru \"zca,\".",
-      "createdAt": "2026-06-25T08:35:42.541Z"
+      "id": "b8425be0-9fdc-4346-a923-9c99e071f2c5",
+      "action": "{\"waktu\":\"2026-06-25T17:53:56.066Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T17:53:56.072Z"
     },
     {
-      "id": "850c8bda-5069-44c2-9645-667ac5e566d8",
-      "action": "{\"waktu\":\"2026-06-25T08:33:25.508Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:33:25.522Z"
+      "id": "af8959e3-ed99-4240-b218-a02c2bcb00f7",
+      "action": "Admin \"admin\" mengubah berkas dokumen \"Apa yang di maksud dengan dokumen\" (berkas diperbarui, ukuran berkas diubah menjadi \"2.0 MB\").",
+      "createdAt": "2026-06-25T17:53:55.978Z"
     },
     {
-      "id": "af9de8ba-adfe-4268-b60e-c0b63a2aafd3",
-      "action": "{\"waktu\":\"2026-06-25T08:33:06.673Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:33:06.677Z"
+      "id": "2c8082a4-b6c7-4405-be32-4442b27c3301",
+      "action": "{\"waktu\":\"2026-06-25T17:53:53.531Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/dokumen/1782410033525_3692e285-99e5-4eee-919f-88ac05557898.docx\",\"size\":2149287}",
+      "createdAt": "2026-06-25T17:53:53.534Z"
     },
     {
-      "id": "29ef7b2c-bc11-4470-9174-c1099fc29de0",
-      "action": "{\"waktu\":\"2026-06-25T08:33:02.031Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:33:02.035Z"
+      "id": "04cbaf7c-e388-46e9-b492-4fa4ed613c0c",
+      "action": "{\"waktu\":\"2026-06-25T17:42:42.592Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T17:42:42.595Z"
     },
     {
-      "id": "9fef2f49-b1a7-4be8-83ea-da98454323d2",
-      "action": "{\"waktu\":\"2026-06-25T08:32:55.980Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:32:55.983Z"
+      "id": "73f9c047-6ab8-480d-8fd6-e984c5bcc24a",
+      "action": "{\"waktu\":\"2026-06-25T17:41:30.882Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T17:41:30.886Z"
     },
     {
-      "id": "16b7a60d-f8f4-4a6f-8d36-cebf72593c1a",
-      "action": "{\"waktu\":\"2026-06-25T08:16:35.645Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:16:35.649Z"
+      "id": "3897d27e-0b3d-48cc-9886-0517ab6a2055",
+      "action": "{\"waktu\":\"2026-06-25T17:41:28.977Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Delete\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782409099970_2bf547a2-2bba-4c1b-b8a5-81b2b1fd23b3.webp\"}",
+      "createdAt": "2026-06-25T17:41:28.981Z"
     },
     {
-      "id": "1707983d-4c41-42a5-ae83-bcf360e89ec3",
-      "action": "Super Admin \"superadmin\" menghapus berkas dokumen \"caoca\".",
-      "createdAt": "2026-06-25T08:16:35.596Z"
+      "id": "753a997d-6182-49cc-9f42-bf4f3ab4464c",
+      "action": "{\"waktu\":\"2026-06-25T17:38:21.364Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T17:38:21.368Z"
     },
     {
-      "id": "4e833f2b-711d-4ece-b752-1d4c76dfe6fd",
-      "action": "{\"waktu\":\"2026-06-25T08:16:28.142Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:16:28.148Z"
+      "id": "012f8530-3004-43a7-86d9-3cfc47c58423",
+      "action": "{\"waktu\":\"2026-06-25T17:38:21.346Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T17:38:21.350Z"
     },
     {
-      "id": "b6598da5-0ca6-4a5f-8899-75f9fd1f80e9",
-      "action": "Super Admin \"superadmin\" menambahkan berkas dokumen baru \"caoca\".",
-      "createdAt": "2026-06-25T08:16:28.082Z"
+      "id": "366ac797-9d19-4371-9228-0923ba27df2e",
+      "action": "{\"waktu\":\"2026-06-25T17:38:19.990Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782409099986_a9740a51-602e-47c1-a307-adbf90d880ce.webp\",\"size\":132144}",
+      "createdAt": "2026-06-25T17:38:19.993Z"
     },
     {
-      "id": "58698d25-0719-42e7-a7a5-cd9c803c0ace",
-      "action": "{\"waktu\":\"2026-06-25T08:11:34.429Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:11:34.432Z"
+      "id": "d3e5f940-796b-41f9-baaa-000d349593b0",
+      "action": "{\"waktu\":\"2026-06-25T17:38:19.974Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782409099970_2bf547a2-2bba-4c1b-b8a5-81b2b1fd23b3.webp\",\"size\":132144}",
+      "createdAt": "2026-06-25T17:38:19.978Z"
     },
     {
-      "id": "807ab1da-a0a0-49c3-98fd-be88d92903cd",
-      "action": "{\"waktu\":\"2026-06-25T08:09:35.923Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:09:35.926Z"
+      "id": "296b972e-451b-4ff8-85e8-6440bd034637",
+      "action": "{\"waktu\":\"2026-06-25T17:32:48.815Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T17:32:48.817Z"
     },
     {
-      "id": "8236b21e-8eb0-4833-807e-1da1fcd4c5b1",
-      "action": "{\"waktu\":\"2026-06-25T08:09:22.671Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:09:22.678Z"
+      "id": "851c10ef-2596-45cd-9ac7-45cede3c4b08",
+      "action": "{\"waktu\":\"2026-06-25T17:32:48.611Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Delete\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782408731721_43375075-144a-4430-8338-6ce00ee13202.webp\"}",
+      "createdAt": "2026-06-25T17:32:48.614Z"
     },
     {
-      "id": "cf718a44-01e1-4379-84b9-bdd24a856577",
-      "action": "{\"waktu\":\"2026-06-25T08:09:03.547Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:09:03.551Z"
+      "id": "34a00fb6-e24a-447e-9677-f602de23db97",
+      "action": "{\"waktu\":\"2026-06-25T17:32:15.481Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T17:32:15.484Z"
     },
     {
-      "id": "52cde1bb-720b-4604-bdee-2255f460614b",
-      "action": "{\"waktu\":\"2026-06-25T08:07:02.676Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:07:02.682Z"
+      "id": "36c329d2-7f65-43ee-a8c0-69aed1f16e3d",
+      "action": "{\"waktu\":\"2026-06-25T17:32:11.726Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782408731721_43375075-144a-4430-8338-6ce00ee13202.webp\",\"size\":132144}",
+      "createdAt": "2026-06-25T17:32:11.731Z"
     },
     {
-      "id": "6713b07f-6361-48e1-8e90-616dab3bdd47",
-      "action": "{\"waktu\":\"2026-06-25T08:06:32.700Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:06:32.704Z"
+      "id": "5937bd7d-33b8-47e7-88e1-9c0df93bf326",
+      "action": "{\"waktu\":\"2026-06-25T17:21:06.760Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T17:21:06.765Z"
     },
     {
-      "id": "10479400-a7f4-4eb1-8ac3-90ebac4f4906",
-      "action": "{\"waktu\":\"2026-06-25T08:04:29.276Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:04:29.280Z"
+      "id": "ba0b41a1-5a60-4505-b623-d5de5a025f89",
+      "action": "{\"waktu\":\"2026-06-25T16:53:02.222Z\",\"user\":\"superadmin\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:53:02.227Z"
     },
     {
-      "id": "18c0bac6-40e1-49d4-9cf8-d9c4a259a95e",
-      "action": "{\"waktu\":\"2026-06-25T08:02:15.132Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T08:02:15.136Z"
+      "id": "ddd48299-ff72-49b0-b145-4e71b3e82260",
+      "action": "{\"waktu\":\"2026-06-25T16:41:23.649Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:41:23.651Z"
     },
     {
-      "id": "8990eeff-08c1-43cf-aa98-a8d1a1630120",
-      "action": "{\"waktu\":\"2026-06-25T07:59:43.029Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/admins\",\"aksi\":\"Hapus Admin: admincontoh (ADMIN)\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T07:59:43.032Z"
+      "id": "f01f0fab-539d-4206-b6d3-4617c88a1831",
+      "action": "{\"waktu\":\"2026-06-25T16:41:13.448Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:41:13.450Z"
     },
     {
-      "id": "608ac6fe-05dc-4f95-a037-c1ef01067bf4",
-      "action": "{\"waktu\":\"2026-06-25T07:58:14.568Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T07:58:14.582Z"
+      "id": "8cbade87-b8e2-4141-b835-9bd05c0caaa8",
+      "action": "{\"waktu\":\"2026-06-25T16:31:02.191Z\",\"user\":\"superadmin\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:31:02.195Z"
     },
     {
-      "id": "6b3a506d-abe0-44d1-a8ab-664976ba4a64",
-      "action": "{\"waktu\":\"2026-06-25T07:16:27.099Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T07:16:27.104Z"
+      "id": "cf64420e-5af4-4d1e-a5d4-517260f822d7",
+      "action": "{\"waktu\":\"2026-06-25T16:19:08.033Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:19:08.040Z"
     },
     {
-      "id": "3cfff554-fc58-4898-a499-b01390117165",
-      "action": "{\"waktu\":\"2026-06-25T07:14:46.989Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T07:14:46.993Z"
+      "id": "f8fdb92c-ffc3-4372-9f8f-9724eec8356b",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"SOP Penyewaan Fasilitas Olahraga (Stadion / GOR)\" (berkas diperbarui).",
+      "createdAt": "2026-06-25T16:19:07.977Z"
     },
     {
-      "id": "4c772d95-ded6-4688-bdaa-535fc08c9e20",
-      "action": "{\"waktu\":\"2026-06-25T07:11:46.886Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T07:11:46.892Z"
+      "id": "0bf375f1-6b31-478a-834e-2e8592328b1e",
+      "action": "{\"waktu\":\"2026-06-25T16:19:04.486Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:19:04.493Z"
     },
     {
-      "id": "80b6e5b8-d925-4fdc-8b2f-e9d56c64b91b",
-      "action": "Admin \"admincontoh\" menghapus berkas dokumen \"Sop peminjaman gor\".",
-      "createdAt": "2026-06-25T07:11:46.818Z"
+      "id": "281f486f-9151-4f5c-b9aa-dd76c7ec3e13",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Formulir Pendaftaran Seleksi Pertukaran Pemuda Antar Negara (PPAN)\" (berkas diperbarui).",
+      "createdAt": "2026-06-25T16:19:04.448Z"
     },
     {
-      "id": "9bef85a9-b5a5-47ae-b1b8-ea393d48a3fd",
-      "action": "{\"waktu\":\"2026-06-25T07:10:47.816Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T07:10:47.820Z"
+      "id": "be05219d-9564-444d-9724-605b02137bdf",
+      "action": "{\"waktu\":\"2026-06-25T16:18:55.073Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:18:55.079Z"
     },
     {
-      "id": "016cf727-a0dc-4674-ac56-9afc23c83196",
-      "action": "Admin \"admincontoh\" mengubah berkas dokumen \"Sop peminjaman gor\" (berkas diperbarui, ukuran berkas diubah menjadi \"1.1 MB\").",
-      "createdAt": "2026-06-25T07:10:47.761Z"
+      "id": "f4a72700-3cef-467f-a09f-58a211f27288",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Apa yang di maksud dengan dokumen\" (berkas diperbarui).",
+      "createdAt": "2026-06-25T16:18:55.035Z"
     },
     {
-      "id": "6d5d1c28-b639-4d9c-b9be-523cc51ecbb2",
-      "action": "{\"waktu\":\"2026-06-25T07:10:45.059Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/dokumen/1782371445054_538f4776-f5ea-4a57-9cbe-986204e85929.docx\",\"size\":1195245}",
-      "createdAt": "2026-06-25T07:10:45.064Z"
+      "id": "9e77e1cd-e7ef-4934-9e9e-316fa395bd20",
+      "action": "{\"waktu\":\"2026-06-25T16:18:41.685Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:18:41.691Z"
     },
     {
-      "id": "b43d6565-352a-4c4e-9ef0-e51d56842993",
-      "action": "{\"waktu\":\"2026-06-25T07:09:52.265Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T07:09:52.270Z"
+      "id": "06fd37de-07a8-4fc4-8ebc-b5c90059e4f4",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Berkas Layanan Registrasi Pelaku Usaha Ekonomi Kreatif Unggulan\" (berkas diperbarui).",
+      "createdAt": "2026-06-25T16:18:41.641Z"
     },
     {
-      "id": "20c75d66-f868-4daa-a0d2-aaf4b5d74445",
-      "action": "Admin \"admincontoh\" menambahkan berkas dokumen baru \"Sop peminjaman gor\".",
-      "createdAt": "2026-06-25T07:09:52.193Z"
+      "id": "0d6d7835-8d6c-41ec-a6bc-6249d4144353",
+      "action": "{\"waktu\":\"2026-06-25T16:13:57.801Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:13:57.806Z"
     },
     {
-      "id": "a352952b-d12a-46c0-8fe9-63a456aacf92",
-      "action": "{\"waktu\":\"2026-06-25T07:09:52.108Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/dokumen/1782371392104_ac79fd89-9900-460a-a030-fc1edfa9d973.pdf\",\"size\":194188}",
-      "createdAt": "2026-06-25T07:09:52.113Z"
+      "id": "4c8ecedc-7591-4068-a5cd-2941ebbae9b4",
+      "action": "{\"waktu\":\"2026-06-25T16:13:45.296Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:13:45.300Z"
     },
     {
-      "id": "9c7f8934-0d51-49a9-aefd-b54efc870dfc",
-      "action": "{\"waktu\":\"2026-06-25T07:08:37.790Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T07:08:37.797Z"
+      "id": "37072259-0e99-4b3e-8962-4557117ec329",
+      "action": "{\"waktu\":\"2026-06-25T16:13:25.376Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:13:25.380Z"
     },
     {
-      "id": "ec0d282a-f195-4cd8-9134-026b265fe1a4",
-      "action": "{\"waktu\":\"2026-06-25T07:08:33.844Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T07:08:33.853Z"
+      "id": "864404db-5cef-4481-9ac4-b6cb0a6b1a3a",
+      "action": "{\"waktu\":\"2026-06-25T16:12:58.964Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:12:58.970Z"
     },
     {
-      "id": "02854171-5251-45bb-9eb2-dd377845d974",
-      "action": "{\"waktu\":\"2026-06-25T07:08:15.347Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T07:08:15.350Z"
+      "id": "0e006fbe-eb8b-42d1-9228-c781ccdf1a7c",
+      "action": "{\"waktu\":\"2026-06-25T16:12:15.759Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:12:15.763Z"
     },
     {
-      "id": "cf5c662c-b1ae-45f4-9058-4608bd162cc8",
-      "action": "{\"waktu\":\"2026-06-25T07:05:57.143Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T07:05:57.147Z"
+      "id": "f0f8a5fa-8533-4f38-aa79-c8a238a44c2a",
+      "action": "{\"waktu\":\"2026-06-25T16:01:15.057Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:01:15.062Z"
     },
     {
-      "id": "dab063fc-7db8-47bb-be9e-8b17675be4a9",
-      "action": "{\"waktu\":\"2026-06-25T07:02:20.213Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/pengaduan/1782370940204_a3cd877a-15df-4cd8-84da-79ea552b598b.webp\",\"size\":6514}",
-      "createdAt": "2026-06-25T07:02:20.218Z"
+      "id": "0234563c-3c65-417b-9240-43f5ea119c06",
+      "action": "Super Admin \"superadmin\" mengubah berkas dokumen \"Apa yang di maksud dengan dokumen\" (berkas diperbarui, ukuran berkas diubah menjadi \"1.5 MB\").",
+      "createdAt": "2026-06-25T16:01:15.023Z"
     },
     {
-      "id": "02bac664-cc32-4590-b7ec-2c08c3794cc1",
-      "action": "{\"waktu\":\"2026-06-25T07:00:54.993Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/pengaduan/1782370854989_0af446e7-1050-4c5c-991b-015bfcb09f34.webp\",\"size\":6514}",
-      "createdAt": "2026-06-25T07:00:55.011Z"
+      "id": "01946676-218f-40b0-8a11-c6e0dac69677",
+      "action": "{\"waktu\":\"2026-06-25T16:01:05.353Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/dokumen/1782403265346_58accd8b-2dcf-47b8-828b-62ce7d6866f0.docx\",\"size\":1566621}",
+      "createdAt": "2026-06-25T16:01:05.357Z"
     },
     {
-      "id": "756cb07b-ce7a-46c0-9bc6-13653782b570",
-      "action": "{\"waktu\":\"2026-06-25T07:00:34.894Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/pengaduan/1782370834889_ce10bfa8-2acc-4198-87bb-e44db8055677.webp\",\"size\":45956}",
-      "createdAt": "2026-06-25T07:00:34.912Z"
+      "id": "7cc52138-68cd-4e4d-841a-bc106751b351",
+      "action": "{\"waktu\":\"2026-06-25T16:00:26.194Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T16:00:26.197Z"
     },
     {
-      "id": "d50c7aec-58e4-4ef9-bc30-569a9993a682",
-      "action": "{\"waktu\":\"2026-06-25T07:00:11.768Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/pengaduan/1782370811763_e40d70f4-b777-44d6-a173-da577027ca56.webp\",\"size\":20268}",
-      "createdAt": "2026-06-25T07:00:11.771Z"
+      "id": "44fc6088-11c7-4f9e-98c0-8235346a45ec",
+      "action": "Super Admin \"superadmin\" menambahkan berkas dokumen baru \"Apa yang di maksud dengan dokumen\".",
+      "createdAt": "2026-06-25T16:00:26.155Z"
     },
     {
-      "id": "58a01227-8325-4217-b9b8-1b821dab5f45",
-      "action": "{\"waktu\":\"2026-06-25T06:58:51.779Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T06:58:51.781Z"
+      "id": "0bc3fbf9-174d-4620-a8f7-c4b63c3a86d2",
+      "action": "{\"waktu\":\"2026-06-25T15:59:46.000Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T15:59:46.003Z"
     },
     {
-      "id": "85bdaf72-408e-4716-bc0e-153cc6b10d1d",
-      "action": "{\"waktu\":\"2026-06-25T06:55:36.257Z\",\"user\":\"admincontoh\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T06:55:36.259Z"
+      "id": "6634dced-601d-41a2-9e8c-ee6680204d6c",
+      "action": "Super Admin \"superadmin\" menghapus berkas dokumen \"Berkas Layanan Standar Operasional Pengelolaan Pondok Wisata (Homestay)\".",
+      "createdAt": "2026-06-25T15:59:45.963Z"
     },
     {
-      "id": "1456a56e-f4f9-4caa-b957-72e08a028bf6",
-      "action": "{\"waktu\":\"2026-06-25T06:54:39.789Z\",\"user\":\"admincontoh\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T06:54:39.792Z"
+      "id": "984b5774-2976-4eb5-822a-de46febfcdc9",
+      "action": "{\"waktu\":\"2026-06-25T15:59:29.190Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T15:59:29.193Z"
     },
     {
-      "id": "1f4841cf-32e4-4d81-9568-676f3f1fe71e",
-      "action": "{\"waktu\":\"2026-06-25T06:54:25.577Z\",\"user\":\"superadmin\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T06:54:25.580Z"
+      "id": "459297af-ba81-4749-96c5-b4c21b86077c",
+      "action": "{\"waktu\":\"2026-06-25T15:58:55.961Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T15:58:55.965Z"
     },
     {
-      "id": "fbf64159-6771-4ef0-9b98-1c705249f86c",
-      "action": "{\"waktu\":\"2026-06-25T06:54:14.427Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/admins\",\"aksi\":\"Tambah Admin Baru: admincontoh (ADMIN)\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T06:54:14.431Z"
+      "id": "dccc6876-cb16-4958-bee0-91cfcec6a592",
+      "action": "{\"waktu\":\"2026-06-25T15:58:49.363Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T15:58:49.367Z"
     },
     {
-      "id": "678cf2d2-f614-4d30-85aa-f8c9197fb0a0",
-      "action": "{\"waktu\":\"2026-06-25T06:53:25.270Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T06:53:25.274Z"
+      "id": "3c172f95-f820-490f-89f3-9cabe79a6bae",
+      "action": "{\"waktu\":\"2026-06-25T15:58:30.202Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T15:58:30.207Z"
     },
     {
-      "id": "8a22ed55-308c-4c64-abde-e083fa633ad7",
-      "action": "{\"waktu\":\"2026-06-25T05:03:19.490Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T05:03:19.494Z"
+      "id": "d3eebfc7-e019-44bb-873d-130ca176a20c",
+      "action": "{\"waktu\":\"2026-06-25T15:58:24.846Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T15:58:24.850Z"
     },
     {
-      "id": "2b5356f0-b928-44c3-bfd7-691e44f89666",
-      "action": "{\"waktu\":\"2026-06-25T05:03:19.483Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Password Migration to Argon2\",\"status\":\"Berhasil\"}",
-      "createdAt": "2026-06-25T05:03:19.486Z"
+      "id": "e7f11294-88f7-4700-be72-fd8139c3c102",
+      "action": "{\"waktu\":\"2026-06-25T15:58:21.075Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/galeri/1782403101072_48f197f0-bd3b-4abe-bbae-6d88277a2579.webp\",\"size\":48140}",
+      "createdAt": "2026-06-25T15:58:21.080Z"
     },
     {
-      "id": "be9d9200-cdd0-482e-ade3-a532241a9b55",
-      "action": "{\"waktu\":\"2026-06-25T05:03:13.767Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Gagal\",\"reason\":\"Invalid password\"}",
-      "createdAt": "2026-06-25T05:03:13.771Z"
+      "id": "d39bf2f8-c750-4c83-9132-7b9b8ecc4d4b",
+      "action": "{\"waktu\":\"2026-06-25T15:58:01.003Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/data\",\"aksi\":\"Operasi API Data Berhasil\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-06-25T15:58:01.005Z"
     }
   ],
   "users": [
     {
-      "id": "0e4a604b-17b6-43fb-a540-323eca20ac66",
+      "id": "40d6173e-772b-4858-abb5-b4e7fbac7676",
       "username": "admin",
-      "password": "$argon2id$v=19$m=65536,t=3,p=1$E/BihPyhVEhNaSefYKds2w$bBMLz9x2FVy02s/9jG0TDVzv6ra0KB4DYLrnVW6YmSo",
+      "password": "$argon2id$v=19$m=65536,t=3,p=1$KzqI77psAUmyWSmiexFE/Q$5clCHBcySKVqgsVpV0OVEsGSFqn1p+Nmx8d3PzzOae4",
       "role": "ADMIN",
-      "createdAt": "2026-06-24T18:14:14.611Z"
+      "createdAt": "2026-06-25T12:47:36.492Z"
     },
     {
-      "id": "8adbd2bf-8726-40a1-b9a2-a64c4ee00f9b",
+      "id": "9544a8b6-e3a4-4e16-8aaf-c6021c411999",
       "username": "superadmin",
-      "password": "$argon2id$v=19$m=65536,t=3,p=1$dpMqyC/jd9Z/v1aPEuOAPQ$WRIi7BeNlsO202PWR8q7N0FoK4W3UyHUFkCZD53PjzQ",
+      "password": "$argon2id$v=19$m=65536,t=3,p=1$/Nok5/Q0pOEVvzEVP4f40Q$JR4uTT2HUymZ8h5FmoSS+EwPjIdggM+UGOpYUe+Lmyo",
       "role": "SUPER_ADMIN",
-      "createdAt": "2026-06-24T18:14:14.598Z"
+      "createdAt": "2026-06-25T12:47:36.478Z"
     }
   ]
 }
