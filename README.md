@@ -17,6 +17,11 @@ Aplikasi portal informasi terintegrasi dan database modern terpusat milik **Dina
 ---
 
 ## 📖 Tentang Proyek
+
+> [!NOTE]
+> **Proyek Pembelajaran (Educational Project)**
+> Aplikasi ini dikembangkan hanya untuk tujuan pembelajaran/akademis (non-komersial) dan bukan merupakan portal resmi milik Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal.
+
 Portal ini dirancang untuk menyajikan informasi publik seputar kepemudaan, olahraga, dan destinasi pariwisata di Kota Tegal, sekaligus berfungsi sebagai panel administrasi terpusat bagi petugas DISPORAPAR untuk memperbarui data operasional dinas secara real-time.
 
 > [!TIP]
