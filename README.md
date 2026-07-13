@@ -146,9 +146,10 @@ Aplikasi ini sudah dilengkapi dengan konfigurasi Docker multi-stage (standalone 
    Container aplikasi (`web`) akan mendeteksi database MySQL (`db`), menunggu hingga port 3306 siap menerima koneksi, lalu menjalankan perintah `npx prisma migrate deploy` secara otomatis sebelum server web dimulai.
 
 3. **Seeding Data Awal (Dummy Data)**
-   Untuk mengisi database dengan data default (akun administrator, berita, agenda, pariwisata, fasilitas, retribusi, dll.), jalankan perintah seed berikut di dalam container:
+   Karena container menggunakan *standalone build* minimal tanpa modul pengembangan (`tsx`/`typescript`), jalankan perintah seeding dari komputer host lokal Anda:
    ```bash
-   docker compose exec web npx prisma db seed
+   # Pastikan DATABASE_URL di berkas .env mengarah ke port Docker (contoh: mysql://root:root_password@localhost:3306/prototype_disporapar)
+   npx prisma db seed
    ```
 
 4. **Memantau Aktivitas & Log**
