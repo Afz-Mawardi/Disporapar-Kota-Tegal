@@ -2,7 +2,7 @@
 
 # 🏛️ Portal DISPORAPAR Kota Tegal
 
-Aplikasi portal informasi terintegrasi dan database modern terpusat **Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal**
+Aplikasi portal informasi terintegrasi dan database modern terpusat **Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal**.
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.4-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38bdf8?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
@@ -115,6 +115,16 @@ Portal ini dirancang untuk menyajikan informasi publik seputar kepemudaan, olahr
 > [!IMPORTANT]
 > Mengakses langsung `http://localhost:3000/admin` tanpa sesi login yang sah akan menghasilkan tampilan **404 Not Found**. Anda wajib masuk secara manual melalui halaman `/login.admin`.
 
+### 🔑 Mengelola Kredensial Admin
+Secara default, akun admin dibuat saat proses *seed* awal menggunakan nilai dari file `.env`. Jika ingin mengubahnya, lakukan langsung melalui database (phpMyAdmin, DBeaver, MySQL CLI, atau sejenisnya).* **Tabel**: `user`
+* **Jenis Akun**:
+  * `SUPER_ADMIN` → Super Admin
+  * `ADMIN` → Admin
+* **Mengubah Kredensial**:
+  1. Ubah nilai kolom `username`.
+  2. Ubah nilai kolom `password` menjadi **MD5 hash** dari password baru (misalnya menggunakan `MD5('password_baru')` atau generator MD5).
+  3. Setelah login pertama menggunakan password tersebut, sistem di [lib/auth.ts](./lib/auth.ts) akan otomatis mengonversi hash **MD5** ke **Argon2id** untuk meningkatkan keamanan.
+
 ---
 
 ## 🐳 Panduan Menjalankan Project dengan Docker (Rekomendasi Produksi)
@@ -162,4 +172,4 @@ Aplikasi ini sudah dilengkapi dengan konfigurasi Docker multi-stage (standalone 
 * 📄 [entrypoint.sh](./entrypoint.sh) — Script startup untuk menunggu database dan menjalankan migrasi Prisma.
 * 📄 [package.json](./package.json) — Konfigurasi package, dependensi modul, dan script build.
 
-Untuk detail arsitektur folder dan struktur direktori lengkap, silakan lihat bagian terkait di **[README_DETAIL.md#-struktur-direktori-proyek](./README_DETAIL.md#-struktur-direktori-proyek)**
+Untuk detail arsitektur folder dan struktur direktori lengkap, silakan lihat bagian terkait di **[README_DETAIL.md#-struktur-direktori-proyek](./README_DETAIL.md#-struktur-direktori-proyek)**.
