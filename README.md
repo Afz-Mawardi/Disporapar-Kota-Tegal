@@ -10,7 +10,7 @@ Aplikasi portal informasi terintegrasi dan database modern terpusat milik **Dina
 [![MySQL Database](https://img.shields.io/badge/MySQL-Database-4479a1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Security Argon2id](https://img.shields.io/badge/Security-Argon2id-red?style=for-the-badge&logo=shield&logoColor=white)](https://en.wikipedia.org/wiki/Argon2)
 [![Docker Ready](https://img.shields.io/badge/Docker-Ready-2496ed?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![License MIT](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![License MIT](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)](./LICENSE)
 
 </div>
 
