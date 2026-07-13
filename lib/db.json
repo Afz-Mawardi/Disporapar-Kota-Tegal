@@ -606,7 +606,7 @@
     {
       "id": "lapor",
       "title": "SP4N-LAPOR!",
-      "url": "https://lapor.go.id"
+      "url": "https://lapor.go.id/"
     },
     {
       "id": "laporgub",
@@ -619,22 +619,154 @@
       "url": "https://ppid.tegalkota.go.id/"
     }
   ],
-  "complaints": [],
-  "adminLogs": [],
-  "users": [
+  "complaints": [
     {
-      "id": "40d6173e-772b-4858-abb5-b4e7fbac7676",
-      "username": "admin",
-      "password": "$argon2id$v=19$m=65536,t=3,p=1$KzqI77psAUmyWSmiexFE/Q$5clCHBcySKVqgsVpV0OVEsGSFqn1p+Nmx8d3PzzOae4",
-      "role": "ADMIN",
-      "createdAt": "2026-06-25T12:47:36.492Z"
+      "id": "eedb4427-f29e-4b67-abd0-9e10268c4d10",
+      "title": "test aduan ke-4",
+      "content": "ini singkat saja tanpa ada gambar",
+      "imageUrl": "",
+      "contact": "0808  YGLN GKDA",
+      "status": "Baru",
+      "notes": "",
+      "createdAt": "2026-07-09T15:54:00.826Z"
     },
     {
-      "id": "9544a8b6-e3a4-4e16-8aaf-c6021c411999",
+      "id": "9896b6a6-67ba-4ff1-830a-bf340da2acc5",
+      "title": "test aduan ke-3",
+      "content": "ini singkat saja tanpa ada gambar",
+      "imageUrl": "",
+      "contact": "kontak@email.com",
+      "status": "Diproses",
+      "notes": "",
+      "createdAt": "2026-07-09T15:52:36.421Z"
+    },
+    {
+      "id": "8d97eed1-7b49-4eed-b3ab-486d163a5465",
+      "title": "test aduan ke-2",
+      "content": "ini singkat saja tanpa ada gambar dan email/no HP",
+      "imageUrl": "",
+      "contact": "",
+      "status": "Selesai",
+      "notes": "",
+      "createdAt": "2026-07-09T15:48:11.142Z"
+    },
+    {
+      "id": "dc593f17-12e9-444f-a584-79e98f68140e",
+      "title": "Test sistem pengaaduan",
+      "content": "dalam test pengduan saya hanya mengisi ddeksrip yg secukupnya untuk test saja, karena pengaduan ini diperuntukan bagi masyarakat agar aduannya secara lagsug di wesite Disporapar",
+      "imageUrl": "/uploads/pengaduan/1783612042956_4320e622-0cb2-4b8a-aada-5e3d16185132.webp",
+      "contact": "email@opsional.co.id  / +62 8123 4567 890",
+      "status": "Ditolak",
+      "notes": "",
+      "createdAt": "2026-07-09T15:47:23.374Z"
+    }
+  ],
+  "adminLogs": [
+    {
+      "id": "d4ecee6c-c3fc-4ce2-a52c-dff9ad3a4ff7",
+      "action": "{\"waktu\":\"2026-07-09T15:47:22.959Z\",\"user\":\"Public Guest\",\"ip\":\"::1\",\"endpoint\":\"/api/upload\",\"aksi\":\"Upload\",\"status\":\"Berhasil\",\"fileUrl\":\"/uploads/pengaduan/1783612042956_4320e622-0cb2-4b8a-aada-5e3d16185132.webp\",\"size\":24198}",
+      "createdAt": "2026-07-09T15:47:22.968Z",
+      "userId": null
+    },
+    {
+      "id": "d18d0cc1-992b-4439-8475-042a8bb9fd9c",
+      "action": "{\"waktu\":\"2026-07-09T15:35:17.990Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T15:35:17.994Z",
+      "userId": "f17b01e6-f6fb-43d5-963b-df2d9a39fc0b"
+    },
+    {
+      "id": "e2f236c3-17a0-45fc-930e-662689ef5b10",
+      "action": "{\"waktu\":\"2026-07-09T15:34:47.932Z\",\"user\":\"superadmin\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T15:34:47.941Z",
+      "userId": "f17b01e6-f6fb-43d5-963b-df2d9a39fc0b"
+    },
+    {
+      "id": "b234ee47-53b9-4f36-846e-10388a0db908",
+      "action": "{\"waktu\":\"2026-07-09T15:29:12.705Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T15:29:12.712Z",
+      "userId": "f17b01e6-f6fb-43d5-963b-df2d9a39fc0b"
+    },
+    {
+      "id": "7496bf08-e717-4dff-b492-942ab6a45691",
+      "action": "{\"waktu\":\"2026-07-09T15:18:06.020Z\",\"user\":\"admin\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T15:18:06.035Z",
+      "userId": "516aa2da-ec96-40b9-87bd-e499e976c17f"
+    },
+    {
+      "id": "099711b3-04b9-408a-9a38-bc1232bf57e3",
+      "action": "{\"waktu\":\"2026-07-09T14:57:25.955Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T14:57:25.960Z",
+      "userId": "516aa2da-ec96-40b9-87bd-e499e976c17f"
+    },
+    {
+      "id": "5b0ebe5f-860b-47ec-90e5-2b7d7ee73932",
+      "action": "{\"waktu\":\"2026-07-09T14:57:25.940Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Password Migration to Argon2\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T14:57:25.946Z",
+      "userId": "516aa2da-ec96-40b9-87bd-e499e976c17f"
+    },
+    {
+      "id": "f819f73f-31a8-4c66-ab72-def43bb08357",
+      "action": "{\"waktu\":\"2026-07-09T13:54:04.975Z\",\"user\":\"superadmin\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T13:54:04.996Z",
+      "userId": "f17b01e6-f6fb-43d5-963b-df2d9a39fc0b"
+    },
+    {
+      "id": "48ff7b6c-0495-4700-9efa-08e91e14fd94",
+      "action": "{\"waktu\":\"2026-07-09T13:31:55.077Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T13:31:55.088Z",
+      "userId": "f17b01e6-f6fb-43d5-963b-df2d9a39fc0b"
+    },
+    {
+      "id": "c978d9ed-4351-4780-9d10-246043216d82",
+      "action": "{\"waktu\":\"2026-07-09T12:38:05.012Z\",\"user\":\"superadmin\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T12:38:05.040Z",
+      "userId": "f17b01e6-f6fb-43d5-963b-df2d9a39fc0b"
+    },
+    {
+      "id": "cb1e0a82-a389-415d-be4e-eec1ee6f43a2",
+      "action": "{\"waktu\":\"2026-07-09T12:27:11.214Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T12:27:11.220Z",
+      "userId": "f17b01e6-f6fb-43d5-963b-df2d9a39fc0b"
+    },
+    {
+      "id": "978af93d-5ba8-40ca-9b14-b5ec223a75ef",
+      "action": "{\"waktu\":\"2026-07-09T12:27:11.199Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Password Migration to Argon2\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T12:27:11.205Z",
+      "userId": "f17b01e6-f6fb-43d5-963b-df2d9a39fc0b"
+    },
+    {
+      "id": "48dbcb60-4075-4fdc-9f24-0ed79c91a0ca",
+      "action": "{\"waktu\":\"2026-07-09T12:25:51.615Z\",\"user\":\"admin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Gagal\",\"reason\":\"Invalid password\"}",
+      "createdAt": "2026-07-09T12:25:51.623Z",
+      "userId": "516aa2da-ec96-40b9-87bd-e499e976c17f"
+    },
+    {
+      "id": "eb9e65f3-23ce-4f8c-9c0b-e2b1eb911662",
+      "action": "{\"waktu\":\"2026-07-09T12:25:42.969Z\",\"user\":\"superadmin\",\"ip\":\"::1\",\"endpoint\":\"/api/auth/login\",\"aksi\":\"Login\",\"status\":\"Gagal\",\"reason\":\"Invalid password\"}",
+      "createdAt": "2026-07-09T12:25:42.974Z",
+      "userId": "f17b01e6-f6fb-43d5-963b-df2d9a39fc0b"
+    },
+    {
+      "id": "2f624e62-c8cf-41cf-b241-dfa92783e5f8",
+      "action": "{\"waktu\":\"2026-07-09T12:25:29.714Z\",\"user\":\"superadmin\",\"ip\":\"Sistem\",\"endpoint\":\"/api/auth/signout\",\"aksi\":\"Logout\",\"status\":\"Berhasil\"}",
+      "createdAt": "2026-07-09T12:25:29.742Z",
+      "userId": "f17b01e6-f6fb-43d5-963b-df2d9a39fc0b"
+    }
+  ],
+  "users": [
+    {
+      "id": "516aa2da-ec96-40b9-87bd-e499e976c17f",
+      "username": "admin",
+      "password": "$argon2id$v=19$m=65536,t=3,p=1$1buNHqnL3zva0CJIWKEu9A$9/omtrZeZYy5YqqOUT4rFIlFnWC6baQeB+o91zJd5Zg",
+      "role": "ADMIN",
+      "createdAt": "2026-07-09T12:23:19.496Z"
+    },
+    {
+      "id": "f17b01e6-f6fb-43d5-963b-df2d9a39fc0b",
       "username": "superadmin",
-      "password": "$argon2id$v=19$m=65536,t=3,p=1$/Nok5/Q0pOEVvzEVP4f40Q$JR4uTT2HUymZ8h5FmoSS+EwPjIdggM+UGOpYUe+Lmyo",
+      "password": "$argon2id$v=19$m=65536,t=3,p=1$61BBt8ibeRTDfPJUb7w0/w$R2gTMJbtqldQ4bmLS1d1JYyl2x6QMqoFnk/FBVAMuGw",
       "role": "SUPER_ADMIN",
-      "createdAt": "2026-06-25T12:47:36.478Z"
+      "createdAt": "2026-07-09T12:23:19.478Z"
     }
   ]
 }

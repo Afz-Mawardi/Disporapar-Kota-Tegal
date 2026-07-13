@@ -9,6 +9,7 @@ async function main() {
   console.log('Seeding database...');
 
   // 1. Clear existing records in correct order to avoid foreign key issues
+  await prisma.adminLog.deleteMany();
   await prisma.user.deleteMany();
   await prisma.news.deleteMany();
   await prisma.event.deleteMany();
@@ -24,10 +25,14 @@ async function main() {
   await prisma.bidangBottomCard.deleteMany();
   await prisma.retribusi.deleteMany();
   // 2. Hash admin password with MD5 and insert Users (read from process.env to avoid hardcoding in the codebase)
-  const superUsername = process.env.DEFAULT_SUPER_ADMIN_USERNAME || 'superadmin';
-  const superPassword = process.env.DEFAULT_SUPER_ADMIN_PASSWORD || 'superpassword123';
-  const regularUsername = process.env.DEFAULT_REGULAR_ADMIN_USERNAME || 'admin';
-  const regularPassword = process.env.DEFAULT_REGULAR_ADMIN_PASSWORD || 'adminpassword123';
+  const superUsername = process.env.DEFAULT_SUPER_ADMIN_USERNAME;
+  const superPassword = process.env.DEFAULT_SUPER_ADMIN_PASSWORD;
+  const regularUsername = process.env.DEFAULT_REGULAR_ADMIN_USERNAME;
+  const regularPassword = process.env.DEFAULT_REGULAR_ADMIN_PASSWORD;
+
+  if (!superUsername || !superPassword || !regularUsername || !regularPassword) {
+    throw new Error('DEFAULT_SUPER_ADMIN and DEFAULT_REGULAR_ADMIN credentials must be defined in the environment variables (.env)');
+  }
 
   const md5SuperPassword = crypto.createHash('md5').update(superPassword).digest('hex');
   const md5RegularPassword = crypto.createHash('md5').update(regularPassword).digest('hex');

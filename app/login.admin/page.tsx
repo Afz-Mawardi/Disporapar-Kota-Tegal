@@ -51,7 +51,7 @@ function LoginPageContent() {
       const newUrl = window.location.pathname;
       window.history.replaceState({ path: newUrl }, '', newUrl);
     } else if (status === 'unauthenticated' && (reason === 'expired' || hasLoginRecord)) {
-      showNotification('Sesi Anda telah berakhir karena tidak ada aktivitas selama 20 menit.', 'error', null);
+      showNotification('Sesi Anda telah berakhir karena tidak ada aktivitas selama 10 menit.', 'error', null);
 
       // Clean up localStorage records immediately so it doesn't show again on manual refresh
       localStorage.removeItem('disporapar_admin_login_time');

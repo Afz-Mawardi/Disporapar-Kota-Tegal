@@ -21,7 +21,7 @@ export const authOptions: AuthOptions = {
       async authorize(credentials, req) {
         const ip = (req?.headers && (req.headers['x-forwarded-for'] || req.headers['x-real-ip'])) || 'Unknown IP';
         const username = credentials?.username || 'Unknown';
-        
+
         // Rate Limiter Check
         const now = Date.now();
         const attempt = loginAttempts.get(ip);
@@ -65,7 +65,7 @@ export const authOptions: AuthOptions = {
             const md5Password = crypto.createHash('md5').update(credentials.password).digest('hex');
             if (md5Password === user.password) {
               isValidPassword = true;
-              
+
               // Transparent Migration: Hash with Argon2 and update DB
               const newArgon2Hash = await argon2.hash(credentials.password, {
                 type: argon2.argon2id,
@@ -73,12 +73,12 @@ export const authOptions: AuthOptions = {
                 timeCost: 3,
                 parallelism: 1
               });
-              
+
               await prisma.user.update({
                 where: { id: user.id },
                 data: { password: newArgon2Hash }
               });
-              
+
               await logAudit({ user: user.username, ip: ip as string, endpoint: '/api/auth/login', action: 'Password Migration to Argon2', status: 'Berhasil' });
             }
           }
@@ -94,7 +94,7 @@ export const authOptions: AuthOptions = {
 
           // Clear attempts on success
           loginAttempts.delete(ip);
-          
+
           await logAudit({ user: user.username, ip: ip as string, endpoint: '/api/auth/login', action: 'Login', status: 'Berhasil' });
 
           return {
@@ -112,7 +112,7 @@ export const authOptions: AuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 20 * 60 // 20 menit sesi (idle timeout)
+    maxAge: 10 * 60 // 10 menit sesi (idle timeout)
   },
   pages: {
     signIn: '/login.admin',

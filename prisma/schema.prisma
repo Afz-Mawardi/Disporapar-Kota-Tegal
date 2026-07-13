@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  username  String   @unique
+  id        String     @id @default(uuid())
+  username  String     @unique
   password  String
-  role      String   @default("ADMIN")
-  createdAt DateTime @default(now())
+  role      String     @default("ADMIN")
+  createdAt DateTime   @default(now())
+  logs      AdminLog[]
 
   @@map("user")
 }
@@ -21,7 +22,11 @@ model AdminLog {
   id        String   @id @default(uuid())
   action    String   @db.Text
   createdAt DateTime @default(now())
+  userId    String?  @map("user_id")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
+  @@index([userId])
+  @@index([createdAt])
   @@map("riwayat_admin")
 }
 
@@ -38,6 +43,7 @@ model News {
   showOnHomepage Boolean  @default(true)
   createdAt      DateTime @default(now())
 
+  @@index([createdAt])
   @@map("berita")
 }
 
@@ -52,6 +58,7 @@ model Event {
   showOnHomepage Boolean  @default(true)
   createdAt      DateTime @default(now())
 
+  @@index([createdAt])
   @@map("agenda")
 }
 
@@ -64,6 +71,8 @@ model GalleryPhoto {
   showOnHomepage Boolean  @default(true)
   createdAt      DateTime @default(now())
 
+  @@index([createdAt])
+  @@index([category])
   @@map("galeri")
 }
 
@@ -77,6 +86,7 @@ model PublicService {
   showOnHomepage Boolean  @default(true)
   createdAt      DateTime @default(now())
 
+  @@index([createdAt])
   @@map("berkas")
 }
 
@@ -114,6 +124,7 @@ model HeroSlide {
   href      String
   createdAt DateTime @default(now())
 
+  @@index([createdAt])
   @@map("beranda")
 }
 
@@ -124,6 +135,7 @@ model PriorityProgram {
   points      Json     // JSON array of strings: string[]
   createdAt   DateTime @default(now())
 
+  @@index([createdAt])
   @@map("pilar_program")
 }
 
@@ -138,6 +150,7 @@ model KepemudaanCard {
   imageUrl    String   @db.Text
   createdAt   DateTime @default(now())
 
+  @@index([createdAt])
   @@map("kepemudaan_card")
 }
 
@@ -152,6 +165,7 @@ model OlahragaCard {
   imageUrl    String   @db.Text
   createdAt   DateTime @default(now())
 
+  @@index([createdAt])
   @@map("olahraga_card")
 }
 
@@ -166,6 +180,7 @@ model PariwisataCard {
   imageUrl         String   @db.Text
   createdAt        DateTime @default(now())
 
+  @@index([createdAt])
   @@map("pariwisata_card")
 }
 
@@ -181,6 +196,7 @@ model BidangBottomCard {
   sectionTitle String?  @db.Text
   createdAt    DateTime @default(now())
 
+  @@index([createdAt])
   @@map("bidang_bottom_card")
 }
 
@@ -191,6 +207,7 @@ model Retribusi {
   fee       String   @db.Text
   createdAt DateTime @default(now())
 
+  @@index([createdAt])
   @@map("retribusi")
 }
 
@@ -204,6 +221,8 @@ model Complaint {
   notes     String   @db.Text
   createdAt DateTime @default(now())
 
+  @@index([createdAt])
+  @@index([status])
   @@map("pengaduan_internal")
 }
 

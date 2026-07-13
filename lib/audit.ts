@@ -24,10 +24,22 @@ export const logAudit = async (data: AuditLogDetails) => {
       ...data.details
     };
 
-    // Store as JSON in the existing db.Text column without altering schema
+    // Find user ID if possible
+    let userId: string | null = null;
+    if (data.user && data.user !== 'Unknown') {
+      const user = await prisma.user.findUnique({
+        where: { username: data.user }
+      });
+      if (user) {
+        userId = user.id;
+      }
+    }
+
+    // Store as JSON in the existing db.Text column
     await prisma.adminLog.create({
       data: {
         action: JSON.stringify(sanitizedData),
+        userId
       }
     });
   } catch (error) {

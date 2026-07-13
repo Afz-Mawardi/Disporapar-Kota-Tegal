@@ -4,7 +4,7 @@
 
 Aplikasi portal informasi terintegrasi dan database modern terpusat milik **Dinas Kepemudaan, Olahraga, dan Pariwisata Kota Tegal**.
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.5-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.4-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38bdf8?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Prisma ORM](https://img.shields.io/badge/Prisma-ORM-2d3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
 [![MySQL Database](https://img.shields.io/badge/MySQL-Database-4479a1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -19,6 +19,9 @@ Aplikasi portal informasi terintegrasi dan database modern terpusat milik **Dina
 ## 📖 Tentang Proyek
 Portal ini dirancang untuk menyajikan informasi publik seputar kepemudaan, olahraga, dan destinasi pariwisata di Kota Tegal, sekaligus berfungsi sebagai panel administrasi terpusat bagi petugas DISPORAPAR untuk memperbarui data operasional dinas secara real-time.
 
+> [!TIP]
+> Untuk penjelasan teknis arsitektur, skema database lengkap, mekanisme keamanan mendalam, dan konfigurasi sistem secara detail, silakan baca **[Dokumentasi Teknis Detail (README_DETAIL.md)](./README_DETAIL.md)**.
+
 ---
 
 ## ⚡ Fitur Utama & Optimasi Performa
@@ -30,7 +33,6 @@ Portal ini dirancang untuk menyajikan informasi publik seputar kepemudaan, olahr
 * **Silently Secure 404** — Mengamankan rute sensitif `/admin/*` dan `/api/admins/*` di [middleware.ts](./middleware.ts) dengan mengarahkan pengguna tanpa token sesi langsung ke halaman 404 palsu Next.js demi menyembunyikan panel admin dari pemindai otomatis.
 * **Audit Logging** — Setiap tindakan CRUD dan login terekam secara terenkapsulasi JSON pada tabel `riwayat_admin`.
 * **Auto-Logout Sesi Inaktif (Idle Session Timeout)** — Melindungi akses panel admin dengan fitur pemutusan sesi otomatis jika administrator tidak melakukan aktivitas apa pun (inaktif) selama 10 menit berturut-turut.
-
 
 ### 🎨 Peningkatan UI/UX & Usability
 * **Responsive Layout & Wrap** — Penerapan pembungkusan otomatis (`flex-wrap`) pada bilah kendali di berbagai sub-halaman admin mencegah meluapnya tombol edit kategori dan filter pencarian pada layar sedang.
@@ -61,27 +63,49 @@ Portal ini dirancang untuk menyajikan informasi publik seputar kepemudaan, olahr
    npm install
    ```
 
-2. **Konfigurasi Environment**
+2. **Pasang Prisma CLI & Generate Client**   
+   Jika modul Prisma belum terinstal di proyek, jalankan pemasangan secara manual:
+   ```bash
+   npm install prisma @prisma/client
+   ```
+   Setelah itu, buat berkas Prisma Client berdasarkan skema database:
+   ```bash
+   npx prisma generate
+   ```
+
+3. **Konfigurasi Environment**   
    Salin berkas sampel `.env.example` menjadi `.env` lalu isi detail koneksi MySQL database Anda:
    ```bash
    cp .env.example .env
    ```
 
-3. **Migrasi Database & Seeding Awal**
-   Terapkan skema tabel ke database MySQL dan jalankan program pengisian data dummy awal (*seed*):
+4. **Migrasi Database & Seeding Awal**       
+   Aktifkan dulu mysql lalu terapkan skema tabel ke database MySQL dan jalankan program pengisian data dummy awal (*seed*):
    ```bash
    npx prisma db push
    npm run seed
    ```
 
-4. **Jalankan Server Development**
+5. **Kompilasi Proyek (Build)**  
+   Lakukan kompilasi Next.js untuk membuat build produksi optimal:
+   ```bash
+   npm run build
+   ```
+
+6. **Jalankan Server Development**
    ```bash
    npm run dev
    ```
 
-5. **Akses Aplikasi**
-    * **Portal Publik**: [http://localhost:3000](http://localhost:3000)
-    * **Akses Login Admin**: [http://localhost:3000/login.admin](http://localhost:3000/login.admin)
+7. **Jalankan Server Produksi Lokal (Opsional)**   
+   Jika ingin menjalankan aplikasi yang sudah di-build dalam mode produksi secara lokal:
+   ```bash
+   npm run start
+   ```
+
+8. **Akses Aplikasi** (sesuaikan port)
+   * **Portal Publik**: [http://localhost:3000](http://localhost:3000)
+   * **Akses Login Admin**: [http://localhost:3000/login.admin](http://localhost:3000/login.admin)
 
 > [!IMPORTANT]
 > Mengakses langsung `http://localhost:3000/admin` tanpa sesi login yang sah akan menghasilkan tampilan **404 Not Found**. Anda wajib masuk secara manual melalui halaman `/login.admin`.
@@ -132,3 +156,5 @@ Aplikasi ini sudah dilengkapi dengan konfigurasi Docker multi-stage (standalone 
 * 🐳 [docker-compose.yml](./docker-compose.yml) — Orkestrasi kontainer layanan web dan MySQL database.
 * 📄 [entrypoint.sh](./entrypoint.sh) — Script startup untuk menunggu database dan menjalankan migrasi Prisma.
 * 📄 [package.json](./package.json) — Konfigurasi package, dependensi modul, dan script build.
+
+Untuk detail arsitektur folder dan struktur direktori lengkap, silakan lihat bagian terkait di **[README_DETAIL.md#-struktur-direktori-proyek](./README_DETAIL.md#-struktur-direktori-proyek)**.
