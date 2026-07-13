@@ -162,7 +162,4 @@ Aplikasi ini sudah dilengkapi dengan konfigurasi Docker multi-stage (standalone 
 * 📄 [entrypoint.sh](./entrypoint.sh) — Script startup untuk menunggu database dan menjalankan migrasi Prisma.
 * 📄 [package.json](./package.json) — Konfigurasi package, dependensi modul, dan script build.
 
-Untuk detail arsitektur folder dan struktur direktori lengkap, silakan lihat bagian terkait di **[README_DETAIL.md#-struktur-direktori-proyek](./README_DETAIL.md#-struktur-direktori-proyek)**.
-#   U A S _ P K L _ 2 3 2 1 5 0 5 8 _ A f s a n i W a h y u M a w a r d i 
- 
- 
+Untuk detail arsitektur folder dan struktur direktori lengkap, silakan lihat bagian terkait di **[README_DETAIL.md#-struktur-direktori-proyek](./README_DETAIL.md#-struktur-direktori-proyek)**
