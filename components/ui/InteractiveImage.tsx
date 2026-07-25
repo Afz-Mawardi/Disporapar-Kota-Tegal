@@ -280,7 +280,8 @@ export default function InteractiveImage({ src, alt, className = '' }: Interacti
             className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-primary hover:bg-slate-100 rounded-lg transition-all duration-200 active:scale-95 cursor-pointer"
             title="Reset Tampilan"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="1" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-rotate-ccw">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              className="w-4 h-4">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
               <path d="M3 3v5h5" />
             </svg>
@@ -306,6 +307,6 @@ export default function InteractiveImage({ src, alt, className = '' }: Interacti
           />
         </div>
       </div>
-    </div>
+    </div >
   );
 }
