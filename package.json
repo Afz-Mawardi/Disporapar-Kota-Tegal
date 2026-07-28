@@ -6,11 +6,10 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "start:prod": "NODE_ENV=production node server.js",
-    "setup": "npm install && npx prisma generate && npm run build",
+    "setup": "npm install && prisma generate && npm run build",
     "lint": "eslint .",
     "clean": "next clean",
-    "seed": "npx prisma db seed"
+    "seed": "prisma db seed"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

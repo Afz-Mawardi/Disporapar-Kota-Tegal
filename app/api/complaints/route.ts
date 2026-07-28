@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import fs from 'fs';
 import path from 'path';
 
-export const revalidate = 20;
+export const revalidate = 0;
 
 function deleteLocalFile(fileUrl: string) {
   if (!fileUrl || typeof fileUrl !== 'string') return;

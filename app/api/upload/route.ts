@@ -6,7 +6,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { logAudit } from '@/lib/audit';
 
-export const revalidate = 20;
+export const revalidate = 0;
 
 const ALLOWED_MIME_TYPES: Record<string, string> = {
   'image/webp': '.webp',

@@ -29,8 +29,11 @@ services:
       - DEFAULT_REGULAR_ADMIN_PASSWORD=${DEFAULT_REGULAR_ADMIN_PASSWORD}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - NEXTAUTH_URL=${NEXTAUTH_URL}
+    volumes:
+      - uploads_data:/app/public/uploads
     depends_on:
       - db
 
 volumes:
   mysql_data:
+  uploads_data:

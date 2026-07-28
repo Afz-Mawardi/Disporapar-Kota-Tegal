@@ -5,7 +5,7 @@ import { authOptions } from '@/lib/auth';
 import fs from 'fs';
 import path from 'path';
 
-export const revalidate = 20;
+export const revalidate = 0;
 
 function saveToLocalDbJson(key: string, data: any) {
   const dbPath = path.join(process.cwd(), 'lib', 'db.json');

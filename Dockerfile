@@ -30,8 +30,14 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Install libc6-compat & netcat-openbsd (digunakan oleh entrypoint.sh)
+RUN apk add --no-cache libc6-compat netcat-openbsd
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+
+# Buat direktori uploads dan beri hak akses pengguna nextjs
+RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public
 
 # Copy file publik dan static assets
 COPY --from=builder /app/public ./public

@@ -67,47 +67,33 @@ Portal ini dirancang untuk menyajikan informasi publik seputar kepemudaan, olahr
    npm install
    ```
 
-2. **Pasang Prisma CLI & Generate Client**   
-   Jika modul Prisma belum terinstal di proyek, jalankan pemasangan secara manual:
-   ```bash
-   npm install prisma @prisma/client
-   ```
-   Setelah itu, buat berkas Prisma Client berdasarkan skema database:
-   ```bash
-   npx prisma generate
-   ```
-
-3. **Konfigurasi Environment**   
+2. **Konfigurasi Environment**   
    Salin berkas sampel `.env.example` menjadi `.env` lalu isi detail koneksi MySQL database Anda:
    ```bash
    cp .env.example .env
    ```
 
-4. **Migrasi Database & Seeding Awal**       
-   Aktifkan dulu mysql lalu terapkan skema tabel ke database MySQL dan jalankan program pengisian data dummy awal (*seed*):
+3. **Inisialisasi Database & Seeding Awal**       
+   Pastikan service MySQL Anda sudah berjalan, lalu generate Prisma Client, terapkan migrasi skema tabel, dan isi data awal (*seed*):
    ```bash
-   npx prisma db push
+   npx prisma generate
+   npx prisma migrate dev --name init
    npm run seed
    ```
 
-5. **Kompilasi Proyek (Build)**  
-   Lakukan kompilasi Next.js untuk membuat build produksi optimal:
-   ```bash
-   npm run build
-   ```
-
-6. **Jalankan Server Development**
+4. **Jalankan Mode Development**
    ```bash
    npm run dev
    ```
 
-7. **Jalankan Server Produksi Lokal (Opsional)**   
-   Jika ingin menjalankan aplikasi yang sudah di-build dalam mode produksi secara lokal:
+5. **Jalankan Server Produksi Lokal (Opsional)**   
+   Jika ingin menguji aplikasi dalam mode produksi secara lokal:
    ```bash
+   npm run build
    npm run start
    ```
 
-8. **Akses Aplikasi** (sesuaikan port)
+6. **Akses Aplikasi**
    * **Portal Publik**: [http://localhost:3000](http://localhost:3000)
    * **Akses Login Admin**: [http://localhost:3000/login.admin](http://localhost:3000/login.admin)
 
@@ -115,7 +101,8 @@ Portal ini dirancang untuk menyajikan informasi publik seputar kepemudaan, olahr
 > Mengakses langsung `http://localhost:3000/admin` tanpa sesi login yang sah akan menghasilkan tampilan **404 Not Found**. Anda wajib masuk secara manual melalui halaman `/login.admin`.
 
 ### 🔑 Mengelola Kredensial Admin
-Secara default, akun admin dibuat saat proses *seed* awal menggunakan nilai dari file `.env`. Jika ingin mengubahnya, lakukan langsung melalui database (phpMyAdmin, DBeaver, MySQL CLI, atau sejenisnya).* **Tabel**: `user`
+Secara default, akun admin dibuat saat proses *seed* awal menggunakan nilai dari file `.env`. Jika ingin mengubahnya, lakukan langsung melalui database (phpMyAdmin, DBeaver, MySQL CLI, atau sejenisnya).
+* **Tabel**: `user`
 * **Jenis Akun**:
   * `SUPER_ADMIN` → Super Admin
   * `ADMIN` → Admin
@@ -128,36 +115,44 @@ Secara default, akun admin dibuat saat proses *seed* awal menggunakan nilai dari
 
 ## 🐳 Panduan Menjalankan Project dengan Docker (Rekomendasi Produksi)
 
-Aplikasi ini sudah dilengkapi dengan konfigurasi Docker multi-stage (standalone build) dan Docker Compose untuk efisiensi performa dan kemudahan deployment.
+Aplikasi ini sudah dilengkapi dengan konfigurasi Docker multi-stage (*standalone build*) dan Docker Compose untuk efisiensi performa, persistensi data, dan kemudahan deployment.
 
 ### 📋 Prasyarat
 * **Docker** & **Docker Compose** terpasang di sistem Anda.
 
 ### 🛠️ Langkah Menjalankan
 
-1. **Jalankan Container Stack**
-   Jalankan perintah berikut untuk mengompilasi Next.js standalone build dan menyalakan server MySQL serta aplikasi:
+1. **Konfigurasi Environment Berkas `.env`**
+   Pastikan berkas `.env` sudah dikonfigurasi dengan `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, serta variabel kredensial admin default.
+
+2. **Jalankan Container Stack**
+   Jalankan perintah berikut untuk mengompilasi Next.js *standalone build* dan menyalakan container MySQL serta aplikasi web:
    ```bash
    docker compose up -d --build
    ```
 
-2. **Migrasi Database Otomatis**
+3. **Migrasi Database Otomatis**
    Container aplikasi (`web`) akan mendeteksi database MySQL (`db`), menunggu hingga port 3306 siap menerima koneksi, lalu menjalankan perintah `npx prisma migrate deploy` secara otomatis sebelum server web dimulai.
 
-3. **Seeding Data Awal (Dummy Data)**
-   Karena container menggunakan *standalone build* minimal tanpa modul pengembangan (`tsx`/`typescript`), jalankan perintah seeding dari komputer host lokal Anda:
+4. **Seeding Data Awal (Dummy Data)**
+   Untuk mengisi data awal database saat pertama kali dijalankan di Docker:
    ```bash
-   # Pastikan DATABASE_URL di berkas .env mengarah ke port Docker (contoh: mysql://root:root_password@localhost:3306/prototype_disporapar)
-   npx prisma db seed
+   # Pastikan DATABASE_URL di berkas .env mengarah ke localhost (contoh: mysql://root:root_password@localhost:3306/prototype_disporapar)
+   npm run seed
    ```
 
-4. **Memantau Aktivitas & Log**
+5. **Persistensi Data Berkas & Database**
+   Konfigurasi [docker-compose.yml](./docker-compose.yml) menggunakan dua Docker Named Volume:
+   * `mysql_data`: Menyimpan seluruh data database MySQL agar tidak hilang saat container restart.
+   * `uploads_data`: Menyimpan seluruh berkas gambar dan dokumen yang diunggah admin (`public/uploads`) agar tetap tersimpan aman.
+
+6. **Memantau Aktivitas & Log**
    Untuk memantau logs startup aplikasi dan proses migrasi secara real-time:
    ```bash
    docker compose logs -f
    ```
 
-5. **Menghentikan Kontainer**
+7. **Menghentikan Kontainer**
    ```bash
    docker compose down
    ```

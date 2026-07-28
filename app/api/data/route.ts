@@ -13,7 +13,7 @@ const OFFICE_INFO = dbData.officeInfo as unknown as OfficeInfo;
 const WELCOME_MESSAGE = dbData.welcomeMessage as unknown as WelcomeMessage;
 const INITIAL_HOMEPAGE_SETTINGS = dbData.homepageSettings as unknown as HomepageSettings;
 
-export const revalidate = 20;
+export const revalidate = 0;
 
 // Helper function to delete local files in public/uploads/
 function deleteLocalFile(fileUrl: string) {

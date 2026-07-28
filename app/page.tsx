@@ -2,7 +2,7 @@ import { prisma, checkDatabaseConnection } from '@/lib/prisma';
 import HomePageClient from './page.client';
 import dbData from '@/lib/db.json';
 
-export const revalidate = 20;
+export const revalidate = 0;
 
 const getFallbackData = () => ({
   news: (dbData.news || []).map((item: any) => ({

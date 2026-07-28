@@ -99,7 +99,7 @@ export default function AdminDashboard() {
   const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-  const getMonthIndex = (dateStr?: string): number => {
+  const getMonthIndex = React.useCallback((dateStr?: string): number => {
     if (!dateStr) return -1;
     const lower = dateStr.toLowerCase();
     if (lower.includes('januari') || lower.includes('jan')) return 0;
@@ -115,10 +115,10 @@ export default function AdminDashboard() {
     if (lower.includes('november') || lower.includes('nov')) return 10;
     if (lower.includes('desember') || lower.includes('des')) return 11;
     return -1;
-  };
+  }, []);
 
   // Helper to extract month index (0-11) and year from items
-  const getItemMonthAndYear = (item: any): { month: number; year: number } => {
+  const getItemMonthAndYear = React.useCallback((item: any): { month: number; year: number } => {
     // 1. Try parsing from item.date (e.g. "24 Mei 2026")
     if (item.date) {
       const m = getMonthIndex(item.date);
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
 
     // Fallback default
     return { month: new Date().getMonth(), year: new Date().getFullYear() };
-  };
+  }, [getMonthIndex]);
 
   // Get all unique years from publications (news, events, gallery)
   const availableYears = React.useMemo(() => {
@@ -187,7 +187,7 @@ export default function AdminDashboard() {
 
     const sortedYears = Array.from(yearsSet).sort((a, b) => b - a);
     return sortedYears.length > 0 ? sortedYears : [new Date().getFullYear()];
-  }, [news, events, gallery]);
+  }, [news, events, gallery, getItemMonthAndYear]);
 
   // Sync selectedYear if the active year gets deleted
   useEffect(() => {

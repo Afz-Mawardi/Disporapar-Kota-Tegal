@@ -238,7 +238,7 @@ export default function HomePageClient({
   };
 
   // Sort homepage events from newest to oldest and limit to max 4
-  const homepageEvents = [...eventsList]
+  const homepageEvents = useMemo(() => [...eventsList]
     .filter(event => event.showOnHomepage !== false)
     .sort((a, b) => {
       try {
@@ -247,7 +247,7 @@ export default function HomePageClient({
         return 0;
       }
     })
-    .slice(0, 4);
+    .slice(0, 4), [eventsList]);
 
   const staticContent = useMemo(() => (
     <>
@@ -1088,7 +1088,7 @@ export default function HomePageClient({
 
 
     </>
-  ), [newsList, eventsList, galleryPhotos, publicServices, homepageSettings, priorityPrograms, todayWIB, selectedPhoto, activeNewsDetail, isGalleryPaused]);
+  ), [newsList, homepageEvents, galleryPhotos, publicServices, homepageSettings, priorityPrograms, todayWIB, selectedPhoto, activeNewsDetail, isGalleryPaused]);
 
   return (
     <div className="w-full min-h-screen bg-[#F8FAFC] selection:bg-primary selection:text-white font-sans overflow-x-hidden">

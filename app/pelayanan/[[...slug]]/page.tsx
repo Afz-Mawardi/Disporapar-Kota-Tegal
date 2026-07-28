@@ -2,7 +2,7 @@ import { prisma, checkDatabaseConnection } from '@/lib/prisma';
 import PelayananPageClient from './page.client';
 import dbData from '@/lib/db.json';
 
-export const revalidate = 20;
+export const revalidate = 0;
 
 export default async function Page() {
   let services: any[] = [];

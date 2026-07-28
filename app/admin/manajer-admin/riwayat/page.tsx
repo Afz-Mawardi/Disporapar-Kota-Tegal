@@ -312,7 +312,7 @@ export default function RiwayatAdminPage() {
             </span>
           </div>
           <div className="text-xs sm:text-sm font-semibold text-[#0E3B66]">
-            "{docName}"
+            &quot;{docName}&quot;
           </div>
           {details && details.trim() && (
             <div className="text-[10px] font-mono text-slate-400 mt-0.5 leading-relaxed">
